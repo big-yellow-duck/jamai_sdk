@@ -356,6 +356,19 @@ class ColumnSchema {
     this.genConfig,
   });
 
+  factory ColumnSchema.fromJson(Map<String, dynamic> json) {
+    return ColumnSchema(
+      id: json['id'] as String? ?? '',
+      dtype: ColumnSchemaDtype.values.firstWhere(
+        (e) => e.value == json['dtype'],
+        orElse: () => ColumnSchemaDtype.str,
+      ),
+      vlen: json['vlen'] as int? ?? 0,
+      index: json['index'] as bool? ?? true,
+      genConfig: json['gen_config'],
+    );
+  }
+
   /// Creates a copy with updated fields
   ColumnSchema copyWith({
     String? id,
@@ -612,6 +625,25 @@ class TableMetaResponse extends TableMeta {
     this.indexedAtVec,
     this.indexedAtSca,
   }) : super(cols: cols.where((c) => !c.id.endsWith('_')).toList());
+
+  factory TableMetaResponse.fromJson(Map<String, dynamic> json) {
+    return TableMetaResponse(
+      id: json['id'] as String? ?? '',
+      meta: json['meta'] as Map<String, dynamic>?,
+      cols: (json['cols'] as List<dynamic>?)
+          ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
+          .toList() ?? [],
+      parentId: json['parent_id'] as String?,
+      title: json['title'] as String? ?? '',
+      createdBy: json['created_by'] as String?,
+      updatedAt: DatetimeUTC.parse(json['updated_at'] as String? ?? ''),
+      numRows: json['num_rows'] as int? ?? -1,
+      version: json['version'] as String? ?? '',
+      indexedAtFts: json['indexed_at_fts'] as String?,
+      indexedAtVec: json['indexed_at_vec'] as String?,
+      indexedAtSca: json['indexed_at_sca'] as String?,
+    );
+  }
 
   @override
   TableMetaResponse copyWith({

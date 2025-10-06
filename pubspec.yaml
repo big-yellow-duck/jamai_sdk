@@ -1,7 +1,6 @@
 name: jamai_sdk
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
 
 environment:
   sdk: ^3.9.2
@@ -12,10 +11,12 @@ dependencies:
     sdk: flutter
   meta: ^1.16.0
   http: ^1.2.1
+  uuid: ^4.4.0
   sealed_countries: ^2.6.0
   sealed_languages: ^2.3.0
   sealed_currencies: ^2.3.0
   timezone: ^0.10.1
+  dotenv: ^4.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -26,7 +27,6 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-flutter:
 
   # To add assets to your package, add an assets section, like this:
   # assets:

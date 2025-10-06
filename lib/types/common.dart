@@ -1,5 +1,6 @@
 
 import 'package:sealed_countries/sealed_countries.dart';
+import 'package:uuid/uuid.dart';
 
 /// Represents the allowed attributes for sorting.
 enum OrderBy {
@@ -366,3 +367,6 @@ typedef JSONInput = dynamic;
 typedef JSONInputBin = dynamic;
 typedef YAMLOutput = dynamic;
 typedef YAMLInput = dynamic;
+
+/// Generates a UUID v7 string
+String uuid7Str() => const Uuid().v7();

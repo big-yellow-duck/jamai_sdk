@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:jamai_sdk/types/db.dart';
 
 /// Project-related API operations
 class Project {
@@ -13,30 +14,19 @@ class Project {
   /// It requires organization.ADMIN permissions.
   ///
   /// [projectId] - The ID for the new project
-  /// [organizationId] - The ID of the organization to create the project under
-  /// [name] - The name of the new project (required, max length 255)
-  /// [meta] - Optional metadata for the project
-  /// [quotas] - Optional quotas to allot to this project
+  /// [body] - The project creation data
   ///
-  /// Returns a Map containing the created project details
+  /// Returns the created project details
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> create({
+  Future<ProjectRead> create({
     required String projectId,
-    required String organizationId,
-    required String name,
-    Map<String, dynamic>? meta,
-    Map<String, dynamic>? quotas,
+    required ProjectCreate body,
   }) async {
     final url = Uri.parse(
-      '$apiUrl/projects',
+      '$apiUrl/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
-    final requestBody = json.encode({
-      'name': name,
-      'organization_id': organizationId,
-      if (meta != null) 'meta': meta,
-      if (quotas != null) 'quotas': quotas,
-    });
+    final requestBody = json.encode(body.toJson());
 
     final response = await http.post(
       url,
@@ -48,7 +38,8 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return ProjectRead.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to create project: ${response.statusCode} - ${response.body}',
@@ -64,11 +55,11 @@ class Project {
   ///
   /// [projectId] - The ID of the project to retrieve
   ///
-  /// Returns a Map containing the detailed project information
+  /// Returns the detailed project information
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> get({required String projectId}) async {
+  Future<ProjectRead> get({required String projectId}) async {
     final url = Uri.parse(
-      '$apiUrl/projects',
+      '$apiUrl/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
     final response = await http.get(
@@ -80,7 +71,20 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return ProjectRead(
+        id: jsonResponse['id'] ?? '',
+        name: jsonResponse['name'] ?? '',
+        meta: jsonResponse['meta'] ?? const {},
+        quotas: jsonResponse['quotas'],
+        organizationId: jsonResponse['organization_id'] ?? '',
+        createdBy: jsonResponse['created_by'] ?? '',
+        owner: jsonResponse['owner'] ?? '',
+        createdAt: DateTime.parse(jsonResponse['created_at'] ?? ''),
+        updatedAt: DateTime.parse(jsonResponse['updated_at'] ?? ''),
+        organization: null, // Assume not populated
+        chatAgents: null,
+      );
     } else {
       throw Exception(
         'Failed to get project: ${response.statusCode} - ${response.body}',
@@ -94,27 +98,19 @@ class Project {
   /// It requires organization.ADMIN or project.ADMIN permissions.
   ///
   /// [projectId] - The ID of the project to update
-  /// [name] - Optional new name for the project (max length 255)
-  /// [meta] - Optional metadata to update for the project
-  /// [quotas] - Optional quotas to update for this project
+  /// [body] - The project update data
   ///
-  /// Returns a Map containing the updated project details
+  /// Returns the updated project details
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> update({
+  Future<ProjectRead> update({
     required String projectId,
-    String? name,
-    Map<String, dynamic>? meta,
-    Map<String, dynamic>? quotas,
+    required ProjectUpdate body,
   }) async {
     final url = Uri.parse(
-      '$apiUrl/projects',
+      '$apiUrl/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
-    final requestBody = json.encode({
-      if (name != null) 'name': name,
-      if (meta != null) 'meta': meta,
-      if (quotas != null) 'quotas': quotas,
-    });
+    final requestBody = json.encode(body.toJson());
 
     final response = await http.patch(
       url,
@@ -126,7 +122,20 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return ProjectRead(
+        id: jsonResponse['id'] ?? '',
+        name: jsonResponse['name'] ?? '',
+        meta: jsonResponse['meta'] ?? const {},
+        quotas: jsonResponse['quotas'],
+        organizationId: jsonResponse['organization_id'] ?? '',
+        createdBy: jsonResponse['created_by'] ?? '',
+        owner: jsonResponse['owner'] ?? '',
+        createdAt: DateTime.parse(jsonResponse['created_at'] ?? ''),
+        updatedAt: DateTime.parse(jsonResponse['updated_at'] ?? ''),
+        organization: null,
+        chatAgents: null,
+      );
     } else {
       throw Exception(
         'Failed to update project: ${response.statusCode} - ${response.body}',

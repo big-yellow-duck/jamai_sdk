@@ -15,6 +15,16 @@ class ModelInfoListResponse {
     return "${prefix}_${x.name}";
   }
 
+  factory ModelInfoListResponse.fromJson(Map<String, dynamic> json) {
+    return ModelInfoListResponse(
+      object: json['object'] ?? "models.info",
+      data: (json['data'] as List<dynamic>?)
+          ?.map((item) => ModelInfoRead.fromJson(item as Map<String, dynamic>))
+          .toList() ??
+          [],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'object': object,

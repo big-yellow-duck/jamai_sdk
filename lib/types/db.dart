@@ -1,12 +1,15 @@
-
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/gen_tables.dart';
 import 'package:sealed_currencies/sealed_currencies.dart';
-import 'package:timezone/timezone.dart';
 
 /// Base model mixin for database models
 mixin BaseModelMixin {
   Map<String, dynamic> get meta => {};
+
+  /// Create a meta field from JSON
+  static Map<String, dynamic> _metaFromJson(Map<String, dynamic> json) {
+    return json['meta'] as Map<String, dynamic>? ?? {};
+  }
 }
 
 /// Table base mixin
@@ -44,6 +47,11 @@ mixin TableBaseMixin {
         return [];
     }
   }
+
+  /// Parse datetime fields from JSON
+  static DatetimeUTC _parseDateTime(String? dateTimeStr) {
+    return DatetimeUTC.parse(dateTimeStr ?? '');
+  }
 }
 
 /// Price tier model
@@ -51,30 +59,25 @@ class PriceTier {
   final double unitCost;
   final double? upTo;
 
-  const PriceTier({
-    required this.unitCost,
-    this.upTo,
-  });
+  const PriceTier({required this.unitCost, this.upTo});
 
   factory PriceTier.nullTier() {
-    return const PriceTier(
-      unitCost: 0.0,
-      upTo: 0.0,
-    );
+    return const PriceTier(unitCost: 0.0, upTo: 0.0);
   }
 
   factory PriceTier.unlimited({double unitCost = 0.0}) {
+    return PriceTier(unitCost: unitCost, upTo: null);
+  }
+
+  factory PriceTier.fromJson(Map<String, dynamic> json) {
     return PriceTier(
-      unitCost: unitCost,
-      upTo: null,
+      unitCost: (json['unit_cost'] as num?)?.toDouble() ?? 0.0,
+      upTo: (json['up_to'] as num?)?.toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'unit_cost': unitCost,
-      'up_to': upTo,
-    };
+    return {'unit_cost': unitCost, 'up_to': upTo};
   }
 }
 
@@ -92,7 +95,6 @@ class Product {
     required this.unit,
   });
 
-
   factory Product.nullProduct(String name, String unit) {
     return Product(
       name: name,
@@ -108,6 +110,21 @@ class Product {
       included: PriceTier.unlimited(unitCost: unitCost),
       tiers: [],
       unit: unit,
+    );
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      name: json['name'] as String? ?? '',
+      included: PriceTier.fromJson(
+        json['included'] as Map<String, dynamic>? ?? {},
+      ),
+      tiers:
+          (json['tiers'] as List<dynamic>?)
+              ?.map((t) => PriceTier.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
+      unit: json['unit'] as String? ?? '',
     );
   }
 
@@ -142,8 +159,14 @@ class Products {
   factory Products.nullProducts() {
     return Products(
       llmTokens: Product.nullProduct("LLM tokens", "Million Tokens"),
-      embeddingTokens: Product.nullProduct("Embedding tokens", "Million Tokens"),
-      rerankerSearches: Product.nullProduct("Reranker searches", "Thousand Searches"),
+      embeddingTokens: Product.nullProduct(
+        "Embedding tokens",
+        "Million Tokens",
+      ),
+      rerankerSearches: Product.nullProduct(
+        "Reranker searches",
+        "Thousand Searches",
+      ),
       dbStorage: Product.nullProduct("Database storage", "GiB"),
       fileStorage: Product.nullProduct("File storage", "GiB"),
       egress: Product.nullProduct("Egress bandwidth", "GiB"),
@@ -152,12 +175,49 @@ class Products {
 
   factory Products.unlimited({double unitCost = 0.0}) {
     return Products(
-      llmTokens: Product.unlimited("LLM tokens", "Million Tokens", unitCost: unitCost),
-      embeddingTokens: Product.unlimited("Embedding tokens", "Million Tokens", unitCost: unitCost),
-      rerankerSearches: Product.unlimited("Reranker searches", "Thousand Searches", unitCost: unitCost),
-      dbStorage: Product.unlimited("Database storage", "GiB", unitCost: unitCost),
+      llmTokens: Product.unlimited(
+        "LLM tokens",
+        "Million Tokens",
+        unitCost: unitCost,
+      ),
+      embeddingTokens: Product.unlimited(
+        "Embedding tokens",
+        "Million Tokens",
+        unitCost: unitCost,
+      ),
+      rerankerSearches: Product.unlimited(
+        "Reranker searches",
+        "Thousand Searches",
+        unitCost: unitCost,
+      ),
+      dbStorage: Product.unlimited(
+        "Database storage",
+        "GiB",
+        unitCost: unitCost,
+      ),
       fileStorage: Product.unlimited("File storage", "GiB", unitCost: unitCost),
       egress: Product.unlimited("Egress bandwidth", "GiB", unitCost: unitCost),
+    );
+  }
+
+  factory Products.fromJson(Map<String, dynamic> json) {
+    return Products(
+      llmTokens: Product.fromJson(
+        json['llm_tokens'] as Map<String, dynamic>? ?? {},
+      ),
+      embeddingTokens: Product.fromJson(
+        json['embedding_tokens'] as Map<String, dynamic>? ?? {},
+      ),
+      rerankerSearches: Product.fromJson(
+        json['reranker_searches'] as Map<String, dynamic>? ?? {},
+      ),
+      dbStorage: Product.fromJson(
+        json['db_storage'] as Map<String, dynamic>? ?? {},
+      ),
+      fileStorage: Product.fromJson(
+        json['file_storage'] as Map<String, dynamic>? ?? {},
+      ),
+      egress: Product.fromJson(json['egress'] as Map<String, dynamic>? ?? {}),
     );
   }
 
@@ -230,7 +290,9 @@ enum ProductType {
   }
 
   static List<ProductType> excludeCredits() {
-    return ProductType.values.where((p) => !p.value.startsWith("credit")).toList();
+    return ProductType.values
+        .where((p) => !p.value.startsWith("credit"))
+        .toList();
   }
 }
 
@@ -255,6 +317,22 @@ class PricePlanUpdate with BaseModelMixin {
     Products? products,
     this.allowedOrgs = const [],
   }) : products = products ?? Products.nullProducts();
+
+  factory PricePlanUpdate.fromJson(Map<String, dynamic> json) {
+    return PricePlanUpdate(
+      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
+      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
+      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
+      maxUsers: json['max_users'] as int?,
+      products: json['products'] != null
+          ? Products.fromJson(json['products'] as Map<String, dynamic>)
+          : Products.nullProducts(),
+      allowedOrgs:
+          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
+    );
+  }
 
   factory PricePlanUpdate.free({
     String stripePriceIdLive = "price_123",
@@ -340,12 +418,27 @@ class PricePlanCreate extends PricePlanUpdate {
     Map<String, dynamic> meta = const {},
   });
 
+  factory PricePlanCreate.fromJson(Map<String, dynamic> json) {
+    return PricePlanCreate(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
+      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
+      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
+      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
+      maxUsers: json['max_users'] as int?,
+      products: json['products'] != null
+          ? Products.fromJson(json['products'] as Map<String, dynamic>)
+          : Products.nullProducts(),
+      allowedOrgs:
+          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
+      meta: BaseModelMixin._metaFromJson(json),
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-    };
+    return {...super.toJson(), 'id': id};
   }
 }
 
@@ -375,6 +468,28 @@ class PricePlan extends PricePlanCreate with TableBaseMixin {
     required this.updatedAt,
   });
 
+  factory PricePlan.fromJson(Map<String, dynamic> json) {
+    return PricePlan(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
+      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
+      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
+      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
+      maxUsers: json['max_users'] as int?,
+      products: json['products'] != null
+          ? Products.fromJson(json['products'] as Map<String, dynamic>)
+          : Products.nullProducts(),
+      allowedOrgs:
+          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
+      meta: BaseModelMixin._metaFromJson(json),
+      isPrivate: json['is_private'] as bool? ?? false,
+      stripePriceId: json['stripe_price_id'] as String? ?? '',
+      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
+      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -403,6 +518,28 @@ class PricePlanRead extends PricePlan {
     required super.createdAt,
     required super.updatedAt,
   });
+
+  factory PricePlanRead.fromJson(Map<String, dynamic> json) {
+    return PricePlanRead(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
+      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
+      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
+      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
+      maxUsers: json['max_users'] as int?,
+      products: json['products'] != null
+          ? Products.fromJson(json['products'] as Map<String, dynamic>)
+          : Products.nullProducts(),
+      allowedOrgs:
+          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
+      meta: BaseModelMixin._metaFromJson(json),
+      isPrivate: json['is_private'] as bool? ?? false,
+      stripePriceId: json['stripe_price_id'] as String? ?? '',
+      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
+      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
+    );
+  }
 }
 
 /// On-prem provider enum
@@ -416,7 +553,8 @@ enum OnPremProvider {
   const OnPremProvider(this.value);
   final String value;
 
-  static List<String> list() => OnPremProvider.values.map((e) => e.value).toList();
+  static List<String> list() =>
+      OnPremProvider.values.map((e) => e.value).toList();
 }
 
 /// Cloud provider enum
@@ -445,7 +583,8 @@ enum CloudProvider {
   const CloudProvider(this.value);
   final String value;
 
-  static List<String> list() => CloudProvider.values.map((e) => e.value).toList();
+  static List<String> list() =>
+      CloudProvider.values.map((e) => e.value).toList();
 }
 
 /// Model provider enum
@@ -460,7 +599,8 @@ enum ModelProvider {
   const ModelProvider(this.value);
   final String value;
 
-  static List<String> list() => ModelProvider.values.map((e) => e.value).toList();
+  static List<String> list() =>
+      ModelProvider.values.map((e) => e.value).toList();
 }
 
 /// Deployment status enum
@@ -522,10 +662,7 @@ class DeploymentCreate extends DeploymentUpdate {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'model_id': modelId,
-    };
+    return {...super.toJson(), 'model_id': modelId};
   }
 }
 
@@ -553,10 +690,7 @@ class Deployment extends DeploymentCreate with TableBaseMixin {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-    };
+    return {...super.toJson(), 'id': id};
   }
 }
 
@@ -584,11 +718,7 @@ class DeploymentRead extends Deployment {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'model': model.toJson(),
-      'status': status,
-    };
+    return {...super.toJson(), 'model': model.toJson(), 'status': status};
   }
 }
 
@@ -663,7 +793,9 @@ class ModelInfo with BaseModelMixin {
 
   void validateId() {
     if (id.split("/").length < 2) {
-      throw ArgumentError("Model `id` must follow the format: `{provider}/{model_id}`.");
+      throw ArgumentError(
+        "Model `id` must follow the format: `{provider}/{model_id}`.",
+      );
     }
   }
 }
@@ -687,6 +819,34 @@ class ModelInfoRead extends ModelInfo with TableBaseMixin {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory ModelInfoRead.fromJson(Map<String, dynamic> json) {
+    return ModelInfoRead(
+      id: json['id'] ?? '',
+      type: ModelType.values.firstWhere(
+        (e) => e.value == json['type'],
+        orElse: () => ModelType.llm,
+      ),
+      name: json['name'] ?? '',
+      ownedBy: json['owned_by'] ?? '',
+      capabilities:
+          (json['capabilities'] as List<dynamic>?)
+              ?.map(
+                (c) => ModelCapability.values.firstWhere(
+                  (e) => e.value == c,
+                  orElse: () => ModelCapability.completion,
+                ),
+              )
+              .toList() ??
+          [],
+      contextLength: json['context_length'] ?? 4096,
+      languages:
+          (json['languages'] as List<dynamic>?)?.cast<String>() ?? const ["en"],
+      maxOutputTokens: json['max_output_tokens'],
+      createdAt: DatetimeUTC.parse(json['created_at'] ?? ''),
+      updatedAt: DatetimeUTC.parse(json['updated_at'] ?? ''),
+    );
+  }
 }
 
 /// Model config update model
@@ -728,11 +888,12 @@ class ModelConfigUpdate extends ModelInfo {
   int get finalEmbeddingSize {
     final embedSize = embeddingDimensions ?? embeddingSize;
     if (embedSize == null) {
-      throw ArgumentError('Both `embedding_dimensions` and `embedding_size` are null for embedding model "$id".');
+      throw ArgumentError(
+        'Both `embedding_dimensions` and `embedding_size` are null for embedding model "$id".',
+      );
     }
     return embedSize;
   }
-
 
   @override
   Map<String, dynamic> toJson() {
@@ -881,16 +1042,10 @@ class OrgMemberUpdate with BaseModelMixin {
   final Map<String, dynamic> meta;
   final Role role;
 
-  const OrgMemberUpdate({
-    required this.role,
-    this.meta = const {},
-  });
+  const OrgMemberUpdate({required this.role, this.meta = const {}});
 
   Map<String, dynamic> toJson() {
-    return {
-      'role': role.value,
-      'meta': meta,
-    };
+    return {'role': role.value, 'meta': meta};
   }
 }
 
@@ -956,16 +1111,10 @@ class ProjectMemberUpdate with BaseModelMixin {
   final Map<String, dynamic> meta;
   final Role role;
 
-  const ProjectMemberUpdate({
-    required this.role,
-    this.meta = const {},
-  });
+  const ProjectMemberUpdate({required this.role, this.meta = const {}});
 
   Map<String, dynamic> toJson() {
-    return {
-      'role': role.value,
-      'meta': meta,
-    };
+    return {'role': role.value, 'meta': meta};
   }
 }
 
@@ -983,11 +1132,7 @@ class ProjectMemberCreate extends ProjectMemberUpdate {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'user_id': userId,
-      'project_id': projectId,
-    };
+    return {...super.toJson(), 'user_id': userId, 'project_id': projectId};
   }
 }
 
@@ -1108,10 +1253,7 @@ class UserUpdate extends UserBase {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'password': password,
-    };
+    return {...super.toJson(), 'password': password};
   }
 }
 
@@ -1141,10 +1283,7 @@ class UserCreate extends UserUpdate {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-    };
+    return {...super.toJson(), 'id': id};
   }
 }
 
@@ -1361,7 +1500,7 @@ enum PaymentState {
 class OrganizationUpdate with BaseModelMixin {
   final String name;
   final FiatCurrency currency;
-  final TimeZone? timezone;
+  final String? timezone;
   final Map<String, String> externalKeys;
 
   const OrganizationUpdate({
@@ -1370,7 +1509,6 @@ class OrganizationUpdate with BaseModelMixin {
     this.timezone,
     this.externalKeys = const {},
   });
-
 
   void validateCurrency() {
     if (currency.code != "USD") {
@@ -1467,6 +1605,65 @@ class Organization extends OrganizationCreate with TableBaseMixin {
     required this.updatedAt,
   });
 
+  factory Organization.fromJson(Map<String, dynamic> json) {
+    return Organization(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      currency: FiatCurrency.fromCode(json['currency'] as String? ?? 'USD'),
+      timezone: json['timezone'] as String?,
+      externalKeys:
+          (json['external_keys'] as Map<String, dynamic>?)
+              ?.cast<String, String>() ??
+          {},
+      createdBy: json['created_by'] as String? ?? '',
+      owner: json['owner'] as String? ?? '',
+      stripeId: json['stripe_id'] as String?,
+      pricePlanId: json['price_plan_id'] as String?,
+      paymentState: PaymentState.values.firstWhere(
+        (e) => e.value == json['payment_state'],
+        orElse: () => PaymentState.none,
+      ),
+      lastSubscriptionPaymentAt: json['last_subscription_payment_at'] != null
+          ? DatetimeUTC.parse(json['last_subscription_payment_at'] as String)
+          : null,
+      quotaResetAt: TableBaseMixin._parseDateTime(
+        json['quota_reset_at'] as String?,
+      ),
+      credit: (json['credit'] as num?)?.toDouble() ?? 0.0,
+      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
+      llmTokensQuotaMtok: (json['llm_tokens_quota_mtok'] as num?)?.toDouble(),
+      llmTokensUsageMtok:
+          (json['llm_tokens_usage_mtok'] as num?)?.toDouble() ?? 0.0,
+      embeddingTokensQuotaMtok: (json['embedding_tokens_quota_mtok'] as num?)
+          ?.toDouble(),
+      embeddingTokensUsageMtok:
+          (json['embedding_tokens_usage_mtok'] as num?)?.toDouble() ?? 0.0,
+      rerankerQuotaKsearch: (json['reranker_quota_ksearch'] as num?)
+          ?.toDouble(),
+      rerankerUsageKsearch:
+          (json['reranker_usage_ksearch'] as num?)?.toDouble() ?? 0.0,
+      dbQuotaGib: (json['db_quota_gib'] as num?)?.toDouble(),
+      dbUsageGib: (json['db_usage_gib'] as num?)?.toDouble() ?? 0.0,
+      dbUsageUpdatedAt: TableBaseMixin._parseDateTime(
+        json['db_usage_updated_at'] as String?,
+      ),
+      fileQuotaGib: (json['file_quota_gib'] as num?)?.toDouble(),
+      fileUsageGib: (json['file_usage_gib'] as num?)?.toDouble() ?? 0.0,
+      fileUsageUpdatedAt: TableBaseMixin._parseDateTime(
+        json['file_usage_updated_at'] as String?,
+      ),
+      egressQuotaGib: (json['egress_quota_gib'] as num?)?.toDouble(),
+      egressUsageGib: (json['egress_usage_gib'] as num?)?.toDouble() ?? 0.0,
+      active: json['active'] as bool? ?? false,
+      quotas:
+          (json['quotas'] as Map<String, dynamic>?)
+              ?.cast<String, Map<String, double?>>() ??
+          {},
+      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
+      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -1477,7 +1674,8 @@ class Organization extends OrganizationCreate with TableBaseMixin {
       'stripe_id': stripeId,
       'price_plan_id': pricePlanId,
       'payment_state': paymentState.value,
-      'last_subscription_payment_at': lastSubscriptionPaymentAt?.toIso8601String(),
+      'last_subscription_payment_at': lastSubscriptionPaymentAt
+          ?.toIso8601String(),
       'quota_reset_at': quotaResetAt.toIso8601String(),
       'credit': credit,
       'credit_grant': creditGrant,
@@ -1543,38 +1741,22 @@ class OrganizationRead extends Organization {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'price_plan': pricePlan?.toJson(),
-    };
+    return {...super.toJson(), 'price_plan': pricePlan?.toJson()};
   }
 }
 
 /// Project update model
 class ProjectUpdate with BaseModelMixin {
-  final String name;
-  final String description;
-  final List<String> tags;
-  final String? profilePictureUrl;
-  final String? coverPictureUrl;
+  @override
+  final Map<String, dynamic> meta;
+  final String? name;
+  final Map<String, dynamic>? quotas;
 
-  const ProjectUpdate({
-    this.name = "",
-    this.description = "",
-    this.tags = const [],
-    this.profilePictureUrl,
-    this.coverPictureUrl,
-  });
+  const ProjectUpdate({this.name, Map<String, dynamic>? meta, this.quotas})
+    : meta = meta ?? const {};
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'description': description,
-      'tags': tags,
-      'profile_picture_url': profilePictureUrl,
-      'cover_picture_url': coverPictureUrl,
-      'meta': meta,
-    };
+    return {'name': name, 'meta': meta, 'quotas': quotas};
   }
 }
 
@@ -1584,20 +1766,14 @@ class ProjectCreate extends ProjectUpdate {
 
   const ProjectCreate({
     required this.organizationId,
-    required super.name,
-    super.description,
-    super.tags,
-    super.profilePictureUrl,
-    super.coverPictureUrl,
-    Map<String, dynamic> meta = const {},
+    required String super.name,
+    Map<String, dynamic> super.meta = const {},
+    super.quotas,
   });
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'organization_id': organizationId,
-    };
+    return {...super.toJson(), 'organization_id': organizationId};
   }
 }
 
@@ -1613,12 +1789,10 @@ class Project extends ProjectCreate with TableBaseMixin {
 
   const Project({
     required this.id,
-    super.name = "",
-    super.description,
-    super.tags,
-    super.profilePictureUrl,
-    super.coverPictureUrl,
     required super.organizationId,
+    required super.name,
+    super.meta,
+    super.quotas,
     required this.createdBy,
     required this.owner,
     required this.createdAt,
@@ -1643,11 +1817,9 @@ class ProjectRead extends Project {
 
   ProjectRead({
     required super.id,
-    String name = "",
-    String description = "",
-    List<String> tags = const [],
-    String? profilePictureUrl,
-    String? coverPictureUrl,
+    required super.name,
+    super.meta,
+    super.quotas,
     required super.organizationId,
     required super.createdBy,
     required super.owner,
@@ -1656,6 +1828,30 @@ class ProjectRead extends Project {
     this.organization,
     this.chatAgents,
   });
+
+  factory ProjectRead.fromJson(Map<String, dynamic> json) {
+    return ProjectRead(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      meta: json['meta'] ?? const {},
+      quotas: json['quotas'],
+      organizationId: json['organization_id'] ?? '',
+      createdBy: json['created_by'] ?? '',
+      owner: json['owner'] ?? '',
+      createdAt: DatetimeUTC.parse(json['created_at'] ?? ''),
+      updatedAt: DatetimeUTC.parse(json['updated_at'] ?? ''),
+      organization: json['organization'] != null
+          ? Organization.fromJson(json['organization'])
+          : null,
+      chatAgents: json['chat_agents'] != null
+          ? (json['chat_agents'] as List)
+                .map(
+                  (e) => TableMetaResponse.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
+    );
+  }
 
   @override
   Map<String, dynamic> toJson() {
@@ -1681,11 +1877,7 @@ class VerificationCodeUpdate with BaseModelMixin {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'role': role,
-      'meta': meta,
-    };
+    return {'name': name, 'role': role, 'meta': meta};
   }
 }
 
@@ -1741,10 +1933,7 @@ class VerificationCode extends VerificationCodeCreate with TableBaseMixin {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-    };
+    return {...super.toJson(), 'id': id};
   }
 }
 
@@ -1769,17 +1958,10 @@ class ProjectKeyUpdate with BaseModelMixin {
   final String name;
   final DatetimeUTC? expiry;
 
-  const ProjectKeyUpdate({
-    this.name = "",
-    this.expiry,
-  });
+  const ProjectKeyUpdate({this.name = "", this.expiry});
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'expiry': expiry?.toIso8601String(),
-      'meta': meta,
-    };
+    return {'name': name, 'expiry': expiry?.toIso8601String(), 'meta': meta};
   }
 }
 
@@ -1787,18 +1969,11 @@ class ProjectKeyUpdate with BaseModelMixin {
 class ProjectKeyCreate extends ProjectKeyUpdate {
   final String? projectId;
 
-  const ProjectKeyCreate({
-    required super.name,
-    super.expiry,
-    this.projectId,
-  });
+  const ProjectKeyCreate({required super.name, super.expiry, this.projectId});
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'project_id': projectId,
-    };
+    return {...super.toJson(), 'project_id': projectId};
   }
 }
 
@@ -1823,11 +1998,7 @@ class ProjectKey extends ProjectKeyCreate with TableBaseMixin {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-      'user_id': userId,
-    };
+    return {...super.toJson(), 'id': id, 'user_id': userId};
   }
 }
 

@@ -1,5 +1,9 @@
+import 'package:jamai_sdk/components/file.dart';
 import 'package:jamai_sdk/components/generative_table.dart';
+import 'package:jamai_sdk/components/mcp.dart';
 import 'package:jamai_sdk/components/project.dart';
+import 'package:jamai_sdk/components/serving.dart';
+import 'package:jamai_sdk/components/tasks.dart';
 import 'package:jamai_sdk/components/templates.dart';
 /// Lightweight API client used across utility modules
 class JamaiApiClient {
@@ -20,4 +24,15 @@ class JamaiApiClient {
   Templates get templates => Templates(apiUrl: baseUrl, apiKey: apiKey);
 
   GenerativeTable get generativeTable => GenerativeTable(apiUrl: baseUrl, apiKey: apiKey);
+
+  Serving get serving => Serving(apiUrl: baseUrl, apiKey: apiKey);
+
+  /// Provides scoped file operations configured with this client's credentials
+  File get file => File(apiUrl: baseUrl, apiKey: apiKey);
+
+  /// Provides scoped task operations configured with this client's credentials
+  Tasks get tasks => Tasks(apiUrl: baseUrl, apiKey: apiKey);
+
+  /// Provides scoped MCP operations configured with this client's credentials
+  MCP get mcp => MCP(apiUrl: baseUrl, apiKey: apiKey);
 }
