@@ -252,8 +252,9 @@ class Templates {
     }
     if (columns != null) queryParams['columns'] = columns;
     if (where != null) queryParams['where'] = where;
-    if (searchQuery != null)
+    if (searchQuery != null) {
       queryParams['search_query'] = searchQuery.toString();
+    }
     if (searchColumns != null) queryParams['search_columns'] = searchColumns;
     if (floatDecimals != null) queryParams['float_decimals'] = floatDecimals;
     if (vecDecimals != null) queryParams['vec_decimals'] = vecDecimals;

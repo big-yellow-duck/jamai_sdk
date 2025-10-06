@@ -757,11 +757,11 @@ class ModelConfigUpdate extends ModelInfo {
 class ModelConfigCreate extends ModelConfigUpdate {
   const ModelConfigCreate({
     required super.id,
-    required ModelType type,
-    required String name,
-    required String ownedBy,
-    required List<ModelCapability> capabilities,
-    required int contextLength,
+    required super.type,
+    required super.name,
+    required super.ownedBy,
+    required super.capabilities,
+    required super.contextLength,
     super.languages,
     super.maxOutputTokens,
     super.timeout,
@@ -775,13 +775,7 @@ class ModelConfigCreate extends ModelConfigUpdate {
     super.embeddingTransformQuery,
     super.embeddingCostPerMtoken,
     super.rerankingCostPerKsearch,
-  }) : super(
-          type: type,
-          name: name,
-          ownedBy: ownedBy,
-          capabilities: capabilities,
-          contextLength: contextLength,
-        );
+  });
 }
 
 /// Model config model
@@ -844,11 +838,11 @@ class ModelConfigRead extends ModelConfig {
     super.embeddingCostPerMtoken,
     super.rerankingCostPerKsearch,
     required super.isPrivate,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required this.deployments,
     required this.isActive,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 }
 
 /// Role enum
@@ -949,11 +943,11 @@ class OrgMemberRead extends OrgMember {
     required super.organizationId,
     required super.role,
     super.meta,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required this.user,
     required this.organization,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 }
 
 /// Project member update model
@@ -1024,11 +1018,11 @@ class ProjectMemberRead extends ProjectMember {
     required super.projectId,
     required super.role,
     super.meta,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required this.user,
     required this.project,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 }
 
 /// User base model
@@ -1242,11 +1236,11 @@ class UserAuth extends User {
     required super.preferredEmail,
     super.preferredPictureUrl,
     super.preferredUsername,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required this.orgMemberships,
     required this.projMemberships,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1287,13 +1281,13 @@ class UserRead extends UserAuth {
     required super.preferredEmail,
     super.preferredPictureUrl,
     super.preferredUsername,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required super.orgMemberships,
     required super.projMemberships,
     required this.organizations,
     required this.projects,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1331,13 +1325,13 @@ class UserReadObscured extends UserRead {
     required super.preferredEmail,
     super.preferredPictureUrl,
     super.preferredUsername,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     required super.orgMemberships,
     required super.projMemberships,
     required super.organizations,
     required super.projects,
-  }) : super(passwordHash: _obscurePasswordHash(passwordHash), createdAt: createdAt, updatedAt: updatedAt);
+  }) : super(passwordHash: _obscurePasswordHash(passwordHash));
 
   static String? _obscurePasswordHash(String? value) {
     return value != null ? "***" : null;
@@ -1398,11 +1392,11 @@ class OrganizationUpdate with BaseModelMixin {
 /// Organization create model
 class OrganizationCreate extends OrganizationUpdate {
   const OrganizationCreate({
-    required String name,
+    required super.name,
     required super.currency,
     super.timezone,
     super.externalKeys,
-  }) : super(name: name);
+  });
 }
 
 /// Organization model
@@ -1440,7 +1434,7 @@ class Organization extends OrganizationCreate with TableBaseMixin {
 
   const Organization({
     required this.id,
-    String name = "",
+    super.name = "",
     required super.currency,
     super.timezone,
     super.externalKeys,
@@ -1471,7 +1465,7 @@ class Organization extends OrganizationCreate with TableBaseMixin {
     required this.quotas,
     required this.createdAt,
     required this.updatedAt,
-  }) : super(name: name);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1542,10 +1536,10 @@ class OrganizationRead extends Organization {
     required super.egressUsageGib,
     required super.active,
     required super.quotas,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     this.pricePlan,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1590,19 +1584,13 @@ class ProjectCreate extends ProjectUpdate {
 
   const ProjectCreate({
     required this.organizationId,
-    required String name,
-    String description = "",
-    List<String> tags = const [],
-    String? profilePictureUrl,
-    String? coverPictureUrl,
+    required super.name,
+    super.description,
+    super.tags,
+    super.profilePictureUrl,
+    super.coverPictureUrl,
     Map<String, dynamic> meta = const {},
-  }) : super(
-          name: name,
-          description: description,
-          tags: tags,
-          profilePictureUrl: profilePictureUrl,
-          coverPictureUrl: coverPictureUrl,
-        );
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1625,23 +1613,17 @@ class Project extends ProjectCreate with TableBaseMixin {
 
   const Project({
     required this.id,
-    String name = "",
-    String description = "",
-    List<String> tags = const [],
-    String? profilePictureUrl,
-    String? coverPictureUrl,
+    super.name = "",
+    super.description,
+    super.tags,
+    super.profilePictureUrl,
+    super.coverPictureUrl,
     required super.organizationId,
     required this.createdBy,
     required this.owner,
     required this.createdAt,
     required this.updatedAt,
-  }) : super(
-          name: name,
-          description: description,
-          tags: tags,
-          profilePictureUrl: profilePictureUrl,
-          coverPictureUrl: coverPictureUrl,
-        );
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1669,11 +1651,11 @@ class ProjectRead extends Project {
     required super.organizationId,
     required super.createdBy,
     required super.owner,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
+    required super.createdAt,
+    required super.updatedAt,
     this.organization,
     this.chatAgents,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1777,9 +1759,9 @@ class VerificationCodeRead extends VerificationCode {
     super.organizationId,
     super.projectId,
     required super.id,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+    required super.createdAt,
+    required super.updatedAt,
+  });
 }
 
 /// Project key update model
@@ -1806,10 +1788,10 @@ class ProjectKeyCreate extends ProjectKeyUpdate {
   final String? projectId;
 
   const ProjectKeyCreate({
-    required String name,
+    required super.name,
     super.expiry,
     this.projectId,
-  }) : super(name: name);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1830,14 +1812,14 @@ class ProjectKey extends ProjectKeyCreate with TableBaseMixin {
   final DatetimeUTC updatedAt;
 
   const ProjectKey({
-    String name = "",
+    super.name = "",
     super.expiry,
     super.projectId,
     required this.id,
     required this.userId,
     required this.createdAt,
     required this.updatedAt,
-  }) : super(name: name);
+  });
 
   @override
   Map<String, dynamic> toJson() {
@@ -1857,7 +1839,7 @@ class ProjectKeyRead extends ProjectKey {
     super.projectId,
     required super.id,
     required super.userId,
-    required DatetimeUTC createdAt,
-    required DatetimeUTC updatedAt,
-  }) : super(createdAt: createdAt, updatedAt: updatedAt);
+    required super.createdAt,
+    required super.updatedAt,
+  });
 }

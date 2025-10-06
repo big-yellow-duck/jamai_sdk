@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:jamai_sdk/components/generative_table.dart';
 import 'package:jamai_sdk/components/project.dart';
 import 'package:jamai_sdk/components/templates.dart';
