@@ -7,7 +7,7 @@ void main() {
   // - project_test_simple.dart: Tests for the Project component
   
   group('Jamai SDK', () {
-    test(JamaiApiClient(apiKey: ), () {
+    test(JamaiApiClient(apiKey: 'test-api-key'), () {
       // Basic test to ensure the SDK imports correctly
       expect(true, isTrue);
     });

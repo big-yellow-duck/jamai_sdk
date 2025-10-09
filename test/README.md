@@ -47,7 +47,7 @@ cp .env.example .env
 JAMAI_API_URL=https://cloud.jamaibase.com
 JAMAI_API_KEY=your_api_key_here
 TEST_ORGANIZATION_ID=your_test_organization_id
-TEST_PROJECT_ID=your_test_project_id
+TEST_PROJECT_NAMe=your_TEST_PROJECT_NAMe
 TEST_USER_ID=your_test_user_id
 ```
 

@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jamai_sdk/types/db.dart';
+import 'package:jamai_sdk/types/common.dart';
 
 /// Project-related API operations
 class Project {
   String apiUrl;
   String apiKey;
-  Project({required this.apiUrl, required this.apiKey});
+  String? userId;
+  Project({required this.apiUrl, required this.apiKey, this.userId});
 
   /// Creates a new project under an organization
   ///
@@ -22,9 +24,7 @@ class Project {
     required String projectId,
     required ProjectCreate body,
   }) async {
-    final url = Uri.parse(
-      '$apiUrl/v2/projects',
-    ).replace(queryParameters: {'project_id': projectId});
+    final url = Uri.parse('$apiUrl/api/v2/projects');
 
     final requestBody = json.encode(body.toJson());
 
@@ -33,6 +33,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
       body: requestBody,
     );
@@ -59,7 +60,7 @@ class Project {
   /// Throws an exception if the request fails
   Future<ProjectRead> get({required String projectId}) async {
     final url = Uri.parse(
-      '$apiUrl/v2/projects',
+      '$apiUrl/api/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
     final response = await http.get(
@@ -67,24 +68,13 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ProjectRead(
-        id: jsonResponse['id'] ?? '',
-        name: jsonResponse['name'] ?? '',
-        meta: jsonResponse['meta'] ?? const {},
-        quotas: jsonResponse['quotas'],
-        organizationId: jsonResponse['organization_id'] ?? '',
-        createdBy: jsonResponse['created_by'] ?? '',
-        owner: jsonResponse['owner'] ?? '',
-        createdAt: DateTime.parse(jsonResponse['created_at'] ?? ''),
-        updatedAt: DateTime.parse(jsonResponse['updated_at'] ?? ''),
-        organization: null, // Assume not populated
-        chatAgents: null,
-      );
+      return ProjectRead.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to get project: ${response.statusCode} - ${response.body}',
@@ -107,7 +97,7 @@ class Project {
     required ProjectUpdate body,
   }) async {
     final url = Uri.parse(
-      '$apiUrl/v2/projects',
+      '$apiUrl/api/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
     final requestBody = json.encode(body.toJson());
@@ -117,25 +107,14 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
       body: requestBody,
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ProjectRead(
-        id: jsonResponse['id'] ?? '',
-        name: jsonResponse['name'] ?? '',
-        meta: jsonResponse['meta'] ?? const {},
-        quotas: jsonResponse['quotas'],
-        organizationId: jsonResponse['organization_id'] ?? '',
-        createdBy: jsonResponse['created_by'] ?? '',
-        owner: jsonResponse['owner'] ?? '',
-        createdAt: DateTime.parse(jsonResponse['created_at'] ?? ''),
-        updatedAt: DateTime.parse(jsonResponse['updated_at'] ?? ''),
-        organization: null,
-        chatAgents: null,
-      );
+      return ProjectRead.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to update project: ${response.statusCode} - ${response.body}',
@@ -152,9 +131,9 @@ class Project {
   ///
   /// Returns a Map containing the deletion result with 'ok' status and 'progress_key'
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> delete({required String projectId}) async {
+  Future<OkResponse> delete({required String projectId}) async {
     final url = Uri.parse(
-      '$apiUrl/projects',
+      '$apiUrl/api/v2/projects',
     ).replace(queryParameters: {'project_id': projectId});
 
     final response = await http.delete(
@@ -162,11 +141,13 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to delete project: ${response.statusCode} - ${response.body}',
@@ -182,29 +163,48 @@ class Project {
   ///
   /// Returns a Map containing the list of projects and pagination info
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> listProjectsByOrganization({
+  Future<Page<ProjectRead>> listProjectsByOrganization({
     required String organizationId,
     int? limit,
     int? offset,
+    String orderBy = "updated_at",
+    bool orderAscending = true,
+    String searchQuery = "",
+    bool listChatAgents = false,
   }) async {
-    final url = Uri.parse('$apiUrl/organizations/$organizationId/projects')
-        .replace(
-          queryParameters: {
-            if (limit != null) 'limit': limit.toString(),
-            if (offset != null) 'offset': offset.toString(),
-          },
-        );
+    final url = Uri.parse('$apiUrl/api/v2/projects/list').replace(
+      queryParameters: {
+        'organization_id': organizationId,
+        if (limit != null) 'limit': limit.toString(),
+        if (offset != null) 'offset': offset.toString(),
+        'order_by': orderBy,
+        'order_ascending': orderAscending.toString(),
+        'search_query': searchQuery,
+        'list_chat_agents': listChatAgents.toString(),
+      },
+    );
 
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      final items = (jsonResponse['items'] as List)
+          .map((item) => ProjectRead.fromJson(item as Map<String, dynamic>))
+          .toList();
+      return Page<ProjectRead>(
+        items: items,
+        offset: jsonResponse['offset'] as int? ?? 0,
+        limit: jsonResponse['limit'] as int? ?? 0,
+        total: jsonResponse['total'] as int? ?? 0,
+        endCursor: jsonResponse['end_cursor'] as String?,
+      );
     } else {
       throw Exception(
         'Failed to list projects by organization: ${response.statusCode} - ${response.body}',
@@ -214,18 +214,34 @@ class Project {
 
   /// Joins a project
   ///
-  /// [projectId] - The ID of the project to join
+  /// [userId] - The ID of the user joining the project (required)
+  /// [inviteCode] - (Optional) Invite code for validation
+  /// [projectId] - (Optional) Project ID. Ignored if invite code is provided
+  /// [role] - (Optional) Project role. Ignored if invite code is provided
   ///
   /// Returns a Map containing the join result
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> joinProject({required String projectId}) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/join');
+  Future<Map<String, dynamic>> joinProject({
+    required String userId,
+    String? inviteCode,
+    String? projectId,
+    Role? role,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/projects/members').replace(
+      queryParameters: {
+        'user_id': userId,
+        if (inviteCode != null) 'invite_code': inviteCode,
+        if (projectId != null) 'project_id': projectId,
+        if (role != null) 'role': role.value,
+      },
+    );
 
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (this.userId != null) 'X-USER-ID': this.userId!,
       },
     );
 
@@ -249,13 +265,16 @@ class Project {
     required String projectId,
     required String userId,
   }) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/members/$userId');
+    final url = Uri.parse(
+      '$apiUrl/api/v2/projects/members',
+    ).replace(queryParameters: {'user_id': userId, 'project_id': projectId});
 
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (this.userId != null) 'X-USER-ID': this.userId!,
       },
     );
 
@@ -269,19 +288,25 @@ class Project {
   }
 
   /// Leaves a project
-  ///
+  /// [userId] -  The ID of the user to leave
   /// [projectId] - The ID of the project to leave
   ///
   /// Returns a Map containing the leave result
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> leaveProject({required String projectId}) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/leave');
+  Future<Map<String, dynamic>> leaveProject({
+    required String userId,
+    required String projectId,
+  }) async {
+    final url = Uri.parse(
+      '$apiUrl/api/v2/projects/members',
+    ).replace(queryParameters: {'user_id': userId, 'project_id': projectId});
 
     final response = await http.delete(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (this.userId != null) 'X-USER-ID': this.userId!,
       },
     );
 
@@ -304,13 +329,24 @@ class Project {
   /// Throws an exception if the request fails
   Future<Map<String, dynamic>> listProjectMembers({
     required String projectId,
-    int? limit,
     int? offset,
+    int? limit,
+    OrderBy? orderBy,
+    bool? orderAscending,
+    String? searchQuery,
+    List<String>? searchColumns,
+    String? after,
   }) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/members').replace(
+    final url = Uri.parse('$apiUrl/api/v2/projects/members/list').replace(
       queryParameters: {
-        if (limit != null) 'limit': limit.toString(),
         if (offset != null) 'offset': offset.toString(),
+        if (limit != null) 'limit': limit.toString(),
+        if (orderBy != null) 'order_by': orderBy.toString(),
+        if (orderAscending != null) 'order_ascending': orderAscending,
+        if (searchQuery != null) 'search_query': searchQuery,
+        if (searchColumns != null) 'search_columns': searchColumns,
+        if (after != null) 'after': after,
+        'project_id': projectId,
       },
     );
 
@@ -319,6 +355,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
@@ -342,19 +379,23 @@ class Project {
   Future<Map<String, dynamic>> updateProjectMemberRole({
     required String projectId,
     required String userId,
-    required String role,
+    required Role role,
   }) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/members/$userId');
-
-    final requestBody = json.encode({'role': role});
+    final url = Uri.parse('$apiUrl/api/v2/projects/members/role').replace(
+      queryParameters: {
+        'user_id': userId,
+        'project_id': projectId,
+        'role': role.value,
+      },
+    );
 
     final response = await http.patch(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (this.userId != null) 'X-USER-ID': this.userId!,
       },
-      body: requestBody,
     );
 
     if (response.statusCode == 200) {
@@ -377,15 +418,19 @@ class Project {
     required String projectId,
     String format = 'json',
   }) async {
-    final url = Uri.parse(
-      '$apiUrl/projects/$projectId/export',
-    ).replace(queryParameters: {'format': format});
+    final url = Uri.parse('$apiUrl/api/v2/projects/export').replace(
+      queryParameters: {
+        'project_id': projectId,
+        'format': format,
+      },
+    );
 
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
@@ -412,7 +457,7 @@ class Project {
     String format = 'json',
   }) async {
     final url = Uri.parse(
-      '$apiUrl/projects/$projectId/import',
+      '$apiUrl/api/projects/$projectId/import',
     ).replace(queryParameters: {'format': format});
 
     final requestBody = importData is String
@@ -424,6 +469,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
       body: requestBody,
     );
@@ -451,7 +497,7 @@ class Project {
     String format = 'json',
   }) async {
     final url = Uri.parse(
-      '$apiUrl/projects/$projectId/import/migration',
+      '$apiUrl/api/projects/$projectId/import/migration',
     ).replace(queryParameters: {'format': format});
 
     final requestBody = migrationData is String
@@ -463,6 +509,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
       body: requestBody,
     );
@@ -490,7 +537,7 @@ class Project {
     Map<String, dynamic>? templateData,
   }) async {
     final url = Uri.parse(
-      '$apiUrl/projects/$projectId/import/template',
+      '$apiUrl/api/projects/$projectId/import/template',
     ).replace(queryParameters: {'template_id': templateId});
 
     final requestBody = templateData != null ? json.encode(templateData) : null;
@@ -500,6 +547,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
       body: requestBody,
     );
@@ -516,30 +564,42 @@ class Project {
   /// Creates a project invitation
   ///
   /// [projectId] - The ID of the project
-  /// [email] - Email address to invite
+  /// [userEmail] - Email address to invite
   /// [role] - Role to assign to the invited user
+  /// [validDays] - Code validity in days (must be > 0 and <= 7)
   ///
   /// Returns a Map containing the invitation details
   /// Throws an exception if the request fails
   Future<Map<String, dynamic>> createInvitation({
     required String projectId,
-    required String email,
-    required String role,
+    required String userEmail,
+    required Role role,
+    int validDays = 7,
   }) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/invitations');
+    // Validate validDays parameter
+    if (validDays <= 0 || validDays > 7) {
+      throw ArgumentError('validDays must be > 0 and <= 7');
+    }
 
-    final requestBody = json.encode({'email': email, 'role': role});
+    final url = Uri.parse('$apiUrl/api/v2/projects/invites').replace(
+      queryParameters: {
+        'user_email': userEmail,
+        'project_id': projectId,
+        'role': role.value,
+        'valid_days': validDays.toString(),
+      },
+    );
 
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
-      body: requestBody,
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return json.decode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception(
@@ -559,8 +619,8 @@ class Project {
     required String projectId,
     required String invitationId,
   }) async {
-    final url = Uri.parse(
-      '$apiUrl/projects/$projectId/invitations/$invitationId',
+    final url = Uri.parse('$apiUrl/api/v2/projects/invites').replace(
+      queryParameters: {'project_id': projectId, 'invite_id': invitationId},
     );
 
     final response = await http.delete(
@@ -568,6 +628,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
@@ -593,8 +654,9 @@ class Project {
     int? limit,
     int? offset,
   }) async {
-    final url = Uri.parse('$apiUrl/projects/$projectId/invitations').replace(
+    final url = Uri.parse('$apiUrl/api/v2/projects/invites/list').replace(
       queryParameters: {
+        'project_id': projectId,
         if (limit != null) 'limit': limit.toString(),
         if (offset != null) 'offset': offset.toString(),
       },
@@ -605,6 +667,7 @@ class Project {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
       },
     );
 
