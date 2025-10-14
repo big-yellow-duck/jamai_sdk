@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'lm.freezed.dart';
+part 'lm.g.dart';
+
 /// Citation pattern for references
 final RegExp citationPattern = RegExp(r'\[(@[0-9]+)[; ]*\]');
 
@@ -373,70 +378,87 @@ class References {
   }
 }
 
+// /// RAG parameters
+// class RAGParams {
+//   final String tableId;
+//   final String? rerankingModel;
+//   final String searchQuery;
+//   final int k;
+//   final bool rerank;
+//   final bool concatRerankerInput;
+//   final bool inlineCitations;
+
+//   const RAGParams({
+//     this.tableId = '',
+//     this.rerankingModel,
+//     this.searchQuery = '',
+//     this.k = 3,
+//     this.rerank = true,
+//     this.concatRerankerInput = false,
+//     this.inlineCitations = true,
+//   });
+
+//   /// Creates a copy with updated fields
+//   RAGParams copyWith({
+//     String? tableId,
+//     String? rerankingModel,
+//     String? searchQuery,
+//     int? k,
+//     bool? rerank,
+//     bool? concatRerankerInput,
+//     bool? inlineCitations,
+//   }) {
+//     return RAGParams(
+//       tableId: tableId ?? this.tableId,
+//       rerankingModel: rerankingModel ?? this.rerankingModel,
+//       searchQuery: searchQuery ?? this.searchQuery,
+//       k: k ?? this.k,
+//       rerank: rerank ?? this.rerank,
+//       concatRerankerInput: concatRerankerInput ?? this.concatRerankerInput,
+//       inlineCitations: inlineCitations ?? this.inlineCitations,
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'table_id': tableId,
+//       'reranking_model': rerankingModel,
+//       'search_query': searchQuery,
+//       'k': k,
+//       'rerank': rerank,
+//       'concat_reranker_input': concatRerankerInput,
+//       'inline_citations': inlineCitations,
+//     };
+//   }
+
+//   factory RAGParams.fromJson(Map<String, dynamic> json) {
+//     return RAGParams(
+//       tableId: json['table_id'] ?? '',
+//       rerankingModel: json['reranking_model'],
+//       searchQuery: json['search_query'] ?? '',
+//       k: json['k'] ?? 3,
+//       rerank: json['rerank'] ?? true,
+//       concatRerankerInput: json['concat_reranker_input'] ?? false,
+//       inlineCitations: json['inline_citations'] ?? true,
+//     );
+//   }
+// }
+
 /// RAG parameters
-class RAGParams {
-  final String tableId;
-  final String? rerankingModel;
-  final String searchQuery;
-  final int k;
-  final bool rerank;
-  final bool concatRerankerInput;
-  final bool inlineCitations;
-
-  const RAGParams({
-    this.tableId = '',
-    this.rerankingModel,
-    this.searchQuery = '',
-    this.k = 3,
-    this.rerank = true,
-    this.concatRerankerInput = false,
-    this.inlineCitations = true,
-  });
-
-  /// Creates a copy with updated fields
-  RAGParams copyWith({
-    String? tableId,
+@freezed
+abstract class RAGParams with _$RAGParams {
+  const factory RAGParams({
+    required String tableId,
     String? rerankingModel,
-    String? searchQuery,
-    int? k,
-    bool? rerank,
-    bool? concatRerankerInput,
-    bool? inlineCitations,
-  }) {
-    return RAGParams(
-      tableId: tableId ?? this.tableId,
-      rerankingModel: rerankingModel ?? this.rerankingModel,
-      searchQuery: searchQuery ?? this.searchQuery,
-      k: k ?? this.k,
-      rerank: rerank ?? this.rerank,
-      concatRerankerInput: concatRerankerInput ?? this.concatRerankerInput,
-      inlineCitations: inlineCitations ?? this.inlineCitations,
-    );
-  }
+    required String searchQuery,
+    @Default(3) int k,
+    @Default(true) bool rerank,
+    @Default(false) bool concatRerankerInput,
+    @Default(true) bool inlineCitations,
+  }) = _RAGParams;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'table_id': tableId,
-      'reranking_model': rerankingModel,
-      'search_query': searchQuery,
-      'k': k,
-      'rerank': rerank,
-      'concat_reranker_input': concatRerankerInput,
-      'inline_citations': inlineCitations,
-    };
-  }
-
-  factory RAGParams.fromJson(Map<String, dynamic> json) {
-    return RAGParams(
-      tableId: json['table_id'] ?? '',
-      rerankingModel: json['reranking_model'],
-      searchQuery: json['search_query'] ?? '',
-      k: json['k'] ?? 3,
-      rerank: json['rerank'] ?? true,
-      concatRerankerInput: json['concat_reranker_input'] ?? false,
-      inlineCitations: json['inline_citations'] ?? true,
-    );
-  }
+  factory RAGParams.fromJson(Map<String, Object> json) =>
+      _$RAGParamsFromJson(json);
 }
 
 /// Function call
@@ -908,60 +930,17 @@ class ToolUsageDetails {
 }
 
 /// Function parameters
-class FunctionParameters {
-  final String type;
-  final Map<String, FunctionParameter> properties;
-  final List<String> required;
-  final bool additionalProperties;
+@freezed
+abstract class FunctionParameters with _$FunctionParameters {
+  const factory FunctionParameters({
+    @Default('object') String type,
+    @Default({}) Map<String, FunctionParameter> properties,
+    @Default([]) List<String> required,
+    @Default(false) bool additionalProperties,
+  }) = _FunctionParameters;
 
-  const FunctionParameters({
-    this.type = 'object',
-    this.properties = const {},
-    this.required = const [],
-    this.additionalProperties = false,
-  });
-
-  /// Creates a copy with updated fields
-  FunctionParameters copyWith({
-    String? type,
-    Map<String, FunctionParameter>? properties,
-    List<String>? required,
-    bool? additionalProperties,
-  }) {
-    return FunctionParameters(
-      type: type ?? this.type,
-      properties: properties ?? this.properties,
-      required: required ?? this.required,
-      additionalProperties: additionalProperties ?? this.additionalProperties,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'properties': properties.map(
-        (key, value) => MapEntry(key, value.toJson()),
-      ),
-      'required': required,
-      'additionalProperties': additionalProperties,
-    };
-  }
-
-  factory FunctionParameters.fromJson(Map<String, dynamic> json) {
-    return FunctionParameters(
-      type: json['type'] ?? 'object',
-      properties:
-          (json['properties'] as Map<String, dynamic>?)?.map(
-            (key, value) => MapEntry(
-              key,
-              FunctionParameter.fromJson(value as Map<String, dynamic>),
-            ),
-          ) ??
-          {},
-      required: (json['required'] as List<dynamic>?)?.cast<String>() ?? [],
-      additionalProperties: json['additionalProperties'] ?? false,
-    );
-  }
+  factory FunctionParameters.fromJson(Map<String, Object> json) =>
+      _$FunctionParametersFromJson(json);
 }
 
 /// Tool function
@@ -1017,145 +996,65 @@ class ToolFunction {
 }
 
 /// Function tool
-class FunctionTool {
-  final ToolType type;
-  final ToolFunction function;
+@freezed
+abstract class FunctionTool with _$FunctionTool {
+  const factory FunctionTool({
+    @Default(ToolType.function) ToolType type,
+    required ToolFunction function,
+  }) = _FunctionTool;
 
-  const FunctionTool({this.type = ToolType.function, required this.function});
-
-  /// Creates a copy with updated fields
-  FunctionTool copyWith({ToolType? type, ToolFunction? function}) {
-    return FunctionTool(
-      type: type ?? this.type,
-      function: function ?? this.function,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'type': type.value, 'function': function.toJson()};
-  }
-
-  factory FunctionTool.fromJson(Map<String, dynamic> json) {
-    return FunctionTool(
-      type: ToolType.values.firstWhere(
-        (e) => e.value == json['type'],
-        orElse: () => ToolType.function,
-      ),
-      function: ToolFunction.fromJson(json['function'] as Map<String, dynamic>),
-    );
-  }
+  factory FunctionTool.fromJson(Map<String, Object> json) =>
+      _$FunctionToolFromJson(json);
 }
 
 /// Web search tool
-class WebSearchTool {
-  final ToolType type;
+@freezed
+abstract class WebSearchTool with _$WebSearchTool {
+  const factory WebSearchTool({required ToolType type}) = _WebSearchTool;
 
-  const WebSearchTool({this.type = ToolType.webSearch});
-
-  /// Creates a copy with updated fields
-  WebSearchTool copyWith({ToolType? type}) {
-    return WebSearchTool(type: type ?? this.type);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'type': type.value};
-  }
-
-  factory WebSearchTool.fromJson(Map<String, dynamic> json) {
-    return WebSearchTool(
-      type: ToolType.values.firstWhere(
-        (e) => e.value == json['type'],
-        orElse: () => ToolType.webSearch,
-      ),
-    );
-  }
+  factory WebSearchTool.fromJson(Map<String, String> json) =>
+      _$WebSearchToolFromJson(json);
 }
 
+sealed class Tool {}
+
 /// Code interpreter tool
-class CodeInterpreterTool {
-  final ToolType type;
-  final Map<String, String> container;
+@freezed
+abstract class CodeInterpreterTool extends Tool with _$CodeInterpreterTool {
+  CodeInterpreterTool._();
+  factory CodeInterpreterTool({
+    required ToolType type,
+    @Default({'type': 'auto'}) Map<String, String> container,
+  }) = _CodeIntepreterTool;
 
-  const CodeInterpreterTool({
-    this.type = ToolType.codeInterpreter,
-    this.container = const {'type': 'auto'},
-  });
-
-  /// Creates a copy with updated fields
-  CodeInterpreterTool copyWith({ToolType? type, Map<String, String>? container}) {
-    return CodeInterpreterTool(
-      type: type ?? this.type,
-      container: container ?? this.container,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'type': type.value, 'container': container};
-  }
-
-  factory CodeInterpreterTool.fromJson(Map<String, dynamic> json) {
-    return CodeInterpreterTool(
-      type: ToolType.values.firstWhere(
-        (e) => e.value == json['type'],
-        orElse: () => ToolType.codeInterpreter,
-      ),
-      container:
-          (json['container'] as Map<String, dynamic>?)
-              ?.cast<String, String>() ??
-          const {'type': 'auto'},
-    );
-  }
+  factory CodeInterpreterTool.fromJson(Map<String, String> json) =>
+      _$CodeInterpreterToolFromJson(json);
 }
 
 /// Tool types
-typedef Tool =
-    dynamic; // Union[WebSearchTool, CodeInterpreterTool, FunctionTool]
+// typedef Tool =
+// dynamic; // Union[WebSearchTool, CodeInterpreterTool, FunctionTool]
 
 /// Tool choice function
-class ToolChoiceFunction {
-  final String name;
+@freezed
+abstract class ToolChoiceFunction extends Tool with _$ToolChoiceFunction {
+  ToolChoiceFunction._();
+  const factory ToolChoiceFunction({required String name}) =
+      _ToolChoiceFunction;
 
-  const ToolChoiceFunction({required this.name});
-
-  /// Creates a copy with updated fields
-  ToolChoiceFunction copyWith({String? name}) {
-    return ToolChoiceFunction(name: name ?? this.name);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'name': name};
-  }
-
-  factory ToolChoiceFunction.fromJson(Map<String, dynamic> json) {
-    return ToolChoiceFunction(name: json['name'] ?? '');
-  }
+  factory ToolChoiceFunction.fromJson(Map<String, Object> json) =>
+      _$ToolChoiceFunctionFromJson(json);
 }
 
 /// Tool call function
-class ToolCallFunction {
-  final String arguments;
-  final String? name;
+@freezed
+abstract class ToolCallFunction extends Tool with _$ToolCallFunction {
+  ToolCallFunction._();
+  const factory ToolCallFunction({required String arguments, String? name}) =
+      _ToolCallFunction;
 
-  const ToolCallFunction({required this.arguments, this.name});
-
-  /// Creates a copy with updated fields
-  ToolCallFunction copyWith({String? arguments, String? name}) {
-    return ToolCallFunction(
-      arguments: arguments ?? this.arguments,
-      name: name ?? this.name,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'arguments': arguments, 'name': name};
-  }
-
-  factory ToolCallFunction.fromJson(Map<String, dynamic> json) {
-    return ToolCallFunction(
-      arguments: json['arguments'] ?? '',
-      name: json['name'],
-    );
-  }
+  factory ToolCallFunction.fromJson(Map<String, Object> json) =>
+      _$ToolCallFunctionFromJson(json);
 }
 
 /// Tool call
@@ -1202,7 +1101,10 @@ class ToolChoice {
   final ToolChoiceType type;
   final ToolChoiceFunction function;
 
-  const ToolChoice({this.type = ToolChoiceType.function, required this.function});
+  const ToolChoice({
+    this.type = ToolChoiceType.function,
+    required this.function,
+  });
 
   /// Creates a copy with updated fields
   ToolChoice copyWith({ToolChoiceType? type, ToolChoiceFunction? function}) {
@@ -1331,12 +1233,12 @@ class ChatRequestBase {
     return ChatRequestBase(
       model: json['model'] ?? '',
       ragParams: json['rag_params'] != null
-          ? RAGParams.fromJson(json['rag_params'] as Map<String, dynamic>)
+          ? RAGParams.fromJson(json['rag_params'])
           : null,
       tools: json['tools'] != null
           ? (json['tools'] as List<dynamic>)
-              .map((tool) => tool)
-              .toList() // dynamic
+                .map((tool) => tool)
+                .toList() // dynamic
           : null,
       toolChoice: json['tool_choice'],
       temperature: (json['temperature'] ?? 0.2).toDouble(),
@@ -1369,6 +1271,148 @@ class ChatRequestBase {
       ..remove('rag_params');
   }
 }
+
+/// Chat request base
+// @freezed
+// abstract class ChatRequestBase with _$ChatRequestBase {
+//   final String model;
+//   final RAGParams? ragParams;
+//   final List<Tool>? tools;
+//   final dynamic toolChoice; // ToolChoiceType | ToolChoice | null
+//   final double temperature;
+//   final double topP;
+//   final bool stream;
+//   final int maxTokens;
+//   final List<String>? stop;
+//   final double presencePenalty;
+//   final double frequencyPenalty;
+//   final Map<String, dynamic> logitBias;
+//   final int? thinkingBudget;
+//   final ReasoningEffort? reasoningEffort;
+//   final int? reasoningBudget;
+//   final ReasoningSummary reasoningSummary;
+
+//   const ChatRequestBase({
+//     this.model = '',
+//     this.ragParams,
+//     this.tools,
+//     this.toolChoice,
+//     this.temperature = 0.2,
+//     this.topP = 0.6,
+//     this.stream = true,
+//     this.maxTokens = 2048,
+//     this.stop,
+//     this.presencePenalty = 0.0,
+//     this.frequencyPenalty = 0.0,
+//     this.logitBias = const {},
+//     this.thinkingBudget = 1,
+//     this.reasoningEffort,
+//     this.reasoningBudget,
+//     this.reasoningSummary = ReasoningSummary.auto,
+//   });
+
+//   /// Creates a copy with updated fields
+//   ChatRequestBase copyWith({
+//     String? model,
+//     RAGParams? ragParams,
+//     List<Tool>? tools,
+//     dynamic toolChoice,
+//     double? temperature,
+//     double? topP,
+//     bool? stream,
+//     int? maxTokens,
+//     List<String>? stop,
+//     double? presencePenalty,
+//     double? frequencyPenalty,
+//     Map<String, dynamic>? logitBias,
+//     int? thinkingBudget,
+//     ReasoningEffort? reasoningEffort,
+//     int? reasoningBudget,
+//     ReasoningSummary? reasoningSummary,
+//   }) {
+//     return ChatRequestBase(
+//       model: model ?? this.model,
+//       ragParams: ragParams ?? this.ragParams,
+//       tools: tools ?? this.tools,
+//       toolChoice: toolChoice ?? this.toolChoice,
+//       temperature: temperature ?? this.temperature,
+//       topP: topP ?? this.topP,
+//       stream: stream ?? this.stream,
+//       maxTokens: maxTokens ?? this.maxTokens,
+//       stop: stop ?? this.stop,
+//       presencePenalty: presencePenalty ?? this.presencePenalty,
+//       frequencyPenalty: frequencyPenalty ?? this.frequencyPenalty,
+//       logitBias: logitBias ?? this.logitBias,
+//       thinkingBudget: thinkingBudget ?? this.thinkingBudget,
+//       reasoningEffort: reasoningEffort ?? this.reasoningEffort,
+//       reasoningBudget: reasoningBudget ?? this.reasoningBudget,
+//       reasoningSummary: reasoningSummary ?? this.reasoningSummary,
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'model': model,
+//       'rag_params': ragParams?.toJson(),
+//       'tools': tools?.map((tool) => tool.toJson()).toList(),
+//       'tool_choice': toolChoice,
+//       'temperature': temperature,
+//       'top_p': topP,
+//       'stream': stream,
+//       'max_tokens': maxTokens,
+//       'stop': stop,
+//       'presence_penalty': presencePenalty,
+//       'frequency_penalty': frequencyPenalty,
+//       'logit_bias': logitBias,
+//       'thinking_budget': thinkingBudget,
+//       'reasoning_effort': reasoningEffort?.value,
+//       'reasoning_budget': reasoningBudget,
+//       'reasoning_summary': reasoningSummary.value,
+//     };
+//   }
+
+//   factory ChatRequestBase.fromJson(Map<String, dynamic> json) {
+//     return ChatRequestBase(
+//       model: json['model'] ?? '',
+//       ragParams: json['rag_params'] != null
+//           ? RAGParams.fromJson(json['rag_params'] as Map<String, dynamic>)
+//           : null,
+//       tools: json['tools'] != null
+//           ? (json['tools'] as List<dynamic>)
+//                 .map((tool) => tool)
+//                 .toList() // dynamic
+//           : null,
+//       toolChoice: json['tool_choice'],
+//       temperature: (json['temperature'] ?? 0.2).toDouble(),
+//       topP: (json['top_p'] ?? 0.6).toDouble(),
+//       stream: json['stream'] ?? true,
+//       maxTokens: json['max_tokens'] ?? 2048,
+//       stop: json['stop'] != null ? List<String>.from(json['stop']) : null,
+//       presencePenalty: (json['presence_penalty'] ?? 0.0).toDouble(),
+//       frequencyPenalty: (json['frequency_penalty'] ?? 0.0).toDouble(),
+//       logitBias: Map<String, dynamic>.from(json['logit_bias'] ?? {}),
+//       thinkingBudget: json['thinking_budget'],
+//       reasoningEffort: json['reasoning_effort'] != null
+//           ? ReasoningEffort.values.firstWhere(
+//               (e) => e.value == json['reasoning_effort'],
+//               orElse: () => ReasoningEffort.disable,
+//             )
+//           : null,
+//       reasoningBudget: json['reasoning_budget'],
+//       reasoningSummary: ReasoningSummary.values.firstWhere(
+//         (e) => e.value == json['reasoning_summary'],
+//         orElse: () => ReasoningSummary.auto,
+//       ),
+//     );
+//   }
+
+//   Map<String, dynamic> get hyperparams {
+//     return toJson()
+//       ..remove('object')
+//       ..remove('messages')
+//       ..remove('rag_params');
+//   }
+// }
 
 /// Chat request
 class ChatRequest extends ChatRequestBase {
@@ -1429,6 +1473,7 @@ class ChatRequest extends ChatRequestBase {
     return ChatRequest(
       id: id ?? this.id,
       messages: messages ?? this.messages,
+
       maxCompletionTokens: maxCompletionTokens ?? this.maxCompletionTokens,
       n: n ?? this.n,
       user: user ?? this.user,
@@ -1742,7 +1787,11 @@ class RerankingData {
     required this.relevanceScore,
   });
 
-  RerankingData copyWith({ObjectType? object, int? index, double? relevanceScore}) {
+  RerankingData copyWith({
+    ObjectType? object,
+    int? index,
+    double? relevanceScore,
+  }) {
     return RerankingData(
       object: object ?? this.object,
       index: index ?? this.index,
@@ -2402,7 +2451,10 @@ class ImageContent {
   final ContentType type;
   final ImageContentData imageUrl;
 
-  const ImageContent({this.type = ContentType.imageUrl, required this.imageUrl});
+  const ImageContent({
+    this.type = ContentType.imageUrl,
+    required this.imageUrl,
+  });
 
   /// Creates a copy with updated fields
   ImageContent copyWith({ContentType? type, ImageContentData? imageUrl}) {
@@ -2473,7 +2525,10 @@ class AudioContent {
   final ContentType type;
   final AudioContentData inputAudio;
 
-  const AudioContent({this.type = ContentType.inputAudio, required this.inputAudio});
+  const AudioContent({
+    this.type = ContentType.inputAudio,
+    required this.inputAudio,
+  });
 
   /// Creates a copy with updated fields
   AudioContent copyWith({ContentType? type, AudioContentData? inputAudio}) {

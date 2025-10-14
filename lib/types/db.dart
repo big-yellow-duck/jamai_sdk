@@ -1951,6 +1951,21 @@ class VerificationCodeRead extends VerificationCode {
     required super.createdAt,
     required super.updatedAt,
   });
+
+  factory VerificationCodeRead.fromJson(Map<String, dynamic> json) {
+    return VerificationCodeRead(
+      name: json['name'] as String? ?? '',
+      role: json['role'] as String?,
+      meta: BaseModelMixin._metaFromJson(json),
+      userEmail: json['user_email'] as String? ?? '',
+      expiry: DatetimeUTC.parse(json['expiry'] as String? ?? ''),
+      organizationId: json['organization_id'] as String?,
+      projectId: json['project_id'] as String?,
+      id: json['id'] as String? ?? '',
+      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
+      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
+    );
+  }
 }
 
 /// Project key update model

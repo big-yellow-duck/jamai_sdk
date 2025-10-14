@@ -1,5 +1,8 @@
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/lm.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'gen_tables.freezed.dart';
 
 /// CSV delimiter options
 enum CSVDelimiter {
@@ -630,9 +633,11 @@ class TableMetaResponse extends TableMeta {
     return TableMetaResponse(
       id: json['id'] as String? ?? '',
       meta: json['meta'] as Map<String, dynamic>?,
-      cols: (json['cols'] as List<dynamic>?)
-          ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+      cols:
+          (json['cols'] as List<dynamic>?)
+              ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
       parentId: json['parent_id'] as String?,
       title: json['title'] as String? ?? '',
       createdBy: json['created_by'] as String?,

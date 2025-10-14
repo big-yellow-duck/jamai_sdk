@@ -32,26 +32,26 @@ class Templates {
     List<String>? searchColumns,
     bool? after,
   }) async {
-    final Map<String, dynamic> queryParams = {};
+    final Map<String, String> queryParams = {};
 
-    if (offset != null) queryParams['offset'] = offset;
-    if (limit != null) queryParams['limit'] = limit;
+    if (offset != null) queryParams['offset'] = offset.toString();
+    if (limit != null) queryParams['limit'] = limit.toString();
     if (orderBy != null) queryParams['order_by'] = orderBy.toString();
     if (orderAscending != null) {
-      queryParams['order_ascending'] = orderAscending;
+      queryParams['order_ascending'] = orderAscending.toString();
     }
     if (searchQuery != null) {
       queryParams['search_query'] = searchQuery.toString();
     }
-    if (after != null) queryParams['after'] = after;
+    if (after != null) queryParams['after'] = after.toString();
 
     // Add each search column as a separate query parameter
     if (searchColumns != null) {
-      queryParams['search_columns'] = searchColumns;
+      queryParams['search_columns'] = searchColumns.join(',');
     }
 
     final url = Uri.parse(
-      '$apiUrl/templates/list',
+      '$apiUrl/api/v2/templates/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -78,7 +78,7 @@ class Templates {
   /// Throws an exception if the request fails
   Future<Map<String, dynamic>> get({required String templateId}) async {
     final url = Uri.parse(
-      '$apiUrl/templates',
+      '$apiUrl/api/v2/templates',
     ).replace(queryParameters: {'template_id': templateId});
 
     final response = await http.get(
@@ -123,31 +123,31 @@ class Templates {
     ShortString? searchQuery,
     bool? countRows,
   }) async {
-    Map<String, dynamic> queryParameters = {};
+    Map<String, String> queryParameters = {};
     queryParameters['template_id'] = templateId;
     if (offset != null) {
-      queryParameters['offset'] = offset;
+      queryParameters['offset'] = offset.toString();
     }
     if (limit != null) {
-      queryParameters['limit'] = limit;
+      queryParameters['limit'] = limit.toString();
     }
     if (orderBy != null) {
       queryParameters['order_by'] = orderBy.toString();
     }
     if (orderAscending != null) {
-      queryParameters['order_ascending'] = orderAscending;
+      queryParameters['order_ascending'] = orderAscending.toString();
     }
     if (parentId != null) {
       queryParameters['parent_id'] = parentId;
     }
     if (searchQuery != null) {
-      queryParameters['search_query'] = searchQuery;
+      queryParameters['search_query'] = searchQuery.toString();
     }
     if (countRows != null) {
-      queryParameters['count_rows'] = countRows;
+      queryParameters['count_rows'] = countRows.toString();
     }
     final url = Uri.parse(
-      '$apiUrl/templates/gen_tables/$tableType/list',
+      '$apiUrl/api/v2/templates/gen_tables/$tableType/list',
     ).replace(queryParameters: queryParameters);
 
     final response = await http.get(
@@ -180,13 +180,13 @@ class Templates {
     required TableType tableType,
     required String tableId,
   }) async {
-    Map<String, dynamic> queryParameters = {};
+    Map<String, String> queryParameters = {};
 
     queryParameters['template_id'] = templateId;
     queryParameters['table_id'] = tableId;
 
     final url = Uri.parse(
-      '$apiUrl/templates/gen_tables/$tableType',
+      '$apiUrl/api/v2/templates/gen_tables/$tableType',
     ).replace(queryParameters: queryParameters);
 
     final response = await http.get(
@@ -239,28 +239,28 @@ class Templates {
     int? floatDecimals,
     int? vecDecimals,
   }) async {
-    final Map<String, dynamic> queryParams = {
+    final Map<String, String> queryParams = {
       'template_id': templateId,
       'table_id': tableId,
     };
 
-    if (offset != null) queryParams['offset'] = offset;
-    if (limit != null) queryParams['limit'] = limit;
+    if (offset != null) queryParams['offset'] = offset.toString();
+    if (limit != null) queryParams['limit'] = limit.toString();
     if (orderBy != null) queryParams['order_by'] = orderBy.toString();
     if (orderAscending != null) {
-      queryParams['order_ascending'] = orderAscending;
+      queryParams['order_ascending'] = orderAscending.toString();
     }
-    if (columns != null) queryParams['columns'] = columns;
+    if (columns != null) queryParams['columns'] = columns.join(',');
     if (where != null) queryParams['where'] = where;
     if (searchQuery != null) {
       queryParams['search_query'] = searchQuery.toString();
     }
-    if (searchColumns != null) queryParams['search_columns'] = searchColumns;
-    if (floatDecimals != null) queryParams['float_decimals'] = floatDecimals;
-    if (vecDecimals != null) queryParams['vec_decimals'] = vecDecimals;
+    if (searchColumns != null) queryParams['search_columns'] = searchColumns.join(',');
+    if (floatDecimals != null) queryParams['float_decimals'] = floatDecimals.toString();
+    if (vecDecimals != null) queryParams['vec_decimals'] = vecDecimals.toString();
 
     final url = Uri.parse(
-      '$apiUrl/templates/gen_tables/$tableType/rows/list',
+      '$apiUrl/api/v2/templates/gen_tables/$tableType/rows/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -301,18 +301,18 @@ class Templates {
     int? floatDecimals,
     int? vecDecimals,
   }) async {
-    final Map<String, dynamic> queryParams = {
+    final Map<String, String> queryParams = {
       'template_id': templateId,
       'table_id': tableId,
       'row_id': rowId,
     };
 
-    if (columns != null) queryParams['columns'] = columns;
-    if (floatDecimals != null) queryParams['float_decimals'] = floatDecimals;
-    if (vecDecimals != null) queryParams['vec_decimals'] = vecDecimals;
+    if (columns != null) queryParams['columns'] = columns.join(',');
+    if (floatDecimals != null) queryParams['float_decimals'] = floatDecimals.toString();
+    if (vecDecimals != null) queryParams['vec_decimals'] = vecDecimals.toString();
 
     final url = Uri.parse(
-      '$apiUrl/templates/gen_tables/$tableType/rows',
+      '$apiUrl/api/v2/templates/gen_tables/$tableType/rows',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(

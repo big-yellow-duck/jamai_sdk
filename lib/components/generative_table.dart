@@ -6,8 +6,12 @@ import 'package:jamai_sdk/types/common.dart';
 class GenerativeTable {
   final String apiUrl;
   final String apiKey;
-
-  GenerativeTable({required this.apiUrl, required this.apiKey});
+  final String projectId;
+  GenerativeTable({
+    required this.apiUrl,
+    required this.apiKey,
+    required this.projectId,
+  });
 
   /// Creates a new action table.
   ///
@@ -16,7 +20,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createActionTable(ActionTableSchemaCreate request) async {
+  Future<Map<String, dynamic>> createActionTable(
+    ActionTableSchemaCreate request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/action');
 
     final response = await http.post(
@@ -44,7 +50,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createKnowledgeTable(KnowledgeTableSchemaCreate request) async {
+  Future<Map<String, dynamic>> createKnowledgeTable(
+    KnowledgeTableSchemaCreate request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/knowledge');
 
     final response = await http.post(
@@ -72,7 +80,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createChatTable(ChatTableSchemaCreate request) async {
+  Future<Map<String, dynamic>> createChatTable(
+    ChatTableSchemaCreate request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/chat');
 
     final response = await http.post(
@@ -166,9 +176,9 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> getTable({required String tableId}) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables').replace(queryParameters: {
-      'table_id': tableId,
-    });
+    final url = Uri.parse(
+      '$apiUrl/api/v2/gen_tables',
+    ).replace(queryParameters: {'table_id': tableId});
 
     final response = await http.get(
       url,
@@ -195,9 +205,9 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> deleteTable({required String tableId}) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables').replace(queryParameters: {
-      'table_id': tableId,
-    });
+    final url = Uri.parse(
+      '$apiUrl/api/v2/gen_tables',
+    ).replace(queryParameters: {'table_id': tableId});
 
     final response = await http.delete(
       url,
@@ -224,7 +234,10 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> addRows(String tableType, MultiRowAddRequest request) async {
+  Future<Map<String, dynamic>> addRows(
+    String tableType,
+    MultiRowAddRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
 
     final response = await http.post(
@@ -420,7 +433,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> importData(TableDataImportRequest request) async {
+  Future<Map<String, dynamic>> importData(
+    TableDataImportRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/import/data');
 
     final response = await http.post(
@@ -476,7 +491,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateGenConfig(GenConfigUpdateRequest request) async {
+  Future<Map<String, dynamic>> updateGenConfig(
+    GenConfigUpdateRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/gen_config');
 
     final response = await http.patch(
@@ -532,7 +549,9 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> reorderColumns(ColumnReorderRequest request) async {
+  Future<Map<String, dynamic>> reorderColumns(
+    ColumnReorderRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/columns/reorder');
 
     final response = await http.patch(
@@ -589,7 +608,10 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> embedFile(String filePath, String tableId) async {
+  Future<Map<String, dynamic>> embedFile(
+    String filePath,
+    String tableId,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/embed');
 
     final response = await http.post(
@@ -609,5 +631,4 @@ class GenerativeTable {
       );
     }
   }
-
 }

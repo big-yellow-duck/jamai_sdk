@@ -568,9 +568,9 @@ class Project {
   /// [role] - Role to assign to the invited user
   /// [validDays] - Code validity in days (must be > 0 and <= 7)
   ///
-  /// Returns a Map containing the invitation details
+  /// Returns a VerificationCodeRead containing the invitation details
   /// Throws an exception if the request fails
-  Future<Map<String, dynamic>> createInvitation({
+  Future<VerificationCodeRead> createInvitation({
     required String projectId,
     required String userEmail,
     required Role role,
@@ -600,7 +600,8 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return VerificationCodeRead.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to create invitation: ${response.statusCode} - ${response.body}',

@@ -127,7 +127,8 @@ void main() {
         userEmail: 'test@example.com',
         role: db_types.Role.member,
       );
-      expect(invitationResult, isA<Map<String, dynamic>>());
+      print(invitationResult);
+      expect(invitationResult, isA<db_types.VerificationCodeRead>());
     });
 
     test('List Project Invitations', () async {
@@ -148,7 +149,7 @@ void main() {
         role: db_types.Role.member,
       );
 
-      final invitationId = createResult['id'] as String;
+      final invitationId = createResult.id;
       final deleteResult = await jamai.project.deleteInvitation(
         projectId: newProject.id,
         invitationId: invitationId,
@@ -156,6 +157,9 @@ void main() {
       expect(deleteResult, isA<Map<String, dynamic>>());
     });
 
+    
+    // Project management test need to run after tables are created
+    // complete the gen tables tests first
     test('Export Project', () async {
       final exportResult = await jamai.project.export(
         projectId: newProject.id,

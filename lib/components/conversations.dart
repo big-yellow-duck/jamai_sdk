@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jamai_sdk/types/common.dart';
@@ -8,7 +7,14 @@ import 'package:jamai_sdk/types/conversations.dart';
 class Conversations {
   String apiUrl;
   String apiKey;
-  Conversations({required this.apiUrl, required this.apiKey});
+  String? userId;
+  String? projectId;
+  Conversations({
+    required this.apiUrl,
+    required this.apiKey,
+    this.userId,
+    this.projectId,
+  });
 
   /// Creates a new conversation and sends the first message. Title will be generated automatically if not provided.
   ///
@@ -17,8 +23,10 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the conversation response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> create({required ConversationCreateRequest request}) async {
-    final url = Uri.parse('$apiUrl/conversations');
+  Future<Map<String, dynamic>> create({
+    required ConversationCreateRequest request,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations');
 
     final response = await http.post(
       url,
@@ -46,9 +54,9 @@ class Conversations {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> get({required String conversationId}) async {
-    final url = Uri.parse('$apiUrl/conversations').replace(queryParameters: {
-      'conversation_id': conversationId,
-    });
+    final url = Uri.parse(
+      '$apiUrl/api/v2/conversations',
+    ).replace(queryParameters: {'conversation_id': conversationId});
 
     final response = await http.get(
       url,
@@ -75,9 +83,9 @@ class Conversations {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> delete({required String conversationId}) async {
-    final url = Uri.parse('$apiUrl/conversations').replace(queryParameters: {
-      'conversation_id': conversationId,
-    });
+    final url = Uri.parse(
+      '$apiUrl/api/v2/conversations',
+    ).replace(queryParameters: {'conversation_id': conversationId});
 
     final response = await http.delete(
       url,
@@ -138,7 +146,7 @@ class Conversations {
     }
 
     final url = Uri.parse(
-      '$apiUrl/conversations/list',
+      '$apiUrl/api/v2/conversations/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -183,8 +191,8 @@ class Conversations {
   }) async {
     final Map<String, dynamic> queryParams = {};
 
-    if (offset != null) queryParams['offset'] = offset;
-    if (limit != null) queryParams['limit'] = limit;
+    if (offset != null) queryParams['offset'] = offset.toString();
+    if (limit != null) queryParams['limit'] = limit.toString();
     if (orderBy != null) queryParams['order_by'] = orderBy.toString();
     if (orderAscending != null) {
       queryParams['order_ascending'] = orderAscending;
@@ -200,7 +208,7 @@ class Conversations {
     }
 
     final url = Uri.parse(
-      '$apiUrl/conversations/agents/list',
+      '$apiUrl/api/v2/conversations/agents/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -208,6 +216,8 @@ class Conversations {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
     );
 
@@ -228,9 +238,9 @@ class Conversations {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> getAgent({required String agentId}) async {
-    final url = Uri.parse('$apiUrl/conversations/agents').replace(queryParameters: {
-      'agent_id': agentId,
-    });
+    final url = Uri.parse(
+      '$apiUrl/api/v2/conversations/agents',
+    ).replace(queryParameters: {'agent_id': agentId});
 
     final response = await http.get(
       url,
@@ -256,8 +266,10 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> generateTitle({required String conversationId}) async {
-    final url = Uri.parse('$apiUrl/conversations/title');
+  Future<Map<String, dynamic>> generateTitle({
+    required String conversationId,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations/title');
 
     final response = await http.post(
       url,
@@ -285,8 +297,11 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> renameTitle({required String conversationId, required String title}) async {
-    final url = Uri.parse('$apiUrl/conversations/title');
+  Future<Map<String, dynamic>> renameTitle({
+    required String conversationId,
+    required String title,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations/title');
 
     final response = await http.patch(
       url,
@@ -313,8 +328,10 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> sendMessage({required MessageAddRequest request}) async {
-    final url = Uri.parse('$apiUrl/conversations/messages');
+  Future<Map<String, dynamic>> sendMessage({
+    required MessageAddRequest request,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations/messages');
 
     final response = await http.post(
       url,
@@ -341,8 +358,10 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateMessage({required MessageUpdateRequest request}) async {
-    final url = Uri.parse('$apiUrl/conversations/messages');
+  Future<Map<String, dynamic>> updateMessage({
+    required MessageUpdateRequest request,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations/messages');
 
     final response = await http.patch(
       url,
@@ -381,7 +400,9 @@ class Conversations {
     OrderBy? orderBy,
     bool? orderAscending,
   }) async {
-    final Map<String, dynamic> queryParams = {'conversation_id': conversationId};
+    final Map<String, dynamic> queryParams = {
+      'conversation_id': conversationId,
+    };
 
     if (offset != null) queryParams['offset'] = offset;
     if (limit != null) queryParams['limit'] = limit;
@@ -391,7 +412,7 @@ class Conversations {
     }
 
     final url = Uri.parse(
-      '$apiUrl/conversations/messages/list',
+      '$apiUrl/api/v2/conversations/messages/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -418,8 +439,10 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> regenMessage({required MessagesRegenRequest request}) async {
-    final url = Uri.parse('$apiUrl/conversations/messages/regen');
+  Future<Map<String, dynamic>> regenMessage({
+    required MessagesRegenRequest request,
+  }) async {
+    final url = Uri.parse('$apiUrl/api/v2/conversations/messages/regen');
 
     final response = await http.post(
       url,
@@ -447,14 +470,17 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the threads
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> getThreads({String? conversationId, String? agentId}) async {
+  Future<Map<String, dynamic>> getThreads({
+    String? conversationId,
+    String? agentId,
+  }) async {
     final Map<String, dynamic> queryParams = {};
 
     if (conversationId != null) queryParams['conversation_id'] = conversationId;
     if (agentId != null) queryParams['agent_id'] = agentId;
 
     final url = Uri.parse(
-      '$apiUrl/conversations/threads',
+      '$apiUrl/api/v2/conversations/threads',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -473,5 +499,4 @@ class Conversations {
       );
     }
   }
-
 }
