@@ -21,7 +21,7 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Map<String, dynamic>> createActionTable(
-    ActionTableSchemaCreate request,
+    TableSchemaCreate request,
   ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/action');
 

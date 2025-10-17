@@ -1,6 +1,9 @@
-
 import 'package:sealed_countries/sealed_countries.dart';
 import 'package:uuid/uuid.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:meta/meta.dart';
+
+part 'common.mapper.dart';
 
 /// Represents the allowed attributes for sorting.
 enum OrderBy {
@@ -138,29 +141,17 @@ class Progress {
 }
 
 /// Represents a stage in a progress operation
-class ProgressStage {
+@MappableClass(discriminatorKey: 'progressStage')
+class ProgressStage with ProgressStageMappable {
   final String name;
   final int progress;
 
-  const ProgressStage({
-    required this.name,
-    this.progress = 0,
-  });
-
-  /// Creates a copy with updated fields
-  ProgressStage copyWith({
-    String? name,
-    int? progress,
-  }) {
-    return ProgressStage(
-      name: name ?? this.name,
-      progress: progress ?? this.progress,
-    );
-  }
+  const ProgressStage({required this.name, this.progress = 0});
 }
 
 /// Progress information for table import operations
-class TableImportProgress extends Progress {
+@MappableClass(discriminatorValue: 'tableImportProgress')
+class TableImportProgress extends Progress with TableImportProgressMappable {
   final ProgressStage loadData;
   final ProgressStage parseData;
   final ProgressStage uploadFiles;
@@ -178,115 +169,6 @@ class TableImportProgress extends Progress {
     this.addRows = const ProgressStage(name: "Add rows"),
     this.index = const ProgressStage(name: "Indexing"),
   });
-
-  /// Creates a copy with updated fields
-  @override
-  TableImportProgress copyWith({
-    String? key,
-    Map<String, dynamic>? data,
-    ProgressState? state,
-    String? error,
-    ProgressStage? loadData,
-    ProgressStage? parseData,
-    ProgressStage? uploadFiles,
-    ProgressStage? addRows,
-    ProgressStage? index,
-  }) {
-    return TableImportProgress(
-      key: key ?? this.key,
-      data: data ?? this.data,
-      state: state ?? this.state,
-      error: error ?? this.error,
-      loadData: loadData ?? this.loadData,
-      parseData: parseData ?? this.parseData,
-      uploadFiles: uploadFiles ?? this.uploadFiles,
-      addRows: addRows ?? this.addRows,
-      index: index ?? this.index,
-    );
-  }
-}
-/// Utility functions for string validation and transformation
-class StringUtils {
-  /// Converts null to empty string
-  static String noneToEmptyString(String? v) {
-    return v ?? "";
-  }
-
-  /// Converts empty string to null
-  static String? emptyStringToNone(String? v) {
-    if (v == null || v.isEmpty) {
-      return null;
-    }
-    return v;
-  }
-
-  /// Validates and sanitizes string input
-  static String strPreValidator(
-    dynamic value, {
-    bool disallowEmptyString = false,
-    bool allowNewline = false,
-  }) {
-    if (value is! String) {
-      value = value.toString();
-    }
-    
-    String strValue = value.trim();
-    
-    if (disallowEmptyString && strValue.isEmpty) {
-      throw ArgumentError("Text is empty.");
-    }
-
-    // Remove combining marks (Zalgo text prevention)
-    strValue = strValue.replaceAll(RegExp(r'[\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF]'), '');
-    
-    // Check for disallowed characters
-    for (int i = 0; i < strValue.length; i++) {
-      String char = strValue[i];
-      if (_isBadChar(char, allowNewline: allowNewline)) {
-        throw ArgumentError("Text contains disallowed or non-printable characters.");
-      }
-    }
-
-    return strValue;
-  }
-
-  /// Checks if a character is disallowed
-  static bool _isBadChar(String char, {required bool allowNewline}) {
-    // Handle newlines based on the flag
-    if (char == "\n") {
-      return !allowNewline; // Bad if newlines are NOT allowed
-    }
-
-    // Check for other non-printable characters
-    if (!char.isPrintable()) {
-      return true;
-    }
-
-    // Check for specific disallowed Unicode blocks
-    // Box drawing
-    if (char.codeUnitAt(0) >= 0x2500 && char.codeUnitAt(0) <= 0x257F) {
-      return true;
-    }
-    // Block elements
-    if (char.codeUnitAt(0) >= 0x2580 && char.codeUnitAt(0) <= 0x259F) {
-      return true;
-    }
-    // Braille patterns
-    if (char.codeUnitAt(0) >= 0x2800 && char.codeUnitAt(0) <= 0x28FF) {
-      return true;
-    }
-
-    return false;
-  }
-}
-
-/// Extension to check if a string is printable
-extension StringPrintable on String {
-  bool isPrintable() {
-    return runes.every((rune) {
-      return rune >= 32 && rune != 127; // ASCII printable characters
-    });
-  }
 }
 
 /// Default multi-language codes
@@ -311,19 +193,21 @@ class LanguageValidator {
     try {
       List<String> code = s.split("-");
       String lang = code[0].toLowerCase().trim();
-      
+
       // Validate ISO 639-1 language code using sealed_languages
       final language = NaturalLanguage.maybeFromCode(lang);
       if (language == null) {
         throw FormatException('Invalid ISO 639-1 language code: $lang');
       }
-      
+
       if (code.length == 2) {
         String country = code[1].toUpperCase().trim();
         // Validate ISO 3166-1 alpha-2 country code using sealed_countries
         final countryObj = WorldCountry.maybeFromCode(country);
         if (countryObj == null) {
-          throw FormatException('Invalid ISO 3166-1 alpha-2 country code: $country');
+          throw FormatException(
+            'Invalid ISO 3166-1 alpha-2 country code: $country',
+          );
         }
         return "${language.code}-$country";
       } else if (code.length == 1) {
@@ -342,13 +226,16 @@ class LanguageValidator {
   /// Validates a list of language codes
   static List<String> validateLangList(List<String> s) {
     Set<String> uniqueLangs = s.map((lang) => lang.trim()).toSet();
-    
+
     // Check for wildcard codes
-    if (uniqueLangs.intersection(DefaultLanguages.wildcardLangCodes).isNotEmpty) {
-      uniqueLangs = uniqueLangs.difference(DefaultLanguages.wildcardLangCodes)
+    if (uniqueLangs
+        .intersection(DefaultLanguages.wildcardLangCodes)
+        .isNotEmpty) {
+      uniqueLangs = uniqueLangs
+          .difference(DefaultLanguages.wildcardLangCodes)
           .union(DefaultLanguages.mulLanguages.toSet());
     }
-    
+
     return uniqueLangs.map((lang) => validateLang(lang)).toList();
   }
 }
@@ -372,41 +259,12 @@ typedef YAMLInput = dynamic;
 String uuid7Str() => const Uuid().v7();
 
 /// Basic response indicating success or failure
-class OkResponse {
+@MappableClass()
+class OkResponse with OkResponseMappable {
   final bool ok;
   final String progressKey;
 
-  const OkResponse({
-    this.ok = true,
-    this.progressKey = "",
-  });
-
-  /// Creates a copy with updated fields
-  OkResponse copyWith({
-    bool? ok,
-    String? progressKey,
-  }) {
-    return OkResponse(
-      ok: ok ?? this.ok,
-      progressKey: progressKey ?? this.progressKey,
-    );
-  }
-  
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'ok': ok,
-      'progress_key': progressKey,
-    };
-  }
-
-  /// Creates from JSON
-  factory OkResponse.fromJson(Map<String, dynamic> json) {
-    return OkResponse(
-      ok: json['ok'] ?? true,
-      progressKey: json['progress_key'] ?? "",
-    );
-  }
+  const OkResponse({this.ok = true, this.progressKey = ""});
 }
 
 /// Generic paginated response
@@ -499,7 +357,9 @@ class UserAgent {
     }
 
     // SDK pattern
-    final sdkMatch = RegExp(r'SDK/(\S+) \((\w+)/(\S+); ([^;]+); (\w+)\)').firstMatch(uaString);
+    final sdkMatch = RegExp(
+      r'SDK/(\S+) \((\w+)/(\S+); ([^;]+); (\w+)\)',
+    ).firstMatch(uaString);
     if (sdkMatch != null) {
       return UserAgent(
         isBrowser: false,
@@ -513,10 +373,12 @@ class UserAgent {
     }
 
     // Browser pattern
-    final browserMatch = RegExp(r'Mozilla/5\.0 \(([^)]+)\).*').firstMatch(uaString);
+    final browserMatch = RegExp(
+      r'Mozilla/5\.0 \(([^)]+)\).*',
+    ).firstMatch(uaString);
     if (browserMatch != null) {
       final osInfo = browserMatch.group(1)!.split(";");
-      
+
       // Microsoft Edge
       final edgeMatch = RegExp(r'.+(Edg/.+)$').firstMatch(uaString);
       if (edgeMatch != null) {
@@ -527,7 +389,7 @@ class UserAgent {
           architecture: osInfo.length == 3 ? osInfo.last.trim() : "",
         );
       }
-      
+
       // Firefox
       final firefoxMatch = RegExp(r'.+(Firefox/.+)$').firstMatch(uaString);
       if (firefoxMatch != null) {
@@ -538,7 +400,7 @@ class UserAgent {
           architecture: osInfo.length == 3 ? osInfo.last.trim() : "",
         );
       }
-      
+
       // Chrome
       final chromeMatch = RegExp(r'.+(Chrome/.+)$').firstMatch(uaString);
       if (chromeMatch != null) {
@@ -550,7 +412,7 @@ class UserAgent {
         );
       }
     }
-    
+
     return UserAgent(
       isBrowser: uaString.toLowerCase().contains('mozilla'),
       agent: "",
@@ -599,10 +461,7 @@ class PasswordLoginRequest {
   final String email;
   final String password;
 
-  const PasswordLoginRequest({
-    required this.email,
-    required this.password,
-  });
+  const PasswordLoginRequest({required this.email, required this.password});
 
   /// Validates the request
   void validate() {
@@ -616,10 +475,7 @@ class PasswordLoginRequest {
 
   /// Converts to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'password': password,
-    };
+    return {'email': email, 'password': password};
   }
 
   /// Creates from JSON
@@ -649,23 +505,23 @@ class PasswordChangeRequest {
       throw ArgumentError('Email cannot be empty');
     }
     if (password.isEmpty || password.length > 72) {
-      throw ArgumentError('Current password must be between 1 and 72 characters');
+      throw ArgumentError(
+        'Current password must be between 1 and 72 characters',
+      );
     }
     if (newPassword.isEmpty || newPassword.length > 72) {
       throw ArgumentError('New password must be between 1 and 72 characters');
     }
     if (password == newPassword) {
-      throw ArgumentError('New password must be different from current password');
+      throw ArgumentError(
+        'New password must be different from current password',
+      );
     }
   }
 
   /// Converts to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'password': password,
-      'new_password': newPassword,
-    };
+    return {'email': email, 'password': password, 'new_password': newPassword};
   }
 
   /// Creates from JSON
@@ -892,4 +748,168 @@ class StripeEventData {
       status: json['status'],
     );
   }
+}
+
+@MappableClass(
+  discriminatorKey: 'type',
+  includeSubClasses: [StringOrListStringString, StringOrListStringList],
+)
+abstract class StringOrListString with StringOrListStringMappable {
+  const StringOrListString();
+
+  // Preserve the original factory constructors API
+  factory StringOrListString.string(String value) = StringOrListStringString;
+  factory StringOrListString.listString(List<String> values) =
+      StringOrListStringList;
+
+  // Replace Freezed JSON factory
+  factory StringOrListString.fromJson(Map<String, dynamic> json) =>
+      MapperContainer.globals.fromMap<StringOrListString>(json);
+}
+
+@MappableClass(discriminatorValue: 'string')
+class StringOrListStringString extends StringOrListString
+    with StringOrListStringStringMappable {
+  final String value;
+  const StringOrListStringString(this.value);
+}
+
+@MappableClass(discriminatorValue: 'listString')
+class StringOrListStringList extends StringOrListString
+    with StringOrListStringListMappable {
+  final List<String> values;
+  const StringOrListStringList(this.values);
+}
+
+@MappableClass(
+  discriminatorKey: 'type',
+  includeSubClasses: [ListDouble, ListDoubleOrStringString],
+)
+abstract class ListDoubleOrString with ListDoubleOrStringMappable {
+  const ListDoubleOrString();
+
+  // Preserve the original factory constructors API
+  factory ListDoubleOrString.listDouble(List<double> values) = ListDouble;
+  factory ListDoubleOrString.string(String value) = ListDoubleOrStringString;
+
+  // Replace Freezed JSON factory
+  factory ListDoubleOrString.fromJson(Map<String, dynamic> json) =>
+      MapperContainer.globals.fromMap<ListDoubleOrString>(json);
+}
+
+@MappableClass(discriminatorValue: 'listDouble')
+class ListDouble extends ListDoubleOrString with ListDoubleMappable {
+  final List<double> values;
+  const ListDouble(this.values);
+}
+
+@MappableClass(discriminatorValue: 'string')
+class ListDoubleOrStringString extends ListDoubleOrString
+    with ListDoubleOrStringStringMappable {
+  final String value;
+  const ListDoubleOrStringString(this.value);
+}
+
+class StringValidator {
+  static bool _isBadChar(String char, {bool allowNewline = false}) {
+    // 1. Handle newlines based on the flag
+    if (char == "\n") {
+      return !allowNewline; // Bad if newlines are NOT allowed
+    }
+
+    // 2. Check for other non-printable characters
+    if (char.isEmpty) return true;
+
+    final rune = char.runes.first;
+
+    // Control characters (excluding space and newline which we already handled)
+    if (rune < 0x20 || rune == 0x7F) {
+      return true;
+    }
+
+    // 3. Check for specific disallowed Unicode categories and blocks
+    // Combining marks (Unicode categories Mn, Mc, Me)
+    if ((rune >= 0x0300 && rune <= 0x036F) || // Combining Diacritical Marks
+        (rune >= 0x1AB0 &&
+            rune <= 0x1AFF) || // Combining Diacritical Marks Extended
+        (rune >= 0x20D0 &&
+            rune <= 0x20FF) || // Combining Diacritical Marks for Symbols
+        (rune >= 0xFE20 && rune <= 0xFE2F)) {
+      // Combining Half Marks
+      return true;
+    }
+
+    // Box drawing
+    if (rune >= 0x2500 && rune <= 0x257F) {
+      return true;
+    }
+
+    // Block elements
+    if (rune >= 0x2580 && rune <= 0x259F) {
+      return true;
+    }
+
+    // Braille patterns
+    if (rune >= 0x2800 && rune <= 0x28FF) {
+      return true;
+    }
+
+    return false;
+  }
+
+  static bool isValidString(String input, {bool allowNewline = false}) {
+    // Check if string is not empty after stripping
+    if (input.trim().isEmpty) {
+      return false;
+    }
+
+    // Check each character
+    for (int i = 0; i < input.length; i++) {
+      if (_isBadChar(input[i], allowNewline: allowNewline)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
+@immutable
+class SanitizedNotEmptyString {
+  factory SanitizedNotEmptyString(String value) {
+    if (!StringValidator.isValidString(value)) {
+      throw ArgumentError(
+        "Text contains disallowed or non-printable characters.",
+      );
+    }
+    return SanitizedNotEmptyString._(value);
+  }
+
+  const SanitizedNotEmptyString._(this.value);
+
+  final String value;
+
+  /// Acts like a string when printed
+  @override
+  String toString() => value;
+
+  /// Optional convenience: allows you to get the underlying value
+  String get get => value;
+
+  /// Optional operator for concatenation
+  SanitizedNotEmptyString operator +(Object other) {
+    return SanitizedNotEmptyString('$value$other');
+  }
+
+  /// Makes equality work properly with other SanitizedNotEmptyString instances
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SanitizedNotEmptyString && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  /// Optional: convenience to convert back to `String`
+  String asString() => value;
 }

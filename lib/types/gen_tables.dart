@@ -3,6 +3,7 @@ import 'package:jamai_sdk/types/lm.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'gen_tables.freezed.dart';
+part 'gen_tables.g.dart';
 
 /// CSV delimiter options
 enum CSVDelimiter {
@@ -73,30 +74,20 @@ enum VectorMetric {
   String toString() => value;
 }
 
-/// Cell references response
-class CellReferencesResponse extends References {
-  final String outputColumnName;
-  final String rowId;
+enum GenConfigTypes {
+  llm('gen_config.llm'),
+  python('gen_config.python'),
+  chat('gen_config.chat'),
+  embed('gen_config.embed');
 
-  const CellReferencesResponse({
-    super.object = ObjectType.genTableReferences,
-    super.chunks = const [],
-    required super.searchQuery,
-    super.finishReason,
-    required this.outputColumnName,
-    required this.rowId,
-  });
+  final String value;
+  const GenConfigTypes(this.value);
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'output_column_name': outputColumnName,
-      'row_id': rowId,
-    };
-  }
+  String toString() => value;
 }
 
+// / Cell references response
 /// Cell completion response
 class CellCompletionResponse extends ChatCompletionChunkResponse {
   final String outputColumnName;
@@ -122,10 +113,91 @@ class CellCompletionResponse extends ChatCompletionChunkResponse {
   }
 }
 
+// @freezed
+// abstract class CellReferencesResponse extends References
+//     with _$CellReferencesResponse {
+//   const CellReferencesResponse._({
+//     super.object = ObjectType.chatReferences,
+//     super.chunks = const [],
+//     required super.searchQuery,
+//     super.finishReason,
+//     required this.outputColumnName,
+//     required this.rowId,
+//   });
+
+//   factory CellReferencesResponse({
+//     @Default(ObjectType.chatReferences) ObjectType object,
+//     @Default([]) List<Chunk> chunks,
+//     required String searchQuery,
+//     FinishReason? finishReason,
+//     required String outputColumnName,
+//     required String rowId,
+//   }) = _CellReferencesResponse;
+
+//   @override
+//   final String outputColumnName;
+
+//   @override
+//   final String rowId;
+
+//   @override
+//   Map<String, dynamic> toJson() {
+//     return {
+//       ...super.toJson(),
+//       'output_column_name': outputColumnName,
+//       'row_id': rowId,
+//     };
+//   }
+
+//   factory CellReferencesResponse.fromJson(Map<String, dynamic> json) {
+//     return CellReferencesResponse(
+//       object: ObjectType.values.firstWhere(
+//         (e) => e.value == json['object'],
+//         orElse: () => ObjectType.chatReferences,
+//       ),
+//       chunks:
+//           (json['chunks'] as List<dynamic>?)
+//               ?.map((c) => Chunk.fromJson(c as Map<String, dynamic>))
+//               .toList() ??
+//           [],
+//       searchQuery: json['search_query'] ?? '',
+//       finishReason: json['finish_reason'] != null
+//           ? FinishReason.values.firstWhere(
+//               (e) => e.value == json['finish_reason'],
+//               orElse: () => FinishReason.stop,
+//             )
+//           : null,
+//       outputColumnName: json['output_column_name'] ?? '',
+//       rowId: json['row_id'] ?? '',
+//     );
+//   }
+// }
+
+@freezed
+abstract class Balls extends Person with _$Balls{
+  Balls._({
+    required super.firstName,
+    required super.lastName,
+    required super.age
+  }): super();
+
+  factory Balls({
+    required String wee
+  }) = _Balls;
+  
+}
+
+// @freezed
+// abstract class CellReferencesResponse extends References with _$CellReferencesResponse{
+//   CellReferencesResponse._({
+//     super.obect
+//   }): super._();
+// }
+
 /// Row completion response
 class RowCompletionResponse {
   final String object;
-  final Map<String, ChatCompletionResponse> columns;
+  final Map<String, ChatCompletionChunkResponse> columns;
   final String rowId;
 
   const RowCompletionResponse({
@@ -156,109 +228,100 @@ class MultiRowCompletionResponse {
 }
 
 /// LLM generation configuration
-class LLMGenConfig extends ChatRequestBase {
-  final String object;
-  final String systemPrompt;
-  final String prompt;
-  final bool multiTurn;
+// @freezed
+// abstract class LLMGenConfig extends ChatRequestBase with _$LLMGenConfig {
+//  LLMGenConfig._({
+//    // Base class fields
+//    String model = '',
+//    RAGParams? ragParams,
+//    List<Tool>? tools,
+//    ToolChoiceOption? toolChoice,
+//    double temperature = 0.2,
+//    double topP = 0.6,
+//    bool stream = true,
+//    int maxTokens = 2048,
+//    List<String>? stop,
+//    double presencePenalty = 0.0,
+//    double frequencyPenalty = 0.0,
+//    Map<String, dynamic> logitBias = const {},
+//    int thinkingBudget = 1,
+//    ReasoningEffort? reasoningEffort,
+//    int? reasoningBudget,
+//    ReasoningSummary reasoningSummary = ReasoningSummary.auto,
+//    // Subclass fields
+//    GenConfigTypes object = GenConfigTypes.llm,
+//    String systemPrompt = '',
+//    String prompt = '',
+//    bool multiTurn = false,
+//  }) : super._({
+//    model: model,
+//    ragParams: ragParams,
+//    tools: tools,
+//    toolChoice: toolChoice,
+//    temperature: temperature,
+//    topP: topP,
+//    stream: stream,
+//    maxTokens: maxTokens,
+//    stop: stop,
+//    presencePenalty: presencePenalty,
+//    frequencyPenalty: frequencyPenalty,
+//    logitBias: logitBias,
+//    thinkingBudget: thinkingBudget,
+//    reasoningEffort: reasoningEffort,
+//    reasoningBudget: reasoningBudget,
+//    reasoningSummary: reasoningSummary,
+//  });
 
-  const LLMGenConfig({
-    this.object = 'gen_config.llm',
-    this.systemPrompt = '',
-    this.prompt = '',
-    this.multiTurn = false,
-    super.model = '',
-    super.ragParams,
-    super.tools,
-    super.toolChoice,
-    super.temperature = 0.2,
-    super.topP = 0.6,
-    super.stream = true,
-    super.maxTokens = 2048,
-    super.stop,
-    super.presencePenalty = 0.0,
-    super.frequencyPenalty = 0.0,
-    super.logitBias = const {},
-    super.thinkingBudget = 1,
-    super.reasoningEffort,
-    super.reasoningBudget,
-    super.reasoningSummary = ReasoningSummary.auto,
-  });
+//  factory LLMGenConfig({
+//    @Default(GenConfigTypes.llm) GenConfigTypes object,
+//    @Default('') String systemPrompt,
+//    @Default('') String prompt,
+//    @Default(false) bool multiTurn,
+//    // Base class fields
+//    @Default('') String model,
+//    RAGParams? ragParams,
+//    List<Tool>? tools,
+//    ToolChoiceOption? toolChoice,
+//    @Default(0.2) double temperature,
+//    @Default(0.6) double topP,
+//    @Default(true) bool stream,
+//    @Default(2048) int maxTokens,
+//    List<String>? stop,
+//    @Default(0.0) double presencePenalty,
+//    @Default(0.0) double frequencyPenalty,
+//    @Default({}) Map<String, dynamic> logitBias,
+//    @Default(1) int thinkingBudget,
+//    ReasoningEffort? reasoningEffort,
+//    int? reasoningBudget,
+//    @Default(ReasoningSummary.auto) ReasoningSummary reasoningSummary,
+//  }) = _LLMGenConfig;
 
-  /// Creates a copy with updated fields
-  @override
-  LLMGenConfig copyWith({
-    String? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-    String? model,
-    RAGParams? ragParams,
-    List<dynamic>? tools,
-    dynamic toolChoice,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    List<String>? stop,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    ReasoningEffort? reasoningEffort,
-    int? reasoningBudget,
-    ReasoningSummary? reasoningSummary,
-  }) {
-    return LLMGenConfig(
-      object: object ?? this.object,
-      systemPrompt: systemPrompt ?? this.systemPrompt,
-      prompt: prompt ?? this.prompt,
-      multiTurn: multiTurn ?? this.multiTurn,
-      model: model ?? this.model,
-      ragParams: ragParams ?? this.ragParams,
-      tools: tools ?? this.tools,
-      toolChoice: toolChoice ?? this.toolChoice,
-      temperature: temperature ?? this.temperature,
-      topP: topP ?? this.topP,
-      stream: stream ?? this.stream,
-      maxTokens: maxTokens ?? this.maxTokens,
-      stop: stop ?? this.stop,
-      presencePenalty: presencePenalty ?? this.presencePenalty,
-      frequencyPenalty: frequencyPenalty ?? this.frequencyPenalty,
-      logitBias: logitBias ?? this.logitBias,
-      thinkingBudget: thinkingBudget ?? this.thinkingBudget,
-      reasoningEffort: reasoningEffort ?? this.reasoningEffort,
-      reasoningBudget: reasoningBudget ?? this.reasoningBudget,
-      reasoningSummary: reasoningSummary ?? this.reasoningSummary,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'object': object,
-      'system_prompt': systemPrompt,
-      'prompt': prompt,
-      'multi_turn': multiTurn,
-      'model': model,
-      'rag_params': ragParams?.toJson(),
-      'tools': tools?.map((t) => t.toJson()).toList(),
-      'tool_choice': toolChoice,
-      'temperature': temperature,
-      'top_p': topP,
-      'stream': stream,
-      'max_tokens': maxTokens,
-      'stop': stop,
-      'presence_penalty': presencePenalty,
-      'frequency_penalty': frequencyPenalty,
-      'logit_bias': logitBias,
-      'thinking_budget': thinkingBudget,
-      'reasoning_effort': reasoningEffort?.value,
-      'reasoning_budget': reasoningBudget,
-      'reasoning_summary': reasoningSummary.value,
-    };
-  }
-}
+// @override
+// Map<String, dynamic> toJson() {
+//   return {
+//     'object': object.value,
+//     'system_prompt': systemPrompt,
+//     'prompt': prompt,
+//     'multi_turn': multiTurn,
+//     'model': model,
+//     'rag_params': ragParams?.toJson(),
+//     'tools': tools?.map((t) => t.toJson()).toList(),
+//     'tool_choice': toolChoice,
+//     'temperature': temperature,
+//     'top_p': topP,
+//     'stream': stream,
+//     'max_tokens': maxTokens,
+//     'stop': stop,
+//     'presence_penalty': presencePenalty,
+//     'frequency_penalty': frequencyPenalty,
+//     'logit_bias': logitBias,
+//     'thinking_budget': thinkingBudget,
+//     'reasoning_effort': reasoningEffort?.value,
+//     'reasoning_budget': reasoningBudget,
+//     'reasoning_summary': reasoningSummary.value,
+//   };
+// }
+// }
 
 /// Embedding generation configuration
 class EmbedGenConfig {
@@ -343,21 +406,43 @@ class PythonGenConfig {
 /// Generation configuration union type
 typedef GenConfig = dynamic; // LLMGenConfig | EmbedGenConfig | PythonGenConfig
 
-/// Column schema
-class ColumnSchema {
-  final String id;
-  final ColumnSchemaDtype dtype;
-  final int vlen;
-  final bool index;
-  final dynamic genConfig;
+// @freezed
+// abstract class GenConfig with _$Genconfig{
 
-  const ColumnSchema({
+// }
+
+/// Column schema
+@freezed
+abstract class ColumnSchema with _$ColumnSchema {
+  ColumnSchema._({
     required this.id,
     this.dtype = ColumnSchemaDtype.str,
     this.vlen = 0,
     this.index = true,
     this.genConfig,
   });
+  factory ColumnSchema({
+    required String id,
+    @Default(ColumnSchemaDtype.str) ColumnSchemaDtype dtype,
+    @Default(0) int vlen,
+    @Default(true) bool index,
+    dynamic genConfig,
+  }) = _ColumnSchema;
+
+  @override
+  final String id;
+
+  @override
+  final ColumnSchemaDtype dtype;
+
+  @override
+  final int vlen;
+
+  @override
+  final bool index;
+
+  @override
+  final dynamic genConfig;
 
   factory ColumnSchema.fromJson(Map<String, dynamic> json) {
     return ColumnSchema(
@@ -369,23 +454,6 @@ class ColumnSchema {
       vlen: json['vlen'] as int? ?? 0,
       index: json['index'] as bool? ?? true,
       genConfig: json['gen_config'],
-    );
-  }
-
-  /// Creates a copy with updated fields
-  ColumnSchema copyWith({
-    String? id,
-    ColumnSchemaDtype? dtype,
-    int? vlen,
-    bool? index,
-    dynamic genConfig,
-  }) {
-    return ColumnSchema(
-      id: id ?? this.id,
-      dtype: dtype ?? this.dtype,
-      vlen: vlen ?? this.vlen,
-      index: index ?? this.index,
-      genConfig: genConfig ?? this.genConfig,
     );
   }
 
@@ -401,145 +469,68 @@ class ColumnSchema {
 }
 
 /// Column schema for creation
-class ColumnSchemaCreate extends ColumnSchema {
-  const ColumnSchemaCreate({
-    required super.id,
-    super.dtype = ColumnSchemaDtype.str,
-    super.vlen = 0,
-    super.index = true,
-    super.genConfig,
-  });
+/// need to update to use sanitized non empty string
+// @freezed
+// abstract class ColumnSchemaCreate extends ColumnSchema
+//     with _$ColumnSchemaCreate {
+//   ColumnSchemaCreate._({
+//     required this.id,
+//     ColumnSchemaDtype dtype = ColumnSchemaDtype.str,
+//     int vlen = 0,
+//     bool index = true,
+//     dynamic genConfig,
+//   }) : super._(
+//          id: id,
+//          dtype: dtype,
+//          vlen: vlen,
+//          index: index,
+//          genConfig: genConfig,
+//        );
 
-  @override
-  ColumnSchemaCreate copyWith({
-    String? id,
-    ColumnSchemaDtype? dtype,
-    int? vlen,
-    bool? index,
-    dynamic genConfig,
-  }) {
-    return ColumnSchemaCreate(
-      id: id ?? this.id,
-      dtype: dtype ?? this.dtype,
-      vlen: vlen ?? this.vlen,
-      index: index ?? this.index,
-      genConfig: genConfig ?? this.genConfig,
-    );
-  }
-}
-
-/// Table base class
-class TableBase {
-  final String id;
-
-  const TableBase({required this.id});
-}
+//   @override
+//   final SanitizedNotEmptyString id;
+// }
 
 /// Table schema for creation
-class TableSchemaCreate extends TableBase {
-  final List<ColumnSchemaCreate> cols;
+// @freezed
+// abstract class TableSchemaCreate with _$TableSchemaCreate {
+//   factory TableSchemaCreate({
+//     required String id,
+//     required List<ColumnSchemaCreate> cols,
+//   }) = _TableSchemaCreate;
 
-  const TableSchemaCreate({required super.id, required this.cols});
+//   factory TableSchemaCreate.fromJson(Map<String, dynamic> json) =>
+//       _$TableSchemaCreateFromJson(json);
+// }
 
-  /// Creates a copy with updated fields
-  TableSchemaCreate copyWith({String? id, List<ColumnSchemaCreate>? cols}) {
-    return TableSchemaCreate(id: id ?? this.id, cols: cols ?? this.cols);
-  }
+// /// Knowledge table schema for creation
+// class KnowledgeTableSchemaCreate extends TableSchemaCreate {
+//   final String embeddingModel;
 
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'cols': cols.map((col) => col.toJson()).toList()};
-  }
-}
+//   const KnowledgeTableSchemaCreate({
+//     required super.id,
+//     required super.cols,
+//     required this.embeddingModel,
+//   });
 
-/// Action table schema for creation
-/// pending deprecate
-class ActionTableSchemaCreate extends TableSchemaCreate {
-  const ActionTableSchemaCreate({required super.id, required super.cols});
+//   @override
+//   KnowledgeTableSchemaCreate copyWith({
+//     String? id,
+//     List<ColumnSchemaCreate>? cols,
+//     String? embeddingModel,
+//   }) {
+//     return KnowledgeTableSchemaCreate(
+//       id: id ?? this.id,
+//       cols: cols ?? this.cols,
+//       embeddingModel: embeddingModel ?? this.embeddingModel,
+//     );
+//   }
 
-  @override
-  ActionTableSchemaCreate copyWith({
-    String? id,
-    List<ColumnSchemaCreate>? cols,
-  }) {
-    return ActionTableSchemaCreate(id: id ?? this.id, cols: cols ?? this.cols);
-  }
-}
-
-/// Add action column schema
-/// pending deprecate
-class AddActionColumnSchema extends ActionTableSchemaCreate {
-  const AddActionColumnSchema({required super.id, required super.cols});
-
-  @override
-  AddActionColumnSchema copyWith({String? id, List<ColumnSchemaCreate>? cols}) {
-    return AddActionColumnSchema(id: id ?? this.id, cols: cols ?? this.cols);
-  }
-}
-
-/// Knowledge table schema for creation
-class KnowledgeTableSchemaCreate extends TableSchemaCreate {
-  final String embeddingModel;
-
-  const KnowledgeTableSchemaCreate({
-    required super.id,
-    required super.cols,
-    required this.embeddingModel,
-  });
-
-  @override
-  KnowledgeTableSchemaCreate copyWith({
-    String? id,
-    List<ColumnSchemaCreate>? cols,
-    String? embeddingModel,
-  }) {
-    return KnowledgeTableSchemaCreate(
-      id: id ?? this.id,
-      cols: cols ?? this.cols,
-      embeddingModel: embeddingModel ?? this.embeddingModel,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'embedding_model': embeddingModel};
-  }
-}
-
-/// Add knowledge column schema
-/// pending deprecate
-class AddKnowledgeColumnSchema extends TableSchemaCreate {
-  const AddKnowledgeColumnSchema({required super.id, required super.cols});
-
-  @override
-  AddKnowledgeColumnSchema copyWith({
-    String? id,
-    List<ColumnSchemaCreate>? cols,
-  }) {
-    return AddKnowledgeColumnSchema(id: id ?? this.id, cols: cols ?? this.cols);
-  }
-}
-
-/// Chat table schema for creation
-/// pending deprecate
-class ChatTableSchemaCreate extends TableSchemaCreate {
-  const ChatTableSchemaCreate({required super.id, required super.cols});
-
-  @override
-  ChatTableSchemaCreate copyWith({String? id, List<ColumnSchemaCreate>? cols}) {
-    return ChatTableSchemaCreate(id: id ?? this.id, cols: cols ?? this.cols);
-  }
-}
-
-/// Add chat column schema
-/// pending deprecate
-class AddChatColumnSchema extends TableSchemaCreate {
-  const AddChatColumnSchema({required super.id, required super.cols});
-
-  @override
-  AddChatColumnSchema copyWith({String? id, List<ColumnSchemaCreate>? cols}) {
-    return AddChatColumnSchema(id: id ?? this.id, cols: cols ?? this.cols);
-  }
-}
+//   @override
+//   Map<String, dynamic> toJson() {
+//     return {...super.toJson(), 'embedding_model': embeddingModel};
+//   }
+// }
 
 /// Table metadata
 class TableMeta extends TableBase {
@@ -1220,3 +1211,4 @@ class TableImportRequest {
     };
   }
 }
+

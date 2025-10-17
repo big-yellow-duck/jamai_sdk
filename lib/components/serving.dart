@@ -85,10 +85,10 @@ class Serving {
   ///
   /// [request] - The chat completion request
   ///
-  /// Returns a [ChatCompletionResponse] containing the chat completion result.
+  /// Returns a [ChatCompletionChunkResponse] containing the chat completion result.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<ChatCompletionResponse> chatCompletion(ChatRequest request) async {
+  Future<ChatCompletionChunkResponse> chatCompletion(ChatRequest request) async {
     final url = Uri.parse('$apiUrl/api/v1/chat_completions');
 
     final response = await http.post(
@@ -102,7 +102,7 @@ class Serving {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ChatCompletionResponse.fromJson(jsonResponse);
+      return ChatCompletionChunkResponse.fromJson(jsonResponse);
     } else {
       throw Exception(
         'Failed to create chat completion: ${response.statusCode} - ${response.body}',
