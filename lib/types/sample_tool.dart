@@ -1,30 +1,39 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+part 'sample_tool.mapper.dart';
 
-part 'sample_tool.freezed.dart';
-part 'sample_tool.g.dart';
+@MappableClass(discriminatorKey: 'vehicleType')
+sealed class Vehicles with VehiclesMappable {}
 
-@freezed
-abstract class Subclass with _$Subclass {
-  const Subclass._(this.value);
-  factory Subclass({required int value}) = _SubClass;
-  @override
-  final int value;
+@MappableClass(discriminatorKey: 'car')
+class Car extends Vehicles with CarMappable {
+  final String model;
+  Car({required this.model});
 
+  factory Car.fromJson(String json) => CarMapper.fromJson(json);
 }
 
-@freezed
-abstract class MyClass extends Subclass with _$MyClass {
-  const MyClass._({required int value}) : super._(value);
-
-  const factory MyClass(int value, String myNewString) = _MyClass;
+@MappableClass(discriminatorKey: 'bike')
+class Bike extends Vehicles with BikeMappable {
+  final double power;
+  Bike({required this.power});
 }
 
-class Niama{
-  final int nombor;
-  Niama(this.nombor);
-}
+void main() {
+  Vehicles wee = Car(model: 'honda');
+  Vehicles kk = Bike(power: 69);
 
-class AnotherClass extends Niama{
-  final int anotherNombor;
-  AnotherClass({required int value, required this.anotherNombor}) : super(value);
+  final m = switch (wee) {
+    Car() => 'this is a car',
+    Bike() => 'this is a bike',
+  };
+  print(wee.toJson());
+
+  print(kk);
+
+  print(m);
+
+  // try from json
+  Vehicles jj = CarMapper.fromJson('{"model" : "honda"}');
+
+  print(jj);
 }

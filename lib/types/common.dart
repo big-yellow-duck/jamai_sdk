@@ -6,37 +6,32 @@ import 'package:meta/meta.dart';
 part 'common.mapper.dart';
 
 /// Represents the allowed attributes for sorting.
+@MappableEnum(caseStyle: CaseStyle.snakeCase, defaultValue: OrderBy.updatedAt)
 enum OrderBy {
-  // Each enum member stores the exact API string.
   id('id'),
   name('name'),
   createdAt('created_at'),
   updatedAt('updated_at');
 
-  // The actual string value sent to the API/database
-  final String apiString;
+  final String displayName;
 
-  // Constructor to assign the string value
-  const OrderBy(this.apiString);
+  const OrderBy(this.displayName);
 
   @override
-  String toString() => apiString;
-  // Define the default value directly on the enum
-  static const OrderBy defaultValue = OrderBy.updatedAt;
+  String toString() => displayName;
 }
 
+@MappableEnum(caseStyle: CaseStyle.snakeCase, defaultValue: TableType.action)
 enum TableType {
-  action('action'),
-  knowledge('knowledge'),
-  chat('chat');
+  action("action"),
+  chat('chat'),
+  knowledge('knowledge');
 
-  final String apiString;
-  const TableType(this.apiString);
+  final String displayName;
+  const TableType(this.displayName);
 
   @override
-  String toString() => apiString;
-
-  static const TableType defaultValue = TableType.action;
+  String toString() => displayName;
 }
 
 /// String of length less than 255
@@ -67,8 +62,6 @@ class ShortString {
     return _value[index];
   }
 
-  /// Delegates equality comparison to the underlying String value.
-  /// This ensures that two ShortString objects with the same content are equal.
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -98,20 +91,25 @@ class ExampleModelIds {
 }
 
 /// Represents the state of a progress operation
+@MappableEnum(
+  caseStyle: CaseStyle.upperCase,
+  defaultValue: ProgressState.started,
+)
 enum ProgressState {
-  started('STARTED'),
-  completed('COMPLETED'),
-  failed('FAILED');
+  started('started'),
+  completed('completed'),
+  failed('failed');
 
-  final String apiString;
-  const ProgressState(this.apiString);
+  final String displayName;
+  const ProgressState(this.displayName);
 
   @override
-  String toString() => apiString;
+  toString() => displayName;
 }
 
 /// Base progress information
-class Progress {
+@MappableClass()
+class Progress with ProgressMappable {
   final String key;
   final Map<String, dynamic> data;
   final ProgressState state;
@@ -123,21 +121,6 @@ class Progress {
     this.state = ProgressState.started,
     this.error,
   });
-
-  /// Creates a copy with updated fields
-  Progress copyWith({
-    String? key,
-    Map<String, dynamic>? data,
-    ProgressState? state,
-    String? error,
-  }) {
-    return Progress(
-      key: key ?? this.key,
-      data: data ?? this.data,
-      state: state ?? this.state,
-      error: error ?? this.error,
-    );
-  }
 }
 
 /// Represents a stage in a progress operation
@@ -268,7 +251,8 @@ class OkResponse with OkResponseMappable {
 }
 
 /// Generic paginated response
-class Page<T> {
+@MappableClass()
+class Page<T> with PageMappable<T> {
   final List<T> items;
   final int offset;
   final int limit;
@@ -282,38 +266,11 @@ class Page<T> {
     this.total = 0,
     this.endCursor,
   });
-
-  /// Creates a copy with updated fields
-  Page<T> copyWith({
-    List<T>? items,
-    int? offset,
-    int? limit,
-    int? total,
-    String? endCursor,
-  }) {
-    return Page<T>(
-      items: items ?? this.items,
-      offset: offset ?? this.offset,
-      limit: limit ?? this.limit,
-      total: total ?? this.total,
-      endCursor: endCursor ?? this.endCursor,
-    );
-  }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'items': items,
-      'offset': offset,
-      'limit': limit,
-      'total': total,
-      'end_cursor': endCursor,
-    };
-  }
 }
 
 /// User agent information for tracking requests
-class UserAgent {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserAgent with UserAgentMappable {
   final bool isBrowser;
   final String agent;
   final String agentVersion;
@@ -418,52 +375,28 @@ class UserAgent {
       agent: "",
     );
   }
-
-  /// Creates a copy with updated fields
-  UserAgent copyWith({
-    bool? isBrowser,
-    String? agent,
-    String? agentVersion,
-    String? os,
-    String? architecture,
-    String? language,
-    String? languageVersion,
-  }) {
-    return UserAgent(
-      isBrowser: isBrowser ?? this.isBrowser,
-      agent: agent ?? this.agent,
-      agentVersion: agentVersion ?? this.agentVersion,
-      os: os ?? this.os,
-      architecture: architecture ?? this.architecture,
-      language: language ?? this.language,
-      languageVersion: languageVersion ?? this.languageVersion,
-    );
-  }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'is_browser': isBrowser,
-      'agent': agent,
-      'agent_version': agentVersion,
-      'os': os,
-      'architecture': architecture,
-      'language': language,
-      'language_version': languageVersion,
-      'system': system,
-      'system_version': systemVersion,
-    };
-  }
 }
 
-/// Password login request
-class PasswordLoginRequest {
+@MappableClass()
+class PasswordLoginRequest with PasswordLoginRequestMappable {
   final String email;
   final String password;
 
-  const PasswordLoginRequest({required this.email, required this.password});
+  const PasswordLoginRequest._({required this.email, required this.password});
 
-  /// Validates the request
+  factory PasswordLoginRequest({
+    required String email,
+    required String password,
+  }) {
+    if (email.isEmpty) {
+      throw ArgumentError('Email cannot be empty');
+    }
+    if (password.isEmpty || password.length > 72) {
+      throw ArgumentError('Password must be between 1 and 72 characters');
+    }
+    return PasswordLoginRequest._(email: email, password: password);
+  }
+
   void validate() {
     if (email.isEmpty) {
       throw ArgumentError('Email cannot be empty');
@@ -472,28 +405,44 @@ class PasswordLoginRequest {
       throw ArgumentError('Password must be between 1 and 72 characters');
     }
   }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {'email': email, 'password': password};
-  }
-
-  /// Creates from JSON
-  factory PasswordLoginRequest.fromJson(Map<String, dynamic> json) {
-    return PasswordLoginRequest(
-      email: json['email'],
-      password: json['password'],
-    );
-  }
 }
 
 /// Password change request
-class PasswordChangeRequest {
+@MappableClass()
+class PasswordChangeRequest with PasswordChangeRequestMappable {
   final String email;
   final String password;
   final String newPassword;
 
-  const PasswordChangeRequest({
+  factory PasswordChangeRequest({
+    required String email,
+    required String password,
+    required String newPassword,
+  }) {
+    if (email.isEmpty) {
+      throw ArgumentError('Email cannot be empty');
+    }
+    if (password.isEmpty || password.length > 72) {
+      throw ArgumentError(
+        'Current password must be between 1 and 72 characters',
+      );
+    }
+    if (newPassword.isEmpty || newPassword.length > 72) {
+      throw ArgumentError('New password must be between 1 and 72 characters');
+    }
+    if (password == newPassword) {
+      throw ArgumentError(
+        'New password must be different from current password',
+      );
+    }
+
+    return PasswordChangeRequest._(
+      email: email,
+      password: password,
+      newPassword: newPassword,
+    );
+  }
+  const PasswordChangeRequest._({
     required this.email,
     required this.password,
     required this.newPassword,
@@ -517,20 +466,6 @@ class PasswordChangeRequest {
         'New password must be different from current password',
       );
     }
-  }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {'email': email, 'password': password, 'new_password': newPassword};
-  }
-
-  /// Creates from JSON
-  factory PasswordChangeRequest.fromJson(Map<String, dynamic> json) {
-    return PasswordChangeRequest(
-      email: json['email'],
-      password: json['password'],
-      newPassword: json['new_password'],
-    );
   }
 }
 
@@ -912,4 +847,8 @@ class SanitizedNotEmptyString {
 
   /// Optional: convenience to convert back to `String`
   String asString() => value;
+}
+
+void main() {
+  print(OrderBy.values);
 }

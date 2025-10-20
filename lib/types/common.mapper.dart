@@ -7,6 +7,327 @@
 
 part of 'common.dart';
 
+class OrderByMapper extends EnumMapper<OrderBy> {
+  OrderByMapper._();
+
+  static OrderByMapper? _instance;
+  static OrderByMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = OrderByMapper._());
+    }
+    return _instance!;
+  }
+
+  static OrderBy fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  OrderBy decode(dynamic value) {
+    switch (value) {
+      case r'id':
+        return OrderBy.id;
+      case r'name':
+        return OrderBy.name;
+      case r'created_at':
+        return OrderBy.createdAt;
+      case r'updated_at':
+        return OrderBy.updatedAt;
+      default:
+        return OrderBy.values[3];
+    }
+  }
+
+  @override
+  dynamic encode(OrderBy self) {
+    switch (self) {
+      case OrderBy.id:
+        return r'id';
+      case OrderBy.name:
+        return r'name';
+      case OrderBy.createdAt:
+        return r'created_at';
+      case OrderBy.updatedAt:
+        return r'updated_at';
+    }
+  }
+}
+
+extension OrderByMapperExtension on OrderBy {
+  String toValue() {
+    OrderByMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<OrderBy>(this) as String;
+  }
+}
+
+class TableTypeMapper extends EnumMapper<TableType> {
+  TableTypeMapper._();
+
+  static TableTypeMapper? _instance;
+  static TableTypeMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = TableTypeMapper._());
+    }
+    return _instance!;
+  }
+
+  static TableType fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  TableType decode(dynamic value) {
+    switch (value) {
+      case r'action':
+        return TableType.action;
+      case r'chat':
+        return TableType.chat;
+      case r'knowledge':
+        return TableType.knowledge;
+      default:
+        return TableType.values[0];
+    }
+  }
+
+  @override
+  dynamic encode(TableType self) {
+    switch (self) {
+      case TableType.action:
+        return r'action';
+      case TableType.chat:
+        return r'chat';
+      case TableType.knowledge:
+        return r'knowledge';
+    }
+  }
+}
+
+extension TableTypeMapperExtension on TableType {
+  String toValue() {
+    TableTypeMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<TableType>(this) as String;
+  }
+}
+
+class ProgressStateMapper extends EnumMapper<ProgressState> {
+  ProgressStateMapper._();
+
+  static ProgressStateMapper? _instance;
+  static ProgressStateMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ProgressStateMapper._());
+    }
+    return _instance!;
+  }
+
+  static ProgressState fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  ProgressState decode(dynamic value) {
+    switch (value) {
+      case r'STARTED':
+        return ProgressState.started;
+      case r'COMPLETED':
+        return ProgressState.completed;
+      case r'FAILED':
+        return ProgressState.failed;
+      default:
+        return ProgressState.values[0];
+    }
+  }
+
+  @override
+  dynamic encode(ProgressState self) {
+    switch (self) {
+      case ProgressState.started:
+        return r'STARTED';
+      case ProgressState.completed:
+        return r'COMPLETED';
+      case ProgressState.failed:
+        return r'FAILED';
+    }
+  }
+}
+
+extension ProgressStateMapperExtension on ProgressState {
+  String toValue() {
+    ProgressStateMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<ProgressState>(this) as String;
+  }
+}
+
+class ProgressMapper extends ClassMapperBase<Progress> {
+  ProgressMapper._();
+
+  static ProgressMapper? _instance;
+  static ProgressMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ProgressMapper._());
+      TableImportProgressMapper.ensureInitialized();
+      ProgressStateMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'Progress';
+
+  static String _$key(Progress v) => v.key;
+  static const Field<Progress, String> _f$key = Field('key', _$key);
+  static Map<String, dynamic> _$data(Progress v) => v.data;
+  static const Field<Progress, Map<String, dynamic>> _f$data = Field(
+    'data',
+    _$data,
+    opt: true,
+    def: const {},
+  );
+  static ProgressState _$state(Progress v) => v.state;
+  static const Field<Progress, ProgressState> _f$state = Field(
+    'state',
+    _$state,
+    opt: true,
+    def: ProgressState.started,
+  );
+  static String? _$error(Progress v) => v.error;
+  static const Field<Progress, String> _f$error = Field(
+    'error',
+    _$error,
+    opt: true,
+  );
+
+  @override
+  final MappableFields<Progress> fields = const {
+    #key: _f$key,
+    #data: _f$data,
+    #state: _f$state,
+    #error: _f$error,
+  };
+
+  static Progress _instantiate(DecodingData data) {
+    return Progress(
+      key: data.dec(_f$key),
+      data: data.dec(_f$data),
+      state: data.dec(_f$state),
+      error: data.dec(_f$error),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static Progress fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Progress>(map);
+  }
+
+  static Progress fromJson(String json) {
+    return ensureInitialized().decodeJson<Progress>(json);
+  }
+}
+
+mixin ProgressMappable {
+  String toJson() {
+    return ProgressMapper.ensureInitialized().encodeJson<Progress>(
+      this as Progress,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return ProgressMapper.ensureInitialized().encodeMap<Progress>(
+      this as Progress,
+    );
+  }
+
+  ProgressCopyWith<Progress, Progress, Progress> get copyWith =>
+      _ProgressCopyWithImpl<Progress, Progress>(
+        this as Progress,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return ProgressMapper.ensureInitialized().stringifyValue(this as Progress);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return ProgressMapper.ensureInitialized().equalsValue(
+      this as Progress,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return ProgressMapper.ensureInitialized().hashValue(this as Progress);
+  }
+}
+
+extension ProgressValueCopy<$R, $Out> on ObjectCopyWith<$R, Progress, $Out> {
+  ProgressCopyWith<$R, Progress, $Out> get $asProgress =>
+      $base.as((v, t, t2) => _ProgressCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class ProgressCopyWith<$R, $In extends Progress, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
+  get data;
+  $R call({
+    String? key,
+    Map<String, dynamic>? data,
+    ProgressState? state,
+    String? error,
+  });
+  ProgressCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _ProgressCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, Progress, $Out>
+    implements ProgressCopyWith<$R, Progress, $Out> {
+  _ProgressCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<Progress> $mapper =
+      ProgressMapper.ensureInitialized();
+  @override
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
+  get data => MapCopyWith(
+    $value.data,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(data: v),
+  );
+  @override
+  $R call({
+    String? key,
+    Map<String, dynamic>? data,
+    ProgressState? state,
+    Object? error = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (key != null) #key: key,
+      if (data != null) #data: data,
+      if (state != null) #state: state,
+      if (error != $none) #error: error,
+    }),
+  );
+  @override
+  Progress $make(CopyWithData data) => Progress(
+    key: data.get(#key, or: $value.key),
+    data: data.get(#data, or: $value.data),
+    state: data.get(#state, or: $value.state),
+    error: data.get(#error, or: $value.error),
+  );
+
+  @override
+  ProgressCopyWith<$R2, Progress, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _ProgressCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
 class ProgressStageMapper extends ClassMapperBase<ProgressStage> {
   ProgressStageMapper._();
 
@@ -137,13 +458,16 @@ class _ProgressStageCopyWithImpl<$R, $Out>
   ) => _ProgressStageCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
-class TableImportProgressMapper extends ClassMapperBase<TableImportProgress> {
+class TableImportProgressMapper
+    extends SubClassMapperBase<TableImportProgress> {
   TableImportProgressMapper._();
 
   static TableImportProgressMapper? _instance;
   static TableImportProgressMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = TableImportProgressMapper._());
+      ProgressMapper.ensureInitialized().addSubMapper(_instance!);
+      ProgressStateMapper.ensureInitialized();
       ProgressStageMapper.ensureInitialized();
     }
     return _instance!;
@@ -222,6 +546,13 @@ class TableImportProgressMapper extends ClassMapperBase<TableImportProgress> {
     #addRows: _f$addRows,
     #index: _f$index,
   };
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'tableImportProgress';
+  @override
+  late final ClassMapperBase superMapper = ProgressMapper.ensureInitialized();
 
   static TableImportProgress _instantiate(DecodingData data) {
     return TableImportProgress(
@@ -306,7 +637,8 @@ abstract class TableImportProgressCopyWith<
   $In extends TableImportProgress,
   $Out
 >
-    implements ClassCopyWith<$R, $In, $Out> {
+    implements ProgressCopyWith<$R, $In, $Out> {
+  @override
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
   get data;
   ProgressStageCopyWith<$R, ProgressStage, ProgressStage> get loadData;
@@ -314,6 +646,7 @@ abstract class TableImportProgressCopyWith<
   ProgressStageCopyWith<$R, ProgressStage, ProgressStage> get uploadFiles;
   ProgressStageCopyWith<$R, ProgressStage, ProgressStage> get addRows;
   ProgressStageCopyWith<$R, ProgressStage, ProgressStage> get index;
+  @override
   $R call({
     String? key,
     Map<String, dynamic>? data,
@@ -534,6 +867,691 @@ class _OkResponseCopyWithImpl<$R, $Out>
   OkResponseCopyWith<$R2, OkResponse, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _OkResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class PageMapper extends ClassMapperBase<Page> {
+  PageMapper._();
+
+  static PageMapper? _instance;
+  static PageMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = PageMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'Page';
+  @override
+  Function get typeFactory =>
+      <T>(f) => f<Page<T>>();
+
+  static List<dynamic> _$items(Page v) => v.items;
+  static dynamic _arg$items<T>(f) => f<List<T>>();
+  static const Field<Page, List<dynamic>> _f$items = Field(
+    'items',
+    _$items,
+    opt: true,
+    def: const [],
+    arg: _arg$items,
+  );
+  static int _$offset(Page v) => v.offset;
+  static const Field<Page, int> _f$offset = Field(
+    'offset',
+    _$offset,
+    opt: true,
+    def: 0,
+  );
+  static int _$limit(Page v) => v.limit;
+  static const Field<Page, int> _f$limit = Field(
+    'limit',
+    _$limit,
+    opt: true,
+    def: 0,
+  );
+  static int _$total(Page v) => v.total;
+  static const Field<Page, int> _f$total = Field(
+    'total',
+    _$total,
+    opt: true,
+    def: 0,
+  );
+  static String? _$endCursor(Page v) => v.endCursor;
+  static const Field<Page, String> _f$endCursor = Field(
+    'endCursor',
+    _$endCursor,
+    opt: true,
+  );
+
+  @override
+  final MappableFields<Page> fields = const {
+    #items: _f$items,
+    #offset: _f$offset,
+    #limit: _f$limit,
+    #total: _f$total,
+    #endCursor: _f$endCursor,
+  };
+
+  static Page<T> _instantiate<T>(DecodingData data) {
+    return Page(
+      items: data.dec(_f$items),
+      offset: data.dec(_f$offset),
+      limit: data.dec(_f$limit),
+      total: data.dec(_f$total),
+      endCursor: data.dec(_f$endCursor),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static Page<T> fromMap<T>(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Page<T>>(map);
+  }
+
+  static Page<T> fromJson<T>(String json) {
+    return ensureInitialized().decodeJson<Page<T>>(json);
+  }
+}
+
+mixin PageMappable<T> {
+  String toJson() {
+    return PageMapper.ensureInitialized().encodeJson<Page<T>>(this as Page<T>);
+  }
+
+  Map<String, dynamic> toMap() {
+    return PageMapper.ensureInitialized().encodeMap<Page<T>>(this as Page<T>);
+  }
+
+  PageCopyWith<Page<T>, Page<T>, Page<T>, T> get copyWith =>
+      _PageCopyWithImpl<Page<T>, Page<T>, T>(
+        this as Page<T>,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return PageMapper.ensureInitialized().stringifyValue(this as Page<T>);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return PageMapper.ensureInitialized().equalsValue(this as Page<T>, other);
+  }
+
+  @override
+  int get hashCode {
+    return PageMapper.ensureInitialized().hashValue(this as Page<T>);
+  }
+}
+
+extension PageValueCopy<$R, $Out, T> on ObjectCopyWith<$R, Page<T>, $Out> {
+  PageCopyWith<$R, Page<T>, $Out, T> get $asPage =>
+      $base.as((v, t, t2) => _PageCopyWithImpl<$R, $Out, T>(v, t, t2));
+}
+
+abstract class PageCopyWith<$R, $In extends Page<T>, $Out, T>
+    implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, T, ObjectCopyWith<$R, T, T>> get items;
+  $R call({
+    List<T>? items,
+    int? offset,
+    int? limit,
+    int? total,
+    String? endCursor,
+  });
+  PageCopyWith<$R2, $In, $Out2, T> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _PageCopyWithImpl<$R, $Out, T>
+    extends ClassCopyWithBase<$R, Page<T>, $Out>
+    implements PageCopyWith<$R, Page<T>, $Out, T> {
+  _PageCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<Page> $mapper = PageMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, T, ObjectCopyWith<$R, T, T>> get items => ListCopyWith(
+    $value.items,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(items: v),
+  );
+  @override
+  $R call({
+    List<T>? items,
+    int? offset,
+    int? limit,
+    int? total,
+    Object? endCursor = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (items != null) #items: items,
+      if (offset != null) #offset: offset,
+      if (limit != null) #limit: limit,
+      if (total != null) #total: total,
+      if (endCursor != $none) #endCursor: endCursor,
+    }),
+  );
+  @override
+  Page<T> $make(CopyWithData data) => Page(
+    items: data.get(#items, or: $value.items),
+    offset: data.get(#offset, or: $value.offset),
+    limit: data.get(#limit, or: $value.limit),
+    total: data.get(#total, or: $value.total),
+    endCursor: data.get(#endCursor, or: $value.endCursor),
+  );
+
+  @override
+  PageCopyWith<$R2, Page<T>, $Out2, T> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _PageCopyWithImpl<$R2, $Out2, T>($value, $cast, t);
+}
+
+class UserAgentMapper extends ClassMapperBase<UserAgent> {
+  UserAgentMapper._();
+
+  static UserAgentMapper? _instance;
+  static UserAgentMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = UserAgentMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'UserAgent';
+
+  static bool _$isBrowser(UserAgent v) => v.isBrowser;
+  static const Field<UserAgent, bool> _f$isBrowser = Field(
+    'isBrowser',
+    _$isBrowser,
+    key: r'is_browser',
+    opt: true,
+    def: true,
+  );
+  static String _$agent(UserAgent v) => v.agent;
+  static const Field<UserAgent, String> _f$agent = Field('agent', _$agent);
+  static String _$agentVersion(UserAgent v) => v.agentVersion;
+  static const Field<UserAgent, String> _f$agentVersion = Field(
+    'agentVersion',
+    _$agentVersion,
+    key: r'agent_version',
+    opt: true,
+    def: "",
+  );
+  static String _$os(UserAgent v) => v.os;
+  static const Field<UserAgent, String> _f$os = Field(
+    'os',
+    _$os,
+    opt: true,
+    def: "",
+  );
+  static String _$architecture(UserAgent v) => v.architecture;
+  static const Field<UserAgent, String> _f$architecture = Field(
+    'architecture',
+    _$architecture,
+    opt: true,
+    def: "",
+  );
+  static String _$language(UserAgent v) => v.language;
+  static const Field<UserAgent, String> _f$language = Field(
+    'language',
+    _$language,
+    opt: true,
+    def: "",
+  );
+  static String _$languageVersion(UserAgent v) => v.languageVersion;
+  static const Field<UserAgent, String> _f$languageVersion = Field(
+    'languageVersion',
+    _$languageVersion,
+    key: r'language_version',
+    opt: true,
+    def: "",
+  );
+  static String _$system(UserAgent v) => v.system;
+  static const Field<UserAgent, String> _f$system = Field(
+    'system',
+    _$system,
+    mode: FieldMode.member,
+  );
+  static String _$systemVersion(UserAgent v) => v.systemVersion;
+  static const Field<UserAgent, String> _f$systemVersion = Field(
+    'systemVersion',
+    _$systemVersion,
+    key: r'system_version',
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<UserAgent> fields = const {
+    #isBrowser: _f$isBrowser,
+    #agent: _f$agent,
+    #agentVersion: _f$agentVersion,
+    #os: _f$os,
+    #architecture: _f$architecture,
+    #language: _f$language,
+    #languageVersion: _f$languageVersion,
+    #system: _f$system,
+    #systemVersion: _f$systemVersion,
+  };
+
+  static UserAgent _instantiate(DecodingData data) {
+    return UserAgent(
+      isBrowser: data.dec(_f$isBrowser),
+      agent: data.dec(_f$agent),
+      agentVersion: data.dec(_f$agentVersion),
+      os: data.dec(_f$os),
+      architecture: data.dec(_f$architecture),
+      language: data.dec(_f$language),
+      languageVersion: data.dec(_f$languageVersion),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static UserAgent fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<UserAgent>(map);
+  }
+
+  static UserAgent fromJson(String json) {
+    return ensureInitialized().decodeJson<UserAgent>(json);
+  }
+}
+
+mixin UserAgentMappable {
+  String toJson() {
+    return UserAgentMapper.ensureInitialized().encodeJson<UserAgent>(
+      this as UserAgent,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return UserAgentMapper.ensureInitialized().encodeMap<UserAgent>(
+      this as UserAgent,
+    );
+  }
+
+  UserAgentCopyWith<UserAgent, UserAgent, UserAgent> get copyWith =>
+      _UserAgentCopyWithImpl<UserAgent, UserAgent>(
+        this as UserAgent,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return UserAgentMapper.ensureInitialized().stringifyValue(
+      this as UserAgent,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return UserAgentMapper.ensureInitialized().equalsValue(
+      this as UserAgent,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return UserAgentMapper.ensureInitialized().hashValue(this as UserAgent);
+  }
+}
+
+extension UserAgentValueCopy<$R, $Out> on ObjectCopyWith<$R, UserAgent, $Out> {
+  UserAgentCopyWith<$R, UserAgent, $Out> get $asUserAgent =>
+      $base.as((v, t, t2) => _UserAgentCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class UserAgentCopyWith<$R, $In extends UserAgent, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({
+    bool? isBrowser,
+    String? agent,
+    String? agentVersion,
+    String? os,
+    String? architecture,
+    String? language,
+    String? languageVersion,
+  });
+  UserAgentCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _UserAgentCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, UserAgent, $Out>
+    implements UserAgentCopyWith<$R, UserAgent, $Out> {
+  _UserAgentCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<UserAgent> $mapper =
+      UserAgentMapper.ensureInitialized();
+  @override
+  $R call({
+    bool? isBrowser,
+    String? agent,
+    String? agentVersion,
+    String? os,
+    String? architecture,
+    String? language,
+    String? languageVersion,
+  }) => $apply(
+    FieldCopyWithData({
+      if (isBrowser != null) #isBrowser: isBrowser,
+      if (agent != null) #agent: agent,
+      if (agentVersion != null) #agentVersion: agentVersion,
+      if (os != null) #os: os,
+      if (architecture != null) #architecture: architecture,
+      if (language != null) #language: language,
+      if (languageVersion != null) #languageVersion: languageVersion,
+    }),
+  );
+  @override
+  UserAgent $make(CopyWithData data) => UserAgent(
+    isBrowser: data.get(#isBrowser, or: $value.isBrowser),
+    agent: data.get(#agent, or: $value.agent),
+    agentVersion: data.get(#agentVersion, or: $value.agentVersion),
+    os: data.get(#os, or: $value.os),
+    architecture: data.get(#architecture, or: $value.architecture),
+    language: data.get(#language, or: $value.language),
+    languageVersion: data.get(#languageVersion, or: $value.languageVersion),
+  );
+
+  @override
+  UserAgentCopyWith<$R2, UserAgent, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _UserAgentCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class PasswordLoginRequestMapper extends ClassMapperBase<PasswordLoginRequest> {
+  PasswordLoginRequestMapper._();
+
+  static PasswordLoginRequestMapper? _instance;
+  static PasswordLoginRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = PasswordLoginRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'PasswordLoginRequest';
+
+  static String _$email(PasswordLoginRequest v) => v.email;
+  static const Field<PasswordLoginRequest, String> _f$email = Field(
+    'email',
+    _$email,
+  );
+  static String _$password(PasswordLoginRequest v) => v.password;
+  static const Field<PasswordLoginRequest, String> _f$password = Field(
+    'password',
+    _$password,
+  );
+
+  @override
+  final MappableFields<PasswordLoginRequest> fields = const {
+    #email: _f$email,
+    #password: _f$password,
+  };
+
+  static PasswordLoginRequest _instantiate(DecodingData data) {
+    return PasswordLoginRequest(
+      email: data.dec(_f$email),
+      password: data.dec(_f$password),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static PasswordLoginRequest fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<PasswordLoginRequest>(map);
+  }
+
+  static PasswordLoginRequest fromJson(String json) {
+    return ensureInitialized().decodeJson<PasswordLoginRequest>(json);
+  }
+}
+
+mixin PasswordLoginRequestMappable {
+  String toJson() {
+    return PasswordLoginRequestMapper.ensureInitialized()
+        .encodeJson<PasswordLoginRequest>(this as PasswordLoginRequest);
+  }
+
+  Map<String, dynamic> toMap() {
+    return PasswordLoginRequestMapper.ensureInitialized()
+        .encodeMap<PasswordLoginRequest>(this as PasswordLoginRequest);
+  }
+
+  PasswordLoginRequestCopyWith<
+    PasswordLoginRequest,
+    PasswordLoginRequest,
+    PasswordLoginRequest
+  >
+  get copyWith =>
+      _PasswordLoginRequestCopyWithImpl<
+        PasswordLoginRequest,
+        PasswordLoginRequest
+      >(this as PasswordLoginRequest, $identity, $identity);
+  @override
+  String toString() {
+    return PasswordLoginRequestMapper.ensureInitialized().stringifyValue(
+      this as PasswordLoginRequest,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return PasswordLoginRequestMapper.ensureInitialized().equalsValue(
+      this as PasswordLoginRequest,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return PasswordLoginRequestMapper.ensureInitialized().hashValue(
+      this as PasswordLoginRequest,
+    );
+  }
+}
+
+extension PasswordLoginRequestValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, PasswordLoginRequest, $Out> {
+  PasswordLoginRequestCopyWith<$R, PasswordLoginRequest, $Out>
+  get $asPasswordLoginRequest => $base.as(
+    (v, t, t2) => _PasswordLoginRequestCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class PasswordLoginRequestCopyWith<
+  $R,
+  $In extends PasswordLoginRequest,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? email, String? password});
+  PasswordLoginRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _PasswordLoginRequestCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, PasswordLoginRequest, $Out>
+    implements PasswordLoginRequestCopyWith<$R, PasswordLoginRequest, $Out> {
+  _PasswordLoginRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<PasswordLoginRequest> $mapper =
+      PasswordLoginRequestMapper.ensureInitialized();
+  @override
+  $R call({String? email, String? password}) => $apply(
+    FieldCopyWithData({
+      if (email != null) #email: email,
+      if (password != null) #password: password,
+    }),
+  );
+  @override
+  PasswordLoginRequest $make(CopyWithData data) => PasswordLoginRequest(
+    email: data.get(#email, or: $value.email),
+    password: data.get(#password, or: $value.password),
+  );
+
+  @override
+  PasswordLoginRequestCopyWith<$R2, PasswordLoginRequest, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _PasswordLoginRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class PasswordChangeRequestMapper
+    extends ClassMapperBase<PasswordChangeRequest> {
+  PasswordChangeRequestMapper._();
+
+  static PasswordChangeRequestMapper? _instance;
+  static PasswordChangeRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = PasswordChangeRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'PasswordChangeRequest';
+
+  static String _$email(PasswordChangeRequest v) => v.email;
+  static const Field<PasswordChangeRequest, String> _f$email = Field(
+    'email',
+    _$email,
+  );
+  static String _$password(PasswordChangeRequest v) => v.password;
+  static const Field<PasswordChangeRequest, String> _f$password = Field(
+    'password',
+    _$password,
+  );
+  static String _$newPassword(PasswordChangeRequest v) => v.newPassword;
+  static const Field<PasswordChangeRequest, String> _f$newPassword = Field(
+    'newPassword',
+    _$newPassword,
+  );
+
+  @override
+  final MappableFields<PasswordChangeRequest> fields = const {
+    #email: _f$email,
+    #password: _f$password,
+    #newPassword: _f$newPassword,
+  };
+
+  static PasswordChangeRequest _instantiate(DecodingData data) {
+    return PasswordChangeRequest(
+      email: data.dec(_f$email),
+      password: data.dec(_f$password),
+      newPassword: data.dec(_f$newPassword),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static PasswordChangeRequest fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<PasswordChangeRequest>(map);
+  }
+
+  static PasswordChangeRequest fromJson(String json) {
+    return ensureInitialized().decodeJson<PasswordChangeRequest>(json);
+  }
+}
+
+mixin PasswordChangeRequestMappable {
+  String toJson() {
+    return PasswordChangeRequestMapper.ensureInitialized()
+        .encodeJson<PasswordChangeRequest>(this as PasswordChangeRequest);
+  }
+
+  Map<String, dynamic> toMap() {
+    return PasswordChangeRequestMapper.ensureInitialized()
+        .encodeMap<PasswordChangeRequest>(this as PasswordChangeRequest);
+  }
+
+  PasswordChangeRequestCopyWith<
+    PasswordChangeRequest,
+    PasswordChangeRequest,
+    PasswordChangeRequest
+  >
+  get copyWith =>
+      _PasswordChangeRequestCopyWithImpl<
+        PasswordChangeRequest,
+        PasswordChangeRequest
+      >(this as PasswordChangeRequest, $identity, $identity);
+  @override
+  String toString() {
+    return PasswordChangeRequestMapper.ensureInitialized().stringifyValue(
+      this as PasswordChangeRequest,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return PasswordChangeRequestMapper.ensureInitialized().equalsValue(
+      this as PasswordChangeRequest,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return PasswordChangeRequestMapper.ensureInitialized().hashValue(
+      this as PasswordChangeRequest,
+    );
+  }
+}
+
+extension PasswordChangeRequestValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, PasswordChangeRequest, $Out> {
+  PasswordChangeRequestCopyWith<$R, PasswordChangeRequest, $Out>
+  get $asPasswordChangeRequest => $base.as(
+    (v, t, t2) => _PasswordChangeRequestCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class PasswordChangeRequestCopyWith<
+  $R,
+  $In extends PasswordChangeRequest,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? email, String? password, String? newPassword});
+  PasswordChangeRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _PasswordChangeRequestCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, PasswordChangeRequest, $Out>
+    implements PasswordChangeRequestCopyWith<$R, PasswordChangeRequest, $Out> {
+  _PasswordChangeRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<PasswordChangeRequest> $mapper =
+      PasswordChangeRequestMapper.ensureInitialized();
+  @override
+  $R call({String? email, String? password, String? newPassword}) => $apply(
+    FieldCopyWithData({
+      if (email != null) #email: email,
+      if (password != null) #password: password,
+      if (newPassword != null) #newPassword: newPassword,
+    }),
+  );
+  @override
+  PasswordChangeRequest $make(CopyWithData data) => PasswordChangeRequest(
+    email: data.get(#email, or: $value.email),
+    password: data.get(#password, or: $value.password),
+    newPassword: data.get(#newPassword, or: $value.newPassword),
+  );
+
+  @override
+  PasswordChangeRequestCopyWith<$R2, PasswordChangeRequest, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _PasswordChangeRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class StringOrListStringMapper extends ClassMapperBase<StringOrListString> {
