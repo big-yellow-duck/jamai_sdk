@@ -396,15 +396,6 @@ class PasswordLoginRequest with PasswordLoginRequestMappable {
     }
     return PasswordLoginRequest._(email: email, password: password);
   }
-
-  void validate() {
-    if (email.isEmpty) {
-      throw ArgumentError('Email cannot be empty');
-    }
-    if (password.isEmpty || password.length > 72) {
-      throw ArgumentError('Password must be between 1 and 72 characters');
-    }
-  }
 }
 
 /// Password change request
@@ -447,30 +438,11 @@ class PasswordChangeRequest with PasswordChangeRequestMappable {
     required this.password,
     required this.newPassword,
   });
-
-  /// Validates the request
-  void validate() {
-    if (email.isEmpty) {
-      throw ArgumentError('Email cannot be empty');
-    }
-    if (password.isEmpty || password.length > 72) {
-      throw ArgumentError(
-        'Current password must be between 1 and 72 characters',
-      );
-    }
-    if (newPassword.isEmpty || newPassword.length > 72) {
-      throw ArgumentError('New password must be between 1 and 72 characters');
-    }
-    if (password == newPassword) {
-      throw ArgumentError(
-        'New password must be different from current password',
-      );
-    }
-  }
 }
 
 /// Stripe payment information
-class StripePaymentInfo {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class StripePaymentInfo with StripePaymentInfoMappable {
   final String status;
   final String? subscriptionId;
   final String? paymentIntentId;
@@ -481,7 +453,36 @@ class StripePaymentInfo {
   final double amountRemaining;
   final String currency;
 
-  const StripePaymentInfo({
+  factory StripePaymentInfo({
+    required String status,
+    String? subscriptionId,
+    String? paymentIntentId,
+    String? clientSecret,
+    required double amountDue,
+    required double amountOverpaid,
+    required double amountPaid,
+    required double amountRemaining,
+    required String currency,
+  }) {
+    if (subscriptionId != null && !subscriptionId!.startsWith('sub_')) {
+      throw ArgumentError('Subscription ID must start with "sub_"');
+    }
+    if (paymentIntentId != null && !paymentIntentId!.startsWith('pi_')) {
+      throw ArgumentError('Payment Intent ID must start with "pi_"');
+    }
+    return StripePaymentInfo._(
+      status: status,
+      subscriptionId: subscriptionId,
+      paymentIntentId: paymentIntentId,
+      clientSecret: clientSecret,
+      amountDue: amountDue,
+      amountOverpaid: amountOverpaid,
+      amountPaid: amountPaid,
+      amountRemaining: amountRemaining,
+      currency: currency,
+    );
+  }
+  StripePaymentInfo._({
     required this.status,
     this.subscriptionId,
     this.paymentIntentId,
@@ -492,74 +493,10 @@ class StripePaymentInfo {
     required this.amountRemaining,
     required this.currency,
   });
-
-  /// Validates Stripe IDs
-  void validate() {
-    if (subscriptionId != null && !subscriptionId!.startsWith('sub_')) {
-      throw ArgumentError('Subscription ID must start with "sub_"');
-    }
-    if (paymentIntentId != null && !paymentIntentId!.startsWith('pi_')) {
-      throw ArgumentError('Payment Intent ID must start with "pi_"');
-    }
-  }
-
-  /// Creates a copy with updated fields
-  StripePaymentInfo copyWith({
-    String? status,
-    String? subscriptionId,
-    String? paymentIntentId,
-    String? clientSecret,
-    double? amountDue,
-    double? amountOverpaid,
-    double? amountPaid,
-    double? amountRemaining,
-    String? currency,
-  }) {
-    return StripePaymentInfo(
-      status: status ?? this.status,
-      subscriptionId: subscriptionId ?? this.subscriptionId,
-      paymentIntentId: paymentIntentId ?? this.paymentIntentId,
-      clientSecret: clientSecret ?? this.clientSecret,
-      amountDue: amountDue ?? this.amountDue,
-      amountOverpaid: amountOverpaid ?? this.amountOverpaid,
-      amountPaid: amountPaid ?? this.amountPaid,
-      amountRemaining: amountRemaining ?? this.amountRemaining,
-      currency: currency ?? this.currency,
-    );
-  }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'subscription_id': subscriptionId,
-      'payment_intent_id': paymentIntentId,
-      'client_secret': clientSecret,
-      'amount_due': amountDue,
-      'amount_overpaid': amountOverpaid,
-      'amount_paid': amountPaid,
-      'amount_remaining': amountRemaining,
-      'currency': currency,
-    };
-  }
-
-  /// Creates from JSON
-  factory StripePaymentInfo.fromJson(Map<String, dynamic> json) {
-    return StripePaymentInfo(
-      status: json['status'],
-      subscriptionId: json['subscription_id'],
-      paymentIntentId: json['payment_intent_id'],
-      clientSecret: json['client_secret'],
-      amountDue: json['amount_due'].toDouble(),
-      amountOverpaid: json['amount_overpaid'].toDouble(),
-      amountPaid: json['amount_paid'].toDouble(),
-      amountRemaining: json['amount_remaining'].toDouble(),
-      currency: json['currency'],
-    );
-  }
 }
 
 /// Stripe event data
+@MappableClass(caseStyle: CaseStyle.snakeCase)
 class StripeEventData {
   final String eventType;
   final String eventId;
@@ -575,24 +512,21 @@ class StripeEventData {
   final String currency;
   final String status;
 
-  const StripeEventData({
-    required this.eventType,
-    required this.eventId,
-    this.invoiceId,
-    this.subscriptionId,
-    this.priceId,
-    this.paymentMethod,
-    required this.customerId,
-    required this.organizationId,
-    required this.collectionMethod,
-    required this.billingReason,
-    required this.amountPaid,
-    required this.currency,
-    required this.status,
-  });
-
-  /// Validates Stripe IDs
-  void validate() {
+  factory StripeEventData({
+    required String eventType,
+    required String eventId,
+    String? invoiceId,
+    String? subscriptionId,
+    String? priceId,
+    String? paymentMethod,
+    required String customerId,
+    required String organizationId,
+    required String collectionMethod,
+    required String billingReason,
+    required double amountPaid,
+    required String currency,
+    required String status,
+  }) {
     if (!eventId.startsWith('evt_')) {
       throw ArgumentError('Event ID must start with "evt_"');
     }
@@ -611,82 +545,42 @@ class StripeEventData {
     if (!customerId.startsWith('cus_')) {
       throw ArgumentError('Customer ID must start with "cus_"');
     }
-  }
 
-  /// Creates a copy with updated fields
-  StripeEventData copyWith({
-    String? eventType,
-    String? eventId,
-    String? invoiceId,
-    String? subscriptionId,
-    String? priceId,
-    String? paymentMethod,
-    String? customerId,
-    String? organizationId,
-    String? collectionMethod,
-    String? billingReason,
-    double? amountPaid,
-    String? currency,
-    String? status,
-  }) {
-    return StripeEventData(
-      eventType: eventType ?? this.eventType,
-      eventId: eventId ?? this.eventId,
-      invoiceId: invoiceId ?? this.invoiceId,
-      subscriptionId: subscriptionId ?? this.subscriptionId,
-      priceId: priceId ?? this.priceId,
-      paymentMethod: paymentMethod ?? this.paymentMethod,
-      customerId: customerId ?? this.customerId,
-      organizationId: organizationId ?? this.organizationId,
-      collectionMethod: collectionMethod ?? this.collectionMethod,
-      billingReason: billingReason ?? this.billingReason,
-      amountPaid: amountPaid ?? this.amountPaid,
-      currency: currency ?? this.currency,
-      status: status ?? this.status,
+    return StripeEventData._(
+      eventType: eventType,
+      eventId: eventId,
+      invoiceId: invoiceId,
+      subscriptionId: subscriptionId,
+      priceId: priceId,
+      paymentMethod: paymentMethod,
+      customerId: customerId,
+      organizationId: organizationId,
+      collectionMethod: collectionMethod,
+      billingReason: billingReason,
+      amountPaid: amountPaid,
+      currency: currency,
+      status: status,
     );
   }
-
-  /// Converts to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'event_type': eventType,
-      'event_id': eventId,
-      'invoice_id': invoiceId,
-      'subscription_id': subscriptionId,
-      'price_id': priceId,
-      'payment_method': paymentMethod,
-      'customer_id': customerId,
-      'organization_id': organizationId,
-      'collection_method': collectionMethod,
-      'billing_reason': billingReason,
-      'amount_paid': amountPaid,
-      'currency': currency,
-      'status': status,
-    };
-  }
-
-  /// Creates from JSON
-  factory StripeEventData.fromJson(Map<String, dynamic> json) {
-    return StripeEventData(
-      eventType: json['event_type'],
-      eventId: json['event_id'],
-      invoiceId: json['invoice_id'],
-      subscriptionId: json['subscription_id'],
-      priceId: json['price_id'],
-      paymentMethod: json['payment_method'],
-      customerId: json['customer_id'],
-      organizationId: json['organization_id'],
-      collectionMethod: json['collection_method'],
-      billingReason: json['billing_reason'],
-      amountPaid: json['amount_paid'].toDouble(),
-      currency: json['currency'],
-      status: json['status'],
-    );
-  }
+  const StripeEventData._({
+    required this.eventType,
+    required this.eventId,
+    this.invoiceId,
+    this.subscriptionId,
+    this.priceId,
+    this.paymentMethod,
+    required this.customerId,
+    required this.organizationId,
+    required this.collectionMethod,
+    required this.billingReason,
+    required this.amountPaid,
+    required this.currency,
+    required this.status,
+  });
 }
 
 @MappableClass(
-  discriminatorKey: 'type',
+  discriminatorKey: 'StringOrListString',
   includeSubClasses: [StringOrListStringString, StringOrListStringList],
 )
 abstract class StringOrListString with StringOrListStringMappable {

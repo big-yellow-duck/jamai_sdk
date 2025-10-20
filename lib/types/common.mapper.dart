@@ -1554,6 +1554,516 @@ class _PasswordChangeRequestCopyWithImpl<$R, $Out>
       _PasswordChangeRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
+class StripePaymentInfoMapper extends ClassMapperBase<StripePaymentInfo> {
+  StripePaymentInfoMapper._();
+
+  static StripePaymentInfoMapper? _instance;
+  static StripePaymentInfoMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = StripePaymentInfoMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'StripePaymentInfo';
+
+  static String _$status(StripePaymentInfo v) => v.status;
+  static const Field<StripePaymentInfo, String> _f$status = Field(
+    'status',
+    _$status,
+  );
+  static String? _$subscriptionId(StripePaymentInfo v) => v.subscriptionId;
+  static const Field<StripePaymentInfo, String> _f$subscriptionId = Field(
+    'subscriptionId',
+    _$subscriptionId,
+    key: r'subscription_id',
+    opt: true,
+  );
+  static String? _$paymentIntentId(StripePaymentInfo v) => v.paymentIntentId;
+  static const Field<StripePaymentInfo, String> _f$paymentIntentId = Field(
+    'paymentIntentId',
+    _$paymentIntentId,
+    key: r'payment_intent_id',
+    opt: true,
+  );
+  static String? _$clientSecret(StripePaymentInfo v) => v.clientSecret;
+  static const Field<StripePaymentInfo, String> _f$clientSecret = Field(
+    'clientSecret',
+    _$clientSecret,
+    key: r'client_secret',
+    opt: true,
+  );
+  static double _$amountDue(StripePaymentInfo v) => v.amountDue;
+  static const Field<StripePaymentInfo, double> _f$amountDue = Field(
+    'amountDue',
+    _$amountDue,
+    key: r'amount_due',
+  );
+  static double _$amountOverpaid(StripePaymentInfo v) => v.amountOverpaid;
+  static const Field<StripePaymentInfo, double> _f$amountOverpaid = Field(
+    'amountOverpaid',
+    _$amountOverpaid,
+    key: r'amount_overpaid',
+  );
+  static double _$amountPaid(StripePaymentInfo v) => v.amountPaid;
+  static const Field<StripePaymentInfo, double> _f$amountPaid = Field(
+    'amountPaid',
+    _$amountPaid,
+    key: r'amount_paid',
+  );
+  static double _$amountRemaining(StripePaymentInfo v) => v.amountRemaining;
+  static const Field<StripePaymentInfo, double> _f$amountRemaining = Field(
+    'amountRemaining',
+    _$amountRemaining,
+    key: r'amount_remaining',
+  );
+  static String _$currency(StripePaymentInfo v) => v.currency;
+  static const Field<StripePaymentInfo, String> _f$currency = Field(
+    'currency',
+    _$currency,
+  );
+
+  @override
+  final MappableFields<StripePaymentInfo> fields = const {
+    #status: _f$status,
+    #subscriptionId: _f$subscriptionId,
+    #paymentIntentId: _f$paymentIntentId,
+    #clientSecret: _f$clientSecret,
+    #amountDue: _f$amountDue,
+    #amountOverpaid: _f$amountOverpaid,
+    #amountPaid: _f$amountPaid,
+    #amountRemaining: _f$amountRemaining,
+    #currency: _f$currency,
+  };
+
+  static StripePaymentInfo _instantiate(DecodingData data) {
+    return StripePaymentInfo(
+      status: data.dec(_f$status),
+      subscriptionId: data.dec(_f$subscriptionId),
+      paymentIntentId: data.dec(_f$paymentIntentId),
+      clientSecret: data.dec(_f$clientSecret),
+      amountDue: data.dec(_f$amountDue),
+      amountOverpaid: data.dec(_f$amountOverpaid),
+      amountPaid: data.dec(_f$amountPaid),
+      amountRemaining: data.dec(_f$amountRemaining),
+      currency: data.dec(_f$currency),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static StripePaymentInfo fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<StripePaymentInfo>(map);
+  }
+
+  static StripePaymentInfo fromJson(String json) {
+    return ensureInitialized().decodeJson<StripePaymentInfo>(json);
+  }
+}
+
+mixin StripePaymentInfoMappable {
+  String toJson() {
+    return StripePaymentInfoMapper.ensureInitialized()
+        .encodeJson<StripePaymentInfo>(this as StripePaymentInfo);
+  }
+
+  Map<String, dynamic> toMap() {
+    return StripePaymentInfoMapper.ensureInitialized()
+        .encodeMap<StripePaymentInfo>(this as StripePaymentInfo);
+  }
+
+  StripePaymentInfoCopyWith<
+    StripePaymentInfo,
+    StripePaymentInfo,
+    StripePaymentInfo
+  >
+  get copyWith =>
+      _StripePaymentInfoCopyWithImpl<StripePaymentInfo, StripePaymentInfo>(
+        this as StripePaymentInfo,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return StripePaymentInfoMapper.ensureInitialized().stringifyValue(
+      this as StripePaymentInfo,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return StripePaymentInfoMapper.ensureInitialized().equalsValue(
+      this as StripePaymentInfo,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return StripePaymentInfoMapper.ensureInitialized().hashValue(
+      this as StripePaymentInfo,
+    );
+  }
+}
+
+extension StripePaymentInfoValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, StripePaymentInfo, $Out> {
+  StripePaymentInfoCopyWith<$R, StripePaymentInfo, $Out>
+  get $asStripePaymentInfo => $base.as(
+    (v, t, t2) => _StripePaymentInfoCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class StripePaymentInfoCopyWith<
+  $R,
+  $In extends StripePaymentInfo,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({
+    String? status,
+    String? subscriptionId,
+    String? paymentIntentId,
+    String? clientSecret,
+    double? amountDue,
+    double? amountOverpaid,
+    double? amountPaid,
+    double? amountRemaining,
+    String? currency,
+  });
+  StripePaymentInfoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _StripePaymentInfoCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, StripePaymentInfo, $Out>
+    implements StripePaymentInfoCopyWith<$R, StripePaymentInfo, $Out> {
+  _StripePaymentInfoCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<StripePaymentInfo> $mapper =
+      StripePaymentInfoMapper.ensureInitialized();
+  @override
+  $R call({
+    String? status,
+    Object? subscriptionId = $none,
+    Object? paymentIntentId = $none,
+    Object? clientSecret = $none,
+    double? amountDue,
+    double? amountOverpaid,
+    double? amountPaid,
+    double? amountRemaining,
+    String? currency,
+  }) => $apply(
+    FieldCopyWithData({
+      if (status != null) #status: status,
+      if (subscriptionId != $none) #subscriptionId: subscriptionId,
+      if (paymentIntentId != $none) #paymentIntentId: paymentIntentId,
+      if (clientSecret != $none) #clientSecret: clientSecret,
+      if (amountDue != null) #amountDue: amountDue,
+      if (amountOverpaid != null) #amountOverpaid: amountOverpaid,
+      if (amountPaid != null) #amountPaid: amountPaid,
+      if (amountRemaining != null) #amountRemaining: amountRemaining,
+      if (currency != null) #currency: currency,
+    }),
+  );
+  @override
+  StripePaymentInfo $make(CopyWithData data) => StripePaymentInfo(
+    status: data.get(#status, or: $value.status),
+    subscriptionId: data.get(#subscriptionId, or: $value.subscriptionId),
+    paymentIntentId: data.get(#paymentIntentId, or: $value.paymentIntentId),
+    clientSecret: data.get(#clientSecret, or: $value.clientSecret),
+    amountDue: data.get(#amountDue, or: $value.amountDue),
+    amountOverpaid: data.get(#amountOverpaid, or: $value.amountOverpaid),
+    amountPaid: data.get(#amountPaid, or: $value.amountPaid),
+    amountRemaining: data.get(#amountRemaining, or: $value.amountRemaining),
+    currency: data.get(#currency, or: $value.currency),
+  );
+
+  @override
+  StripePaymentInfoCopyWith<$R2, StripePaymentInfo, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _StripePaymentInfoCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class StripeEventDataMapper extends ClassMapperBase<StripeEventData> {
+  StripeEventDataMapper._();
+
+  static StripeEventDataMapper? _instance;
+  static StripeEventDataMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = StripeEventDataMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'StripeEventData';
+
+  static String _$eventType(StripeEventData v) => v.eventType;
+  static const Field<StripeEventData, String> _f$eventType = Field(
+    'eventType',
+    _$eventType,
+    key: r'event_type',
+  );
+  static String _$eventId(StripeEventData v) => v.eventId;
+  static const Field<StripeEventData, String> _f$eventId = Field(
+    'eventId',
+    _$eventId,
+    key: r'event_id',
+  );
+  static String? _$invoiceId(StripeEventData v) => v.invoiceId;
+  static const Field<StripeEventData, String> _f$invoiceId = Field(
+    'invoiceId',
+    _$invoiceId,
+    key: r'invoice_id',
+    opt: true,
+  );
+  static String? _$subscriptionId(StripeEventData v) => v.subscriptionId;
+  static const Field<StripeEventData, String> _f$subscriptionId = Field(
+    'subscriptionId',
+    _$subscriptionId,
+    key: r'subscription_id',
+    opt: true,
+  );
+  static String? _$priceId(StripeEventData v) => v.priceId;
+  static const Field<StripeEventData, String> _f$priceId = Field(
+    'priceId',
+    _$priceId,
+    key: r'price_id',
+    opt: true,
+  );
+  static String? _$paymentMethod(StripeEventData v) => v.paymentMethod;
+  static const Field<StripeEventData, String> _f$paymentMethod = Field(
+    'paymentMethod',
+    _$paymentMethod,
+    key: r'payment_method',
+    opt: true,
+  );
+  static String _$customerId(StripeEventData v) => v.customerId;
+  static const Field<StripeEventData, String> _f$customerId = Field(
+    'customerId',
+    _$customerId,
+    key: r'customer_id',
+  );
+  static String _$organizationId(StripeEventData v) => v.organizationId;
+  static const Field<StripeEventData, String> _f$organizationId = Field(
+    'organizationId',
+    _$organizationId,
+    key: r'organization_id',
+  );
+  static String _$collectionMethod(StripeEventData v) => v.collectionMethod;
+  static const Field<StripeEventData, String> _f$collectionMethod = Field(
+    'collectionMethod',
+    _$collectionMethod,
+    key: r'collection_method',
+  );
+  static String _$billingReason(StripeEventData v) => v.billingReason;
+  static const Field<StripeEventData, String> _f$billingReason = Field(
+    'billingReason',
+    _$billingReason,
+    key: r'billing_reason',
+  );
+  static double _$amountPaid(StripeEventData v) => v.amountPaid;
+  static const Field<StripeEventData, double> _f$amountPaid = Field(
+    'amountPaid',
+    _$amountPaid,
+    key: r'amount_paid',
+  );
+  static String _$currency(StripeEventData v) => v.currency;
+  static const Field<StripeEventData, String> _f$currency = Field(
+    'currency',
+    _$currency,
+  );
+  static String _$status(StripeEventData v) => v.status;
+  static const Field<StripeEventData, String> _f$status = Field(
+    'status',
+    _$status,
+  );
+
+  @override
+  final MappableFields<StripeEventData> fields = const {
+    #eventType: _f$eventType,
+    #eventId: _f$eventId,
+    #invoiceId: _f$invoiceId,
+    #subscriptionId: _f$subscriptionId,
+    #priceId: _f$priceId,
+    #paymentMethod: _f$paymentMethod,
+    #customerId: _f$customerId,
+    #organizationId: _f$organizationId,
+    #collectionMethod: _f$collectionMethod,
+    #billingReason: _f$billingReason,
+    #amountPaid: _f$amountPaid,
+    #currency: _f$currency,
+    #status: _f$status,
+  };
+
+  static StripeEventData _instantiate(DecodingData data) {
+    return StripeEventData(
+      eventType: data.dec(_f$eventType),
+      eventId: data.dec(_f$eventId),
+      invoiceId: data.dec(_f$invoiceId),
+      subscriptionId: data.dec(_f$subscriptionId),
+      priceId: data.dec(_f$priceId),
+      paymentMethod: data.dec(_f$paymentMethod),
+      customerId: data.dec(_f$customerId),
+      organizationId: data.dec(_f$organizationId),
+      collectionMethod: data.dec(_f$collectionMethod),
+      billingReason: data.dec(_f$billingReason),
+      amountPaid: data.dec(_f$amountPaid),
+      currency: data.dec(_f$currency),
+      status: data.dec(_f$status),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static StripeEventData fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<StripeEventData>(map);
+  }
+
+  static StripeEventData fromJson(String json) {
+    return ensureInitialized().decodeJson<StripeEventData>(json);
+  }
+}
+
+mixin StripeEventDataMappable {
+  String toJson() {
+    return StripeEventDataMapper.ensureInitialized()
+        .encodeJson<StripeEventData>(this as StripeEventData);
+  }
+
+  Map<String, dynamic> toMap() {
+    return StripeEventDataMapper.ensureInitialized().encodeMap<StripeEventData>(
+      this as StripeEventData,
+    );
+  }
+
+  StripeEventDataCopyWith<StripeEventData, StripeEventData, StripeEventData>
+  get copyWith =>
+      _StripeEventDataCopyWithImpl<StripeEventData, StripeEventData>(
+        this as StripeEventData,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return StripeEventDataMapper.ensureInitialized().stringifyValue(
+      this as StripeEventData,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return StripeEventDataMapper.ensureInitialized().equalsValue(
+      this as StripeEventData,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return StripeEventDataMapper.ensureInitialized().hashValue(
+      this as StripeEventData,
+    );
+  }
+}
+
+extension StripeEventDataValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, StripeEventData, $Out> {
+  StripeEventDataCopyWith<$R, StripeEventData, $Out> get $asStripeEventData =>
+      $base.as((v, t, t2) => _StripeEventDataCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class StripeEventDataCopyWith<$R, $In extends StripeEventData, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({
+    String? eventType,
+    String? eventId,
+    String? invoiceId,
+    String? subscriptionId,
+    String? priceId,
+    String? paymentMethod,
+    String? customerId,
+    String? organizationId,
+    String? collectionMethod,
+    String? billingReason,
+    double? amountPaid,
+    String? currency,
+    String? status,
+  });
+  StripeEventDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _StripeEventDataCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, StripeEventData, $Out>
+    implements StripeEventDataCopyWith<$R, StripeEventData, $Out> {
+  _StripeEventDataCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<StripeEventData> $mapper =
+      StripeEventDataMapper.ensureInitialized();
+  @override
+  $R call({
+    String? eventType,
+    String? eventId,
+    Object? invoiceId = $none,
+    Object? subscriptionId = $none,
+    Object? priceId = $none,
+    Object? paymentMethod = $none,
+    String? customerId,
+    String? organizationId,
+    String? collectionMethod,
+    String? billingReason,
+    double? amountPaid,
+    String? currency,
+    String? status,
+  }) => $apply(
+    FieldCopyWithData({
+      if (eventType != null) #eventType: eventType,
+      if (eventId != null) #eventId: eventId,
+      if (invoiceId != $none) #invoiceId: invoiceId,
+      if (subscriptionId != $none) #subscriptionId: subscriptionId,
+      if (priceId != $none) #priceId: priceId,
+      if (paymentMethod != $none) #paymentMethod: paymentMethod,
+      if (customerId != null) #customerId: customerId,
+      if (organizationId != null) #organizationId: organizationId,
+      if (collectionMethod != null) #collectionMethod: collectionMethod,
+      if (billingReason != null) #billingReason: billingReason,
+      if (amountPaid != null) #amountPaid: amountPaid,
+      if (currency != null) #currency: currency,
+      if (status != null) #status: status,
+    }),
+  );
+  @override
+  StripeEventData $make(CopyWithData data) => StripeEventData(
+    eventType: data.get(#eventType, or: $value.eventType),
+    eventId: data.get(#eventId, or: $value.eventId),
+    invoiceId: data.get(#invoiceId, or: $value.invoiceId),
+    subscriptionId: data.get(#subscriptionId, or: $value.subscriptionId),
+    priceId: data.get(#priceId, or: $value.priceId),
+    paymentMethod: data.get(#paymentMethod, or: $value.paymentMethod),
+    customerId: data.get(#customerId, or: $value.customerId),
+    organizationId: data.get(#organizationId, or: $value.organizationId),
+    collectionMethod: data.get(#collectionMethod, or: $value.collectionMethod),
+    billingReason: data.get(#billingReason, or: $value.billingReason),
+    amountPaid: data.get(#amountPaid, or: $value.amountPaid),
+    currency: data.get(#currency, or: $value.currency),
+    status: data.get(#status, or: $value.status),
+  );
+
+  @override
+  StripeEventDataCopyWith<$R2, StripeEventData, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _StripeEventDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
 class StringOrListStringMapper extends ClassMapperBase<StringOrListString> {
   StringOrListStringMapper._();
 
@@ -1576,8 +2086,8 @@ class StringOrListStringMapper extends ClassMapperBase<StringOrListString> {
   static StringOrListString _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
       'StringOrListString',
-      'type',
-      '${data.value['type']}',
+      'StringOrListString',
+      '${data.value['StringOrListString']}',
     );
   }
 
@@ -1646,7 +2156,7 @@ class StringOrListStringStringMapper
   };
 
   @override
-  final String discriminatorKey = 'type';
+  final String discriminatorKey = 'StringOrListString';
   @override
   final dynamic discriminatorValue = 'string';
   @override
@@ -1784,7 +2294,7 @@ class StringOrListStringListMapper
   };
 
   @override
-  final String discriminatorKey = 'type';
+  final String discriminatorKey = 'StringOrListString';
   @override
   final dynamic discriminatorValue = 'listString';
   @override
