@@ -225,7 +225,6 @@ class LanguageValidator {
 
 /// Type aliases for common use cases
 typedef NullableStr = String?;
-typedef EmptyIfNoneStr = String;
 typedef PositiveInt = int;
 typedef PositiveNonZeroInt = int;
 typedef DatetimeUTC = DateTime;
@@ -579,64 +578,64 @@ class StripeEventData {
   });
 }
 
-@MappableClass(
-  discriminatorKey: 'StringOrListString',
-  includeSubClasses: [StringOrListStringString, StringOrListStringList],
-)
-abstract class StringOrListString with StringOrListStringMappable {
+sealed class StringOrListString {
   const StringOrListString();
 
-  // Preserve the original factory constructors API
-  factory StringOrListString.string(String value) = StringOrListStringString;
-  factory StringOrListString.listString(List<String> values) =
-      StringOrListStringList;
-
-  // Replace Freezed JSON factory
-  factory StringOrListString.fromJson(Map<String, dynamic> json) =>
-      MapperContainer.globals.fromMap<StringOrListString>(json);
+  factory StringOrListString.fromDynamic(dynamic value) {
+    if (value is String) return StringOrListStringString(value);
+    if (value is List<String>) return StringOrListStringListString(value);
+    throw ArgumentError('Value must be String or List<String>');
+  }
 }
 
-@MappableClass(discriminatorValue: 'string')
-class StringOrListStringString extends StringOrListString
-    with StringOrListStringStringMappable {
+class StringOrListStringString extends StringOrListString {
   final String value;
   const StringOrListStringString(this.value);
 }
 
-@MappableClass(discriminatorValue: 'listString')
-class StringOrListStringList extends StringOrListString
-    with StringOrListStringListMappable {
-  final List<String> values;
-  const StringOrListStringList(this.values);
+class StringOrListStringListString extends StringOrListString {
+  final List<String> value;
+  const StringOrListStringListString(this.value);
 }
 
-@MappableClass(
-  discriminatorKey: 'type',
-  includeSubClasses: [ListDouble, ListDoubleOrStringString],
-)
-abstract class ListDoubleOrString with ListDoubleOrStringMappable {
-  const ListDoubleOrString();
+sealed class StringOrListDouble {
+  const StringOrListDouble();
 
-  // Preserve the original factory constructors API
-  factory ListDoubleOrString.listDouble(List<double> values) = ListDouble;
-  factory ListDoubleOrString.string(String value) = ListDoubleOrStringString;
-
-  // Replace Freezed JSON factory
-  factory ListDoubleOrString.fromJson(Map<String, dynamic> json) =>
-      MapperContainer.globals.fromMap<ListDoubleOrString>(json);
+  factory StringOrListDouble.fromDynamic(dynamic value) {
+    if (value is String) return StringOrListDoubleString(value);
+    if (value is List) {
+      final doubleList = value.map((e) => (e as num).toDouble()).toList();
+      return StringOrListDoubleListDouble(doubleList);
+    }
+    throw ArgumentError('Value must be String or List<double>');
+  }
 }
 
-@MappableClass(discriminatorValue: 'listDouble')
-class ListDouble extends ListDoubleOrString with ListDoubleMappable {
-  final List<double> values;
-  const ListDouble(this.values);
+class StringOrListDoubleListDouble extends StringOrListDouble {
+  final List<double> value;
+  StringOrListDoubleListDouble(this.value);
 }
 
-@MappableClass(discriminatorValue: 'string')
-class ListDoubleOrStringString extends ListDoubleOrString
-    with ListDoubleOrStringStringMappable {
+class StringOrListDoubleString extends StringOrListDouble {
   final String value;
-  const ListDoubleOrStringString(this.value);
+  StringOrListDoubleString(this.value);
+}
+
+class StringOrListDoubleHook extends MappingHook {
+  const StringOrListDoubleHook();
+
+  @override
+  dynamic beforeDecode(dynamic value) {
+    StringOrListDouble.fromDynamic(value);
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return switch (value as StringOrListDouble) {
+      StringOrListDoubleListDouble(value: final list) => list,
+      StringOrListDoubleString(value: final str) => str,
+    };
+  }
 }
 
 class StringValidator {
@@ -743,6 +742,3 @@ class SanitizedNotEmptyString {
   String asString() => value;
 }
 
-void main() {
-  print(OrderBy.values);
-}
