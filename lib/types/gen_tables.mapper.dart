@@ -1526,12 +1526,6 @@ mixin LLMGenConfigMappable {
     );
   }
 
-  LLMGenConfigCopyWith<LLMGenConfig, LLMGenConfig, LLMGenConfig> get copyWith =>
-      _LLMGenConfigCopyWithImpl<LLMGenConfig, LLMGenConfig>(
-        this as LLMGenConfig,
-        $identity,
-        $identity,
-      );
   @override
   String toString() {
     return LLMGenConfigMapper.ensureInitialized().stringifyValue(
@@ -1553,161 +1547,6 @@ mixin LLMGenConfigMappable {
       this as LLMGenConfig,
     );
   }
-}
-
-extension LLMGenConfigValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, LLMGenConfig, $Out> {
-  LLMGenConfigCopyWith<$R, LLMGenConfig, $Out> get $asLLMGenConfig =>
-      $base.as((v, t, t2) => _LLMGenConfigCopyWithImpl<$R, $Out>(v, t, t2));
-}
-
-abstract class LLMGenConfigCopyWith<$R, $In extends LLMGenConfig, $Out>
-    implements ChatRequestBaseCopyWith<$R, $In, $Out> {
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams;
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>?>? get tools;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?>? get stop;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
-  get logitBias;
-  @override
-  $R call({
-    String? model,
-    RAGParams? ragParams,
-    List<Tool>? tools,
-    ToolChoiceOption? toolChoice,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    List<String>? stop,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    ReasoningEffort? reasoningEffort,
-    int? reasoningBudget,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  });
-  LLMGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
-}
-
-class _LLMGenConfigCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, LLMGenConfig, $Out>
-    implements LLMGenConfigCopyWith<$R, LLMGenConfig, $Out> {
-  _LLMGenConfigCopyWithImpl(super.value, super.then, super.then2);
-
-  @override
-  late final ClassMapperBase<LLMGenConfig> $mapper =
-      LLMGenConfigMapper.ensureInitialized();
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams =>
-      $value.ragParams?.copyWith.$chain((v) => call(ragParams: v));
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>?>? get tools =>
-      $value.tools != null
-      ? ListCopyWith(
-          $value.tools!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(tools: v),
-        )
-      : null;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?>? get stop =>
-      $value.stop != null
-      ? ListCopyWith(
-          $value.stop!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(stop: v),
-        )
-      : null;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
-  get logitBias => MapCopyWith(
-    $value.logitBias,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(logitBias: v),
-  );
-  @override
-  $R call({
-    String? model,
-    Object? ragParams = $none,
-    Object? tools = $none,
-    Object? toolChoice = $none,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    Object? stop = $none,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    Object? reasoningEffort = $none,
-    Object? reasoningBudget = $none,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  }) => $apply(
-    FieldCopyWithData({
-      if (model != null) #model: model,
-      if (ragParams != $none) #ragParams: ragParams,
-      if (tools != $none) #tools: tools,
-      if (toolChoice != $none) #toolChoice: toolChoice,
-      if (temperature != null) #temperature: temperature,
-      if (topP != null) #topP: topP,
-      if (stream != null) #stream: stream,
-      if (maxTokens != null) #maxTokens: maxTokens,
-      if (stop != $none) #stop: stop,
-      if (presencePenalty != null) #presencePenalty: presencePenalty,
-      if (frequencyPenalty != null) #frequencyPenalty: frequencyPenalty,
-      if (logitBias != null) #logitBias: logitBias,
-      if (thinkingBudget != null) #thinkingBudget: thinkingBudget,
-      if (reasoningEffort != $none) #reasoningEffort: reasoningEffort,
-      if (reasoningBudget != $none) #reasoningBudget: reasoningBudget,
-      if (reasoningSummary != null) #reasoningSummary: reasoningSummary,
-      if (object != null) #object: object,
-      if (systemPrompt != null) #systemPrompt: systemPrompt,
-      if (prompt != null) #prompt: prompt,
-      if (multiTurn != null) #multiTurn: multiTurn,
-    }),
-  );
-  @override
-  LLMGenConfig $make(CopyWithData data) => LLMGenConfig(
-    model: data.get(#model, or: $value.model),
-    ragParams: data.get(#ragParams, or: $value.ragParams),
-    tools: data.get(#tools, or: $value.tools),
-    toolChoice: data.get(#toolChoice, or: $value.toolChoice),
-    temperature: data.get(#temperature, or: $value.temperature),
-    topP: data.get(#topP, or: $value.topP),
-    stream: data.get(#stream, or: $value.stream),
-    maxTokens: data.get(#maxTokens, or: $value.maxTokens),
-    stop: data.get(#stop, or: $value.stop),
-    presencePenalty: data.get(#presencePenalty, or: $value.presencePenalty),
-    frequencyPenalty: data.get(#frequencyPenalty, or: $value.frequencyPenalty),
-    logitBias: data.get(#logitBias, or: $value.logitBias),
-    thinkingBudget: data.get(#thinkingBudget, or: $value.thinkingBudget),
-    reasoningEffort: data.get(#reasoningEffort, or: $value.reasoningEffort),
-    reasoningBudget: data.get(#reasoningBudget, or: $value.reasoningBudget),
-    reasoningSummary: data.get(#reasoningSummary, or: $value.reasoningSummary),
-    object: data.get(#object, or: $value.object),
-    systemPrompt: data.get(#systemPrompt, or: $value.systemPrompt),
-    prompt: data.get(#prompt, or: $value.prompt),
-    multiTurn: data.get(#multiTurn, or: $value.multiTurn),
-  );
-
-  @override
-  LLMGenConfigCopyWith<$R2, LLMGenConfig, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _LLMGenConfigCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class EmbedGenConfigMapper extends ClassMapperBase<EmbedGenConfig> {
@@ -2186,24 +2025,6 @@ class DiscriminatedGenConfigMapper
 mixin DiscriminatedGenConfigMappable {
   String toJson();
   Map<String, dynamic> toMap();
-  DiscriminatedGenConfigCopyWith<
-    DiscriminatedGenConfig,
-    DiscriminatedGenConfig,
-    DiscriminatedGenConfig
-  >
-  get copyWith;
-}
-
-abstract class DiscriminatedGenConfigCopyWith<
-  $R,
-  $In extends DiscriminatedGenConfig,
-  $Out
->
-    implements ClassCopyWith<$R, $In, $Out> {
-  $R call();
-  DiscriminatedGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
 }
 
 class DiscriminatedLLMGenConfigMapper
@@ -2476,16 +2297,6 @@ mixin DiscriminatedLLMGenConfigMappable {
         );
   }
 
-  DiscriminatedLLMGenConfigCopyWith<
-    DiscriminatedLLMGenConfig,
-    DiscriminatedLLMGenConfig,
-    DiscriminatedLLMGenConfig
-  >
-  get copyWith =>
-      _DiscriminatedLLMGenConfigCopyWithImpl<
-        DiscriminatedLLMGenConfig,
-        DiscriminatedLLMGenConfig
-      >(this as DiscriminatedLLMGenConfig, $identity, $identity);
   @override
   String toString() {
     return DiscriminatedLLMGenConfigMapper.ensureInitialized().stringifyValue(
@@ -2507,174 +2318,6 @@ mixin DiscriminatedLLMGenConfigMappable {
       this as DiscriminatedLLMGenConfig,
     );
   }
-}
-
-extension DiscriminatedLLMGenConfigValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, DiscriminatedLLMGenConfig, $Out> {
-  DiscriminatedLLMGenConfigCopyWith<$R, DiscriminatedLLMGenConfig, $Out>
-  get $asDiscriminatedLLMGenConfig => $base.as(
-    (v, t, t2) => _DiscriminatedLLMGenConfigCopyWithImpl<$R, $Out>(v, t, t2),
-  );
-}
-
-abstract class DiscriminatedLLMGenConfigCopyWith<
-  $R,
-  $In extends DiscriminatedLLMGenConfig,
-  $Out
->
-    implements
-        LLMGenConfigCopyWith<$R, $In, $Out>,
-        DiscriminatedGenConfigCopyWith<$R, $In, $Out> {
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams;
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>>? get tools;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get logitBias;
-  @override
-  $R call({
-    String? model,
-    RAGParams? ragParams,
-    List<Tool>? tools,
-    ToolChoiceOption? toolChoice,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    List<String>? stop,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    ReasoningEffort? reasoningEffort,
-    int? reasoningBudget,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  });
-  DiscriminatedLLMGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
-}
-
-class _DiscriminatedLLMGenConfigCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, DiscriminatedLLMGenConfig, $Out>
-    implements
-        DiscriminatedLLMGenConfigCopyWith<$R, DiscriminatedLLMGenConfig, $Out> {
-  _DiscriminatedLLMGenConfigCopyWithImpl(super.value, super.then, super.then2);
-
-  @override
-  late final ClassMapperBase<DiscriminatedLLMGenConfig> $mapper =
-      DiscriminatedLLMGenConfigMapper.ensureInitialized();
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams =>
-      $value.ragParams?.copyWith.$chain((v) => call(ragParams: v));
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>>? get tools =>
-      $value.tools != null
-      ? ListCopyWith(
-          $value.tools!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(tools: v),
-        )
-      : null;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop =>
-      $value.stop != null
-      ? ListCopyWith(
-          $value.stop!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(stop: v),
-        )
-      : null;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get logitBias => MapCopyWith(
-    $value.logitBias,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(logitBias: v),
-  );
-  @override
-  $R call({
-    String? model,
-    Object? ragParams = $none,
-    Object? tools = $none,
-    Object? toolChoice = $none,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    Object? stop = $none,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    Object? reasoningEffort = $none,
-    Object? reasoningBudget = $none,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  }) => $apply(
-    FieldCopyWithData({
-      if (model != null) #model: model,
-      if (ragParams != $none) #ragParams: ragParams,
-      if (tools != $none) #tools: tools,
-      if (toolChoice != $none) #toolChoice: toolChoice,
-      if (temperature != null) #temperature: temperature,
-      if (topP != null) #topP: topP,
-      if (stream != null) #stream: stream,
-      if (maxTokens != null) #maxTokens: maxTokens,
-      if (stop != $none) #stop: stop,
-      if (presencePenalty != null) #presencePenalty: presencePenalty,
-      if (frequencyPenalty != null) #frequencyPenalty: frequencyPenalty,
-      if (logitBias != null) #logitBias: logitBias,
-      if (thinkingBudget != null) #thinkingBudget: thinkingBudget,
-      if (reasoningEffort != $none) #reasoningEffort: reasoningEffort,
-      if (reasoningBudget != $none) #reasoningBudget: reasoningBudget,
-      if (reasoningSummary != null) #reasoningSummary: reasoningSummary,
-      if (object != null) #object: object,
-      if (systemPrompt != null) #systemPrompt: systemPrompt,
-      if (prompt != null) #prompt: prompt,
-      if (multiTurn != null) #multiTurn: multiTurn,
-    }),
-  );
-  @override
-  DiscriminatedLLMGenConfig $make(
-    CopyWithData data,
-  ) => DiscriminatedLLMGenConfig(
-    model: data.get(#model, or: $value.model),
-    ragParams: data.get(#ragParams, or: $value.ragParams),
-    tools: data.get(#tools, or: $value.tools),
-    toolChoice: data.get(#toolChoice, or: $value.toolChoice),
-    temperature: data.get(#temperature, or: $value.temperature),
-    topP: data.get(#topP, or: $value.topP),
-    stream: data.get(#stream, or: $value.stream),
-    maxTokens: data.get(#maxTokens, or: $value.maxTokens),
-    stop: data.get(#stop, or: $value.stop),
-    presencePenalty: data.get(#presencePenalty, or: $value.presencePenalty),
-    frequencyPenalty: data.get(#frequencyPenalty, or: $value.frequencyPenalty),
-    logitBias: data.get(#logitBias, or: $value.logitBias),
-    thinkingBudget: data.get(#thinkingBudget, or: $value.thinkingBudget),
-    reasoningEffort: data.get(#reasoningEffort, or: $value.reasoningEffort),
-    reasoningBudget: data.get(#reasoningBudget, or: $value.reasoningBudget),
-    reasoningSummary: data.get(#reasoningSummary, or: $value.reasoningSummary),
-    object: data.get(#object, or: $value.object),
-    systemPrompt: data.get(#systemPrompt, or: $value.systemPrompt),
-    prompt: data.get(#prompt, or: $value.prompt),
-    multiTurn: data.get(#multiTurn, or: $value.multiTurn),
-  );
-
-  @override
-  DiscriminatedLLMGenConfigCopyWith<$R2, DiscriminatedLLMGenConfig, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _DiscriminatedLLMGenConfigCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class DiscriminatedChatGenConfigMapper
@@ -2830,7 +2473,7 @@ class DiscriminatedChatGenConfigMapper
   );
   static GenConfigTypes _$object(DiscriminatedChatGenConfig v) => v.object;
   static const Field<DiscriminatedChatGenConfig, GenConfigTypes> _f$object =
-      Field('object', _$object, opt: true, def: GenConfigTypes.chat);
+      Field('object', _$object, opt: true, def: GenConfigTypes.llm);
   static String _$systemPrompt(DiscriminatedChatGenConfig v) => v.systemPrompt;
   static const Field<DiscriminatedChatGenConfig, String> _f$systemPrompt =
       Field(
@@ -2945,16 +2588,6 @@ mixin DiscriminatedChatGenConfigMappable {
         );
   }
 
-  DiscriminatedChatGenConfigCopyWith<
-    DiscriminatedChatGenConfig,
-    DiscriminatedChatGenConfig,
-    DiscriminatedChatGenConfig
-  >
-  get copyWith =>
-      _DiscriminatedChatGenConfigCopyWithImpl<
-        DiscriminatedChatGenConfig,
-        DiscriminatedChatGenConfig
-      >(this as DiscriminatedChatGenConfig, $identity, $identity);
   @override
   String toString() {
     return DiscriminatedChatGenConfigMapper.ensureInitialized().stringifyValue(
@@ -2976,178 +2609,6 @@ mixin DiscriminatedChatGenConfigMappable {
       this as DiscriminatedChatGenConfig,
     );
   }
-}
-
-extension DiscriminatedChatGenConfigValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, DiscriminatedChatGenConfig, $Out> {
-  DiscriminatedChatGenConfigCopyWith<$R, DiscriminatedChatGenConfig, $Out>
-  get $asDiscriminatedChatGenConfig => $base.as(
-    (v, t, t2) => _DiscriminatedChatGenConfigCopyWithImpl<$R, $Out>(v, t, t2),
-  );
-}
-
-abstract class DiscriminatedChatGenConfigCopyWith<
-  $R,
-  $In extends DiscriminatedChatGenConfig,
-  $Out
->
-    implements
-        LLMGenConfigCopyWith<$R, $In, $Out>,
-        DiscriminatedGenConfigCopyWith<$R, $In, $Out> {
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams;
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>>? get tools;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get logitBias;
-  @override
-  $R call({
-    String? model,
-    RAGParams? ragParams,
-    List<Tool>? tools,
-    ToolChoiceOption? toolChoice,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    List<String>? stop,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    ReasoningEffort? reasoningEffort,
-    int? reasoningBudget,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  });
-  DiscriminatedChatGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  );
-}
-
-class _DiscriminatedChatGenConfigCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, DiscriminatedChatGenConfig, $Out>
-    implements
-        DiscriminatedChatGenConfigCopyWith<
-          $R,
-          DiscriminatedChatGenConfig,
-          $Out
-        > {
-  _DiscriminatedChatGenConfigCopyWithImpl(super.value, super.then, super.then2);
-
-  @override
-  late final ClassMapperBase<DiscriminatedChatGenConfig> $mapper =
-      DiscriminatedChatGenConfigMapper.ensureInitialized();
-  @override
-  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams =>
-      $value.ragParams?.copyWith.$chain((v) => call(ragParams: v));
-  @override
-  ListCopyWith<$R, Tool, ObjectCopyWith<$R, Tool, Tool>>? get tools =>
-      $value.tools != null
-      ? ListCopyWith(
-          $value.tools!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(tools: v),
-        )
-      : null;
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop =>
-      $value.stop != null
-      ? ListCopyWith(
-          $value.stop!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(stop: v),
-        )
-      : null;
-  @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
-  get logitBias => MapCopyWith(
-    $value.logitBias,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(logitBias: v),
-  );
-  @override
-  $R call({
-    String? model,
-    Object? ragParams = $none,
-    Object? tools = $none,
-    Object? toolChoice = $none,
-    double? temperature,
-    double? topP,
-    bool? stream,
-    int? maxTokens,
-    Object? stop = $none,
-    double? presencePenalty,
-    double? frequencyPenalty,
-    Map<String, dynamic>? logitBias,
-    int? thinkingBudget,
-    Object? reasoningEffort = $none,
-    Object? reasoningBudget = $none,
-    ReasoningSummary? reasoningSummary,
-    GenConfigTypes? object,
-    String? systemPrompt,
-    String? prompt,
-    bool? multiTurn,
-  }) => $apply(
-    FieldCopyWithData({
-      if (model != null) #model: model,
-      if (ragParams != $none) #ragParams: ragParams,
-      if (tools != $none) #tools: tools,
-      if (toolChoice != $none) #toolChoice: toolChoice,
-      if (temperature != null) #temperature: temperature,
-      if (topP != null) #topP: topP,
-      if (stream != null) #stream: stream,
-      if (maxTokens != null) #maxTokens: maxTokens,
-      if (stop != $none) #stop: stop,
-      if (presencePenalty != null) #presencePenalty: presencePenalty,
-      if (frequencyPenalty != null) #frequencyPenalty: frequencyPenalty,
-      if (logitBias != null) #logitBias: logitBias,
-      if (thinkingBudget != null) #thinkingBudget: thinkingBudget,
-      if (reasoningEffort != $none) #reasoningEffort: reasoningEffort,
-      if (reasoningBudget != $none) #reasoningBudget: reasoningBudget,
-      if (reasoningSummary != null) #reasoningSummary: reasoningSummary,
-      if (object != null) #object: object,
-      if (systemPrompt != null) #systemPrompt: systemPrompt,
-      if (prompt != null) #prompt: prompt,
-      if (multiTurn != null) #multiTurn: multiTurn,
-    }),
-  );
-  @override
-  DiscriminatedChatGenConfig $make(
-    CopyWithData data,
-  ) => DiscriminatedChatGenConfig(
-    model: data.get(#model, or: $value.model),
-    ragParams: data.get(#ragParams, or: $value.ragParams),
-    tools: data.get(#tools, or: $value.tools),
-    toolChoice: data.get(#toolChoice, or: $value.toolChoice),
-    temperature: data.get(#temperature, or: $value.temperature),
-    topP: data.get(#topP, or: $value.topP),
-    stream: data.get(#stream, or: $value.stream),
-    maxTokens: data.get(#maxTokens, or: $value.maxTokens),
-    stop: data.get(#stop, or: $value.stop),
-    presencePenalty: data.get(#presencePenalty, or: $value.presencePenalty),
-    frequencyPenalty: data.get(#frequencyPenalty, or: $value.frequencyPenalty),
-    logitBias: data.get(#logitBias, or: $value.logitBias),
-    thinkingBudget: data.get(#thinkingBudget, or: $value.thinkingBudget),
-    reasoningEffort: data.get(#reasoningEffort, or: $value.reasoningEffort),
-    reasoningBudget: data.get(#reasoningBudget, or: $value.reasoningBudget),
-    reasoningSummary: data.get(#reasoningSummary, or: $value.reasoningSummary),
-    object: data.get(#object, or: $value.object),
-    systemPrompt: data.get(#systemPrompt, or: $value.systemPrompt),
-    prompt: data.get(#prompt, or: $value.prompt),
-    multiTurn: data.get(#multiTurn, or: $value.multiTurn),
-  );
-
-  @override
-  DiscriminatedChatGenConfigCopyWith<$R2, DiscriminatedChatGenConfig, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _DiscriminatedChatGenConfigCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class DiscriminatedPythonGenConfigMapper
@@ -3269,9 +2730,7 @@ abstract class DiscriminatedPythonGenConfigCopyWith<
   $In extends DiscriminatedPythonGenConfig,
   $Out
 >
-    implements
-        PythonGenConfigCopyWith<$R, $In, $Out>,
-        DiscriminatedGenConfigCopyWith<$R, $In, $Out> {
+    implements PythonGenConfigCopyWith<$R, $In, $Out> {
   @override
   $R call({GenConfigTypes? object, String? pythonCode});
   DiscriminatedPythonGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -3442,9 +2901,7 @@ abstract class DiscriminatedEmbedGenConfigCopyWith<
   $In extends DiscriminatedEmbedGenConfig,
   $Out
 >
-    implements
-        EmbedGenConfigCopyWith<$R, $In, $Out>,
-        DiscriminatedGenConfigCopyWith<$R, $In, $Out> {
+    implements EmbedGenConfigCopyWith<$R, $In, $Out> {
   @override
   $R call({
     GenConfigTypes? object,
@@ -3619,9 +3076,7 @@ abstract class DiscriminatedCodeGenConfigCopyWith<
   $In extends DiscriminatedCodeGenConfig,
   $Out
 >
-    implements
-        CodeGenConfigCopyWith<$R, $In, $Out>,
-        DiscriminatedGenConfigCopyWith<$R, $In, $Out> {
+    implements CodeGenConfigCopyWith<$R, $In, $Out> {
   @override
   $R call({GenConfigTypes? object, String? sourceColumn});
   DiscriminatedCodeGenConfigCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -3743,12 +3198,6 @@ mixin ColumnSchemaMappable {
 
 abstract class ColumnSchemaCopyWith<$R, $In extends ColumnSchema, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  DiscriminatedGenConfigCopyWith<
-    $R,
-    DiscriminatedGenConfig,
-    DiscriminatedGenConfig
-  >?
-  get genConfig;
   $R call({
     String? id,
     ColumnSchemaDtype? dtype,
@@ -3894,12 +3343,6 @@ abstract class ColumnSchemaCreateCopyWith<
   $Out
 >
     implements ColumnSchemaCopyWith<$R, $In, $Out> {
-  DiscriminatedGenConfigCopyWith<
-    $R,
-    DiscriminatedGenConfig,
-    DiscriminatedGenConfig
-  >?
-  get genConfig;
   @override
   $R call({
     String? id,
@@ -3921,13 +3364,6 @@ class _ColumnSchemaCreateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ColumnSchemaCreate> $mapper =
       ColumnSchemaCreateMapper.ensureInitialized();
-  @override
-  DiscriminatedGenConfigCopyWith<
-    $R,
-    DiscriminatedGenConfig,
-    DiscriminatedGenConfig
-  >?
-  get genConfig => $value.genConfig?.copyWith.$chain((v) => call(genConfig: v));
   @override
   $R call({
     String? id,
@@ -4917,11 +4353,7 @@ abstract class GenConfigUpdateRequestCopyWith<
     $R,
     String,
     DiscriminatedGenConfig?,
-    DiscriminatedGenConfigCopyWith<
-      $R,
-      DiscriminatedGenConfig,
-      DiscriminatedGenConfig
-    >?
+    ObjectCopyWith<$R, DiscriminatedGenConfig?, DiscriminatedGenConfig?>?
   >
   get columnMap;
   $R call({String? tableId, Map<String, DiscriminatedGenConfig?>? columnMap});
@@ -4944,15 +4376,11 @@ class _GenConfigUpdateRequestCopyWithImpl<$R, $Out>
     $R,
     String,
     DiscriminatedGenConfig?,
-    DiscriminatedGenConfigCopyWith<
-      $R,
-      DiscriminatedGenConfig,
-      DiscriminatedGenConfig
-    >?
+    ObjectCopyWith<$R, DiscriminatedGenConfig?, DiscriminatedGenConfig?>?
   >
   get columnMap => MapCopyWith(
     $value.columnMap,
-    (v, t) => v?.copyWith.$chain(t),
+    (v, t) => ObjectCopyWith(v, $identity, t),
     (v) => call(columnMap: v),
   );
   @override

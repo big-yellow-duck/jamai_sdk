@@ -1,5 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jamai_sdk/types/common.dart';
+import 'package:jamai_sdk/types/gen_tables.dart';
 
 part 'lm.mapper.dart';
 
@@ -617,7 +618,37 @@ class ChatRequestBase with ChatRequestBaseMappable {
     return map; // Return the modified map
   }
 }
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Niama extends ChatRequestBase with NiamaMappable {
+  final GenConfigTypes object;
+  final String systemPrompt;
+  final String prompt;
+  final bool multiTurn;
 
+  Niama({
+    super.model = '',
+    super.ragParams,
+    super.tools,
+    super.toolChoice,
+    super.temperature = 0.2,
+    super.topP = 0.6,
+    super.stream = true,
+    super.maxTokens = 2048,
+    super.stop,
+    super.presencePenalty = 0.0,
+    super.frequencyPenalty = 0.0,
+    super.logitBias = const {},
+    super.thinkingBudget = 1,
+    super.reasoningEffort,
+    super.reasoningBudget,
+    super.reasoningSummary = ReasoningSummary.auto,
+    // Subclass fields
+    this.object = GenConfigTypes.llm,
+    this.systemPrompt = '',
+    this.prompt = '',
+    this.multiTurn = false,
+  });
+}
 /// Chat request
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class ChatRequest with ChatRequestMappable {

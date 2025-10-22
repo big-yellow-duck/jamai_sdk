@@ -4600,6 +4600,7 @@ class ChatRequestBaseMapper extends ClassMapperBase<ChatRequestBase> {
   static ChatRequestBaseMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ChatRequestBaseMapper._());
+      NiamaMapper.ensureInitialized();
       RAGParamsMapper.ensureInitialized();
       ToolMapper.ensureInitialized();
       ReasoningEffortMapper.ensureInitialized();
@@ -4844,8 +4845,8 @@ abstract class ChatRequestBaseCopyWith<$R, $In extends ChatRequestBase, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams;
   ListCopyWith<$R, Tool, ToolCopyWith<$R, Tool, Tool>>? get tools;
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop;
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?>? get stop;
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
   get logitBias;
   $R call({
     String? model,
@@ -4891,7 +4892,7 @@ class _ChatRequestBaseCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop =>
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?>? get stop =>
       $value.stop != null
       ? ListCopyWith(
           $value.stop!,
@@ -4900,7 +4901,7 @@ class _ChatRequestBaseCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>?>
   get logitBias => MapCopyWith(
     $value.logitBias,
     (v, t) => ObjectCopyWith(v, $identity, t),
@@ -4968,6 +4969,421 @@ class _ChatRequestBaseCopyWithImpl<$R, $Out>
   ChatRequestBaseCopyWith<$R2, ChatRequestBase, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _ChatRequestBaseCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class NiamaMapper extends ClassMapperBase<Niama> {
+  NiamaMapper._();
+
+  static NiamaMapper? _instance;
+  static NiamaMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = NiamaMapper._());
+      ChatRequestBaseMapper.ensureInitialized();
+      RAGParamsMapper.ensureInitialized();
+      ToolMapper.ensureInitialized();
+      ReasoningEffortMapper.ensureInitialized();
+      ReasoningSummaryMapper.ensureInitialized();
+      GenConfigTypesMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'Niama';
+
+  static String _$model(Niama v) => v.model;
+  static const Field<Niama, String> _f$model = Field(
+    'model',
+    _$model,
+    opt: true,
+    def: '',
+  );
+  static RAGParams? _$ragParams(Niama v) => v.ragParams;
+  static const Field<Niama, RAGParams> _f$ragParams = Field(
+    'ragParams',
+    _$ragParams,
+    key: r'rag_params',
+    opt: true,
+  );
+  static List<Tool>? _$tools(Niama v) => v.tools;
+  static const Field<Niama, List<Tool>> _f$tools = Field(
+    'tools',
+    _$tools,
+    opt: true,
+  );
+  static ToolChoiceOption? _$toolChoice(Niama v) => v.toolChoice;
+  static const Field<Niama, ToolChoiceOption> _f$toolChoice = Field(
+    'toolChoice',
+    _$toolChoice,
+    key: r'tool_choice',
+    opt: true,
+    hook: ToolChoiceHook(),
+  );
+  static double _$temperature(Niama v) => v.temperature;
+  static const Field<Niama, double> _f$temperature = Field(
+    'temperature',
+    _$temperature,
+    opt: true,
+    def: 0.2,
+  );
+  static double _$topP(Niama v) => v.topP;
+  static const Field<Niama, double> _f$topP = Field(
+    'topP',
+    _$topP,
+    key: r'top_p',
+    opt: true,
+    def: 0.6,
+  );
+  static bool _$stream(Niama v) => v.stream;
+  static const Field<Niama, bool> _f$stream = Field(
+    'stream',
+    _$stream,
+    opt: true,
+    def: true,
+  );
+  static int _$maxTokens(Niama v) => v.maxTokens;
+  static const Field<Niama, int> _f$maxTokens = Field(
+    'maxTokens',
+    _$maxTokens,
+    key: r'max_tokens',
+    opt: true,
+    def: 2048,
+  );
+  static List<String>? _$stop(Niama v) => v.stop;
+  static const Field<Niama, List<String>> _f$stop = Field(
+    'stop',
+    _$stop,
+    opt: true,
+  );
+  static double _$presencePenalty(Niama v) => v.presencePenalty;
+  static const Field<Niama, double> _f$presencePenalty = Field(
+    'presencePenalty',
+    _$presencePenalty,
+    key: r'presence_penalty',
+    opt: true,
+    def: 0.0,
+  );
+  static double _$frequencyPenalty(Niama v) => v.frequencyPenalty;
+  static const Field<Niama, double> _f$frequencyPenalty = Field(
+    'frequencyPenalty',
+    _$frequencyPenalty,
+    key: r'frequency_penalty',
+    opt: true,
+    def: 0.0,
+  );
+  static Map<String, dynamic> _$logitBias(Niama v) => v.logitBias;
+  static const Field<Niama, Map<String, dynamic>> _f$logitBias = Field(
+    'logitBias',
+    _$logitBias,
+    key: r'logit_bias',
+    opt: true,
+    def: const {},
+  );
+  static int _$thinkingBudget(Niama v) => v.thinkingBudget;
+  static const Field<Niama, int> _f$thinkingBudget = Field(
+    'thinkingBudget',
+    _$thinkingBudget,
+    key: r'thinking_budget',
+    opt: true,
+    def: 1,
+  );
+  static ReasoningEffort? _$reasoningEffort(Niama v) => v.reasoningEffort;
+  static const Field<Niama, ReasoningEffort> _f$reasoningEffort = Field(
+    'reasoningEffort',
+    _$reasoningEffort,
+    key: r'reasoning_effort',
+    opt: true,
+  );
+  static int? _$reasoningBudget(Niama v) => v.reasoningBudget;
+  static const Field<Niama, int> _f$reasoningBudget = Field(
+    'reasoningBudget',
+    _$reasoningBudget,
+    key: r'reasoning_budget',
+    opt: true,
+  );
+  static ReasoningSummary _$reasoningSummary(Niama v) => v.reasoningSummary;
+  static const Field<Niama, ReasoningSummary> _f$reasoningSummary = Field(
+    'reasoningSummary',
+    _$reasoningSummary,
+    key: r'reasoning_summary',
+    opt: true,
+    def: ReasoningSummary.auto,
+  );
+  static GenConfigTypes _$object(Niama v) => v.object;
+  static const Field<Niama, GenConfigTypes> _f$object = Field(
+    'object',
+    _$object,
+    opt: true,
+    def: GenConfigTypes.llm,
+  );
+  static String _$systemPrompt(Niama v) => v.systemPrompt;
+  static const Field<Niama, String> _f$systemPrompt = Field(
+    'systemPrompt',
+    _$systemPrompt,
+    key: r'system_prompt',
+    opt: true,
+    def: '',
+  );
+  static String _$prompt(Niama v) => v.prompt;
+  static const Field<Niama, String> _f$prompt = Field(
+    'prompt',
+    _$prompt,
+    opt: true,
+    def: '',
+  );
+  static bool _$multiTurn(Niama v) => v.multiTurn;
+  static const Field<Niama, bool> _f$multiTurn = Field(
+    'multiTurn',
+    _$multiTurn,
+    key: r'multi_turn',
+    opt: true,
+    def: false,
+  );
+  static Map<String, dynamic> _$hyperparams(Niama v) => v.hyperparams;
+  static const Field<Niama, Map<String, dynamic>> _f$hyperparams = Field(
+    'hyperparams',
+    _$hyperparams,
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<Niama> fields = const {
+    #model: _f$model,
+    #ragParams: _f$ragParams,
+    #tools: _f$tools,
+    #toolChoice: _f$toolChoice,
+    #temperature: _f$temperature,
+    #topP: _f$topP,
+    #stream: _f$stream,
+    #maxTokens: _f$maxTokens,
+    #stop: _f$stop,
+    #presencePenalty: _f$presencePenalty,
+    #frequencyPenalty: _f$frequencyPenalty,
+    #logitBias: _f$logitBias,
+    #thinkingBudget: _f$thinkingBudget,
+    #reasoningEffort: _f$reasoningEffort,
+    #reasoningBudget: _f$reasoningBudget,
+    #reasoningSummary: _f$reasoningSummary,
+    #object: _f$object,
+    #systemPrompt: _f$systemPrompt,
+    #prompt: _f$prompt,
+    #multiTurn: _f$multiTurn,
+    #hyperparams: _f$hyperparams,
+  };
+
+  static Niama _instantiate(DecodingData data) {
+    return Niama(
+      model: data.dec(_f$model),
+      ragParams: data.dec(_f$ragParams),
+      tools: data.dec(_f$tools),
+      toolChoice: data.dec(_f$toolChoice),
+      temperature: data.dec(_f$temperature),
+      topP: data.dec(_f$topP),
+      stream: data.dec(_f$stream),
+      maxTokens: data.dec(_f$maxTokens),
+      stop: data.dec(_f$stop),
+      presencePenalty: data.dec(_f$presencePenalty),
+      frequencyPenalty: data.dec(_f$frequencyPenalty),
+      logitBias: data.dec(_f$logitBias),
+      thinkingBudget: data.dec(_f$thinkingBudget),
+      reasoningEffort: data.dec(_f$reasoningEffort),
+      reasoningBudget: data.dec(_f$reasoningBudget),
+      reasoningSummary: data.dec(_f$reasoningSummary),
+      object: data.dec(_f$object),
+      systemPrompt: data.dec(_f$systemPrompt),
+      prompt: data.dec(_f$prompt),
+      multiTurn: data.dec(_f$multiTurn),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static Niama fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Niama>(map);
+  }
+
+  static Niama fromJson(String json) {
+    return ensureInitialized().decodeJson<Niama>(json);
+  }
+}
+
+mixin NiamaMappable {
+  String toJson() {
+    return NiamaMapper.ensureInitialized().encodeJson<Niama>(this as Niama);
+  }
+
+  Map<String, dynamic> toMap() {
+    return NiamaMapper.ensureInitialized().encodeMap<Niama>(this as Niama);
+  }
+
+  NiamaCopyWith<Niama, Niama, Niama> get copyWith =>
+      _NiamaCopyWithImpl<Niama, Niama>(this as Niama, $identity, $identity);
+  @override
+  String toString() {
+    return NiamaMapper.ensureInitialized().stringifyValue(this as Niama);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return NiamaMapper.ensureInitialized().equalsValue(this as Niama, other);
+  }
+
+  @override
+  int get hashCode {
+    return NiamaMapper.ensureInitialized().hashValue(this as Niama);
+  }
+}
+
+extension NiamaValueCopy<$R, $Out> on ObjectCopyWith<$R, Niama, $Out> {
+  NiamaCopyWith<$R, Niama, $Out> get $asNiama =>
+      $base.as((v, t, t2) => _NiamaCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class NiamaCopyWith<$R, $In extends Niama, $Out>
+    implements ChatRequestBaseCopyWith<$R, $In, $Out> {
+  @override
+  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams;
+  @override
+  ListCopyWith<$R, Tool, ToolCopyWith<$R, Tool, Tool>>? get tools;
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop;
+  @override
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  get logitBias;
+  @override
+  $R call({
+    String? model,
+    RAGParams? ragParams,
+    List<Tool>? tools,
+    ToolChoiceOption? toolChoice,
+    double? temperature,
+    double? topP,
+    bool? stream,
+    int? maxTokens,
+    List<String>? stop,
+    double? presencePenalty,
+    double? frequencyPenalty,
+    Map<String, dynamic>? logitBias,
+    int? thinkingBudget,
+    ReasoningEffort? reasoningEffort,
+    int? reasoningBudget,
+    ReasoningSummary? reasoningSummary,
+    GenConfigTypes? object,
+    String? systemPrompt,
+    String? prompt,
+    bool? multiTurn,
+  });
+  NiamaCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _NiamaCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Niama, $Out>
+    implements NiamaCopyWith<$R, Niama, $Out> {
+  _NiamaCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<Niama> $mapper = NiamaMapper.ensureInitialized();
+  @override
+  RAGParamsCopyWith<$R, RAGParams, RAGParams>? get ragParams =>
+      $value.ragParams?.copyWith.$chain((v) => call(ragParams: v));
+  @override
+  ListCopyWith<$R, Tool, ToolCopyWith<$R, Tool, Tool>>? get tools =>
+      $value.tools != null
+      ? ListCopyWith(
+          $value.tools!,
+          (v, t) => v.copyWith.$chain(t),
+          (v) => call(tools: v),
+        )
+      : null;
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get stop =>
+      $value.stop != null
+      ? ListCopyWith(
+          $value.stop!,
+          (v, t) => ObjectCopyWith(v, $identity, t),
+          (v) => call(stop: v),
+        )
+      : null;
+  @override
+  MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
+  get logitBias => MapCopyWith(
+    $value.logitBias,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(logitBias: v),
+  );
+  @override
+  $R call({
+    String? model,
+    Object? ragParams = $none,
+    Object? tools = $none,
+    Object? toolChoice = $none,
+    double? temperature,
+    double? topP,
+    bool? stream,
+    int? maxTokens,
+    Object? stop = $none,
+    double? presencePenalty,
+    double? frequencyPenalty,
+    Map<String, dynamic>? logitBias,
+    int? thinkingBudget,
+    Object? reasoningEffort = $none,
+    Object? reasoningBudget = $none,
+    ReasoningSummary? reasoningSummary,
+    GenConfigTypes? object,
+    String? systemPrompt,
+    String? prompt,
+    bool? multiTurn,
+  }) => $apply(
+    FieldCopyWithData({
+      if (model != null) #model: model,
+      if (ragParams != $none) #ragParams: ragParams,
+      if (tools != $none) #tools: tools,
+      if (toolChoice != $none) #toolChoice: toolChoice,
+      if (temperature != null) #temperature: temperature,
+      if (topP != null) #topP: topP,
+      if (stream != null) #stream: stream,
+      if (maxTokens != null) #maxTokens: maxTokens,
+      if (stop != $none) #stop: stop,
+      if (presencePenalty != null) #presencePenalty: presencePenalty,
+      if (frequencyPenalty != null) #frequencyPenalty: frequencyPenalty,
+      if (logitBias != null) #logitBias: logitBias,
+      if (thinkingBudget != null) #thinkingBudget: thinkingBudget,
+      if (reasoningEffort != $none) #reasoningEffort: reasoningEffort,
+      if (reasoningBudget != $none) #reasoningBudget: reasoningBudget,
+      if (reasoningSummary != null) #reasoningSummary: reasoningSummary,
+      if (object != null) #object: object,
+      if (systemPrompt != null) #systemPrompt: systemPrompt,
+      if (prompt != null) #prompt: prompt,
+      if (multiTurn != null) #multiTurn: multiTurn,
+    }),
+  );
+  @override
+  Niama $make(CopyWithData data) => Niama(
+    model: data.get(#model, or: $value.model),
+    ragParams: data.get(#ragParams, or: $value.ragParams),
+    tools: data.get(#tools, or: $value.tools),
+    toolChoice: data.get(#toolChoice, or: $value.toolChoice),
+    temperature: data.get(#temperature, or: $value.temperature),
+    topP: data.get(#topP, or: $value.topP),
+    stream: data.get(#stream, or: $value.stream),
+    maxTokens: data.get(#maxTokens, or: $value.maxTokens),
+    stop: data.get(#stop, or: $value.stop),
+    presencePenalty: data.get(#presencePenalty, or: $value.presencePenalty),
+    frequencyPenalty: data.get(#frequencyPenalty, or: $value.frequencyPenalty),
+    logitBias: data.get(#logitBias, or: $value.logitBias),
+    thinkingBudget: data.get(#thinkingBudget, or: $value.thinkingBudget),
+    reasoningEffort: data.get(#reasoningEffort, or: $value.reasoningEffort),
+    reasoningBudget: data.get(#reasoningBudget, or: $value.reasoningBudget),
+    reasoningSummary: data.get(#reasoningSummary, or: $value.reasoningSummary),
+    object: data.get(#object, or: $value.object),
+    systemPrompt: data.get(#systemPrompt, or: $value.systemPrompt),
+    prompt: data.get(#prompt, or: $value.prompt),
+    multiTurn: data.get(#multiTurn, or: $value.multiTurn),
+  );
+
+  @override
+  NiamaCopyWith<$R2, Niama, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _NiamaCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class ChatRequestMapper extends ClassMapperBase<ChatRequest> {

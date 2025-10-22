@@ -162,7 +162,14 @@ class MultiRowCompletionResponse with MultiRowCompletionResponseMappable {
 }
 
 /// LLM generation configuration
-@MappableClass(caseStyle: CaseStyle.snakeCase)
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  generateMethods:
+      GenerateMethods.decode |
+      GenerateMethods.encode |
+      GenerateMethods.equals |
+      GenerateMethods.stringify,
+)
 class LLMGenConfig extends ChatRequestBase
     with LLMGenConfigMappable
     implements GenConfig {
@@ -172,7 +179,6 @@ class LLMGenConfig extends ChatRequestBase
   final bool multiTurn;
 
   LLMGenConfig({
-    // Base class fields
     super.model = '',
     super.ragParams,
     super.tools,
@@ -255,13 +261,26 @@ sealed class GenConfig {
   }
 }
 
-@MappableClass(caseStyle: CaseStyle.snakeCase, discriminatorKey: 'object')
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorKey: 'object',
+  generateMethods:
+      GenerateMethods.decode |
+      GenerateMethods.encode |
+      GenerateMethods.equals |
+      GenerateMethods.stringify,
+)
 sealed class DiscriminatedGenConfig with DiscriminatedGenConfigMappable {}
 
 // discriminated gen configs
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
   discriminatorValue: GenConfigTypes.llm,
+  generateMethods:
+      GenerateMethods.decode |
+      GenerateMethods.encode |
+      GenerateMethods.equals |
+      GenerateMethods.stringify,
 )
 class DiscriminatedLLMGenConfig extends LLMGenConfig
     with DiscriminatedLLMGenConfigMappable
@@ -295,12 +314,16 @@ class DiscriminatedLLMGenConfig extends LLMGenConfig
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
   discriminatorValue: GenConfigTypes.chat,
+  generateMethods:
+      GenerateMethods.decode |
+      GenerateMethods.encode |
+      GenerateMethods.equals |
+      GenerateMethods.stringify,
 )
 class DiscriminatedChatGenConfig extends LLMGenConfig
     with DiscriminatedChatGenConfigMappable
     implements DiscriminatedGenConfig {
   DiscriminatedChatGenConfig({
-    // Same parameters as DiscriminatedLLMGenConfig
     super.model = '',
     super.ragParams,
     super.tools,
@@ -317,7 +340,8 @@ class DiscriminatedChatGenConfig extends LLMGenConfig
     super.reasoningEffort,
     super.reasoningBudget,
     super.reasoningSummary = ReasoningSummary.auto,
-    super.object = GenConfigTypes.chat, // Different default
+    // Subclass fields
+    super.object = GenConfigTypes.llm,
     super.systemPrompt = '',
     super.prompt = '',
     super.multiTurn = false,
