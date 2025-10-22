@@ -78,35 +78,49 @@ enum VectorMetric {
   String toString() => value;
 }
 
-@MappableEnum(caseStyle: CaseStyle.snakeCase)
+@MappableEnum()
 enum GenConfigTypes {
-  llm('gen_config.llm'),
-  python('gen_config.python'),
-  chat('gen_config.chat'),
-  embed('gen_config.embed');
+  @MappableValue('gen_config.llm')
+  llm,
+  @MappableValue('gen_config.python')
+  python,
+  @MappableValue('gen_config.chat')
+  chat,
+  @MappableValue('gen_config.embed')
+  embed,
+  @MappableValue('gen_config.code')
+  code;
 
-  final String value;
-  const GenConfigTypes(this.value);
+  String get value => switch (this) {
+    GenConfigTypes.llm => 'gen_config.llm',
+    GenConfigTypes.python => 'gen_config.python',
+    GenConfigTypes.chat => 'gen_config.chat',
+    GenConfigTypes.embed => 'gen_config.embed',
+    GenConfigTypes.code => 'gen_config.code',
+  };
 
   @override
   String toString() => value;
 }
 
-// / Cell references response
-/// Cell completion response
 @MappableClass(caseStyle: CaseStyle.snakeCase)
-class CellCompletionResponse extends ChatCompletionChunkResponse {
+class CellCompletionResponse extends ChatCompletionChunkResponse
+    with CellCompletionResponseMappable {
   final String outputColumnName;
   final String rowId;
 
   const CellCompletionResponse({
-    required this.outputColumnName,
-    required this.rowId,
-    required super.object,
     required super.id,
+    super.object = ObjectType.completionChunk,
     required super.created,
     required super.model,
     required super.choices,
+    super.usage,
+    super.references,
+    super.serviceTier,
+    super.systemFingerprint,
+    required this.outputColumnName,
+    required this.rowId,
   });
 }
 
@@ -126,8 +140,8 @@ class CellReferencesResponse extends References
   });
 }
 
-/// Row completion response
-class RowCompletionResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RowCompletionResponse with RowCompletionResponseMappable {
   final String object;
   final Map<String, ChatCompletionChunkResponse> columns;
   final String rowId;
@@ -137,495 +151,346 @@ class RowCompletionResponse {
     required this.columns,
     required this.rowId,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'object': object,
-      'columns': columns.map((key, value) => MapEntry(key, value.toJson())),
-      'row_id': rowId,
-    };
-  }
 }
 
-/// Multi-row completion response
-class MultiRowCompletionResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowCompletionResponse with MultiRowCompletionResponseMappable {
   final String object;
   final List<RowCompletionResponse> rows;
 
   const MultiRowCompletionResponse({required this.object, required this.rows});
-
-  Map<String, dynamic> toJson() {
-    return {'object': object, 'rows': rows.map((row) => row.toJson()).toList()};
-  }
 }
 
 /// LLM generation configuration
-// @freezed
-// abstract class LLMGenConfig extends ChatRequestBase with _$LLMGenConfig {
-//  LLMGenConfig._({
-//    // Base class fields
-//    String model = '',
-//    RAGParams? ragParams,
-//    List<Tool>? tools,
-//    ToolChoiceOption? toolChoice,
-//    double temperature = 0.2,
-//    double topP = 0.6,
-//    bool stream = true,
-//    int maxTokens = 2048,
-//    List<String>? stop,
-//    double presencePenalty = 0.0,
-//    double frequencyPenalty = 0.0,
-//    Map<String, dynamic> logitBias = const {},
-//    int thinkingBudget = 1,
-//    ReasoningEffort? reasoningEffort,
-//    int? reasoningBudget,
-//    ReasoningSummary reasoningSummary = ReasoningSummary.auto,
-//    // Subclass fields
-//    GenConfigTypes object = GenConfigTypes.llm,
-//    String systemPrompt = '',
-//    String prompt = '',
-//    bool multiTurn = false,
-//  }) : super._({
-//    model: model,
-//    ragParams: ragParams,
-//    tools: tools,
-//    toolChoice: toolChoice,
-//    temperature: temperature,
-//    topP: topP,
-//    stream: stream,
-//    maxTokens: maxTokens,
-//    stop: stop,
-//    presencePenalty: presencePenalty,
-//    frequencyPenalty: frequencyPenalty,
-//    logitBias: logitBias,
-//    thinkingBudget: thinkingBudget,
-//    reasoningEffort: reasoningEffort,
-//    reasoningBudget: reasoningBudget,
-//    reasoningSummary: reasoningSummary,
-//  });
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class LLMGenConfig extends ChatRequestBase
+    with LLMGenConfigMappable
+    implements GenConfig {
+  final GenConfigTypes object;
+  final String systemPrompt;
+  final String prompt;
+  final bool multiTurn;
 
-//  factory LLMGenConfig({
-//    @Default(GenConfigTypes.llm) GenConfigTypes object,
-//    @Default('') String systemPrompt,
-//    @Default('') String prompt,
-//    @Default(false) bool multiTurn,
-//    // Base class fields
-//    @Default('') String model,
-//    RAGParams? ragParams,
-//    List<Tool>? tools,
-//    ToolChoiceOption? toolChoice,
-//    @Default(0.2) double temperature,
-//    @Default(0.6) double topP,
-//    @Default(true) bool stream,
-//    @Default(2048) int maxTokens,
-//    List<String>? stop,
-//    @Default(0.0) double presencePenalty,
-//    @Default(0.0) double frequencyPenalty,
-//    @Default({}) Map<String, dynamic> logitBias,
-//    @Default(1) int thinkingBudget,
-//    ReasoningEffort? reasoningEffort,
-//    int? reasoningBudget,
-//    @Default(ReasoningSummary.auto) ReasoningSummary reasoningSummary,
-//  }) = _LLMGenConfig;
-
-// @override
-// Map<String, dynamic> toJson() {
-//   return {
-//     'object': object.value,
-//     'system_prompt': systemPrompt,
-//     'prompt': prompt,
-//     'multi_turn': multiTurn,
-//     'model': model,
-//     'rag_params': ragParams?.toJson(),
-//     'tools': tools?.map((t) => t.toJson()).toList(),
-//     'tool_choice': toolChoice,
-//     'temperature': temperature,
-//     'top_p': topP,
-//     'stream': stream,
-//     'max_tokens': maxTokens,
-//     'stop': stop,
-//     'presence_penalty': presencePenalty,
-//     'frequency_penalty': frequencyPenalty,
-//     'logit_bias': logitBias,
-//     'thinking_budget': thinkingBudget,
-//     'reasoning_effort': reasoningEffort?.value,
-//     'reasoning_budget': reasoningBudget,
-//     'reasoning_summary': reasoningSummary.value,
-//   };
-// }
-// }
+  LLMGenConfig({
+    // Base class fields
+    super.model = '',
+    super.ragParams,
+    super.tools,
+    super.toolChoice,
+    super.temperature = 0.2,
+    super.topP = 0.6,
+    super.stream = true,
+    super.maxTokens = 2048,
+    super.stop,
+    super.presencePenalty = 0.0,
+    super.frequencyPenalty = 0.0,
+    super.logitBias = const {},
+    super.thinkingBudget = 1,
+    super.reasoningEffort,
+    super.reasoningBudget,
+    super.reasoningSummary = ReasoningSummary.auto,
+    // Subclass fields
+    this.object = GenConfigTypes.llm,
+    this.systemPrompt = '',
+    this.prompt = '',
+    this.multiTurn = false,
+  });
+}
 
 /// Embedding generation configuration
-class EmbedGenConfig {
-  final String object;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class EmbedGenConfig extends GenConfig with EmbedGenConfigMappable {
+  final GenConfigTypes object;
   final String embeddingModel;
   final String sourceColumn;
 
   const EmbedGenConfig({
-    this.object = 'gen_config.embed',
+    this.object = GenConfigTypes.embed,
     required this.embeddingModel,
     required this.sourceColumn,
   });
-
-  /// Creates a copy with updated fields
-  EmbedGenConfig copyWith({
-    String? object,
-    String? embeddingModel,
-    String? sourceColumn,
-  }) {
-    return EmbedGenConfig(
-      object: object ?? this.object,
-      embeddingModel: embeddingModel ?? this.embeddingModel,
-      sourceColumn: sourceColumn ?? this.sourceColumn,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'object': object,
-      'embedding_model': embeddingModel,
-      'source_column': sourceColumn,
-    };
-  }
 }
 
-/// Code generation configuration
-class CodeGenConfig {
-  final String object;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class CodeGenConfig extends GenConfig with CodeGenConfigMappable {
+  final GenConfigTypes object;
   final String sourceColumn;
 
   const CodeGenConfig({
-    this.object = 'gen_config.code',
+    this.object = GenConfigTypes.code,
     required this.sourceColumn,
   });
-
-  /// Creates a copy with updated fields
-  CodeGenConfig copyWith({String? object, String? sourceColumn}) {
-    return CodeGenConfig(
-      object: object ?? this.object,
-      sourceColumn: sourceColumn ?? this.sourceColumn,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'object': object, 'source_column': sourceColumn};
-  }
 }
 
 /// Python generation configuration
-class PythonGenConfig {
-  final String object;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PythonGenConfig extends GenConfig with PythonGenConfigMappable {
+  final GenConfigTypes object;
   final String pythonCode;
 
   const PythonGenConfig({
-    this.object = 'gen_config.python',
+    this.object = GenConfigTypes.python,
     required this.pythonCode,
   });
+}
 
-  /// Creates a copy with updated fields
-  PythonGenConfig copyWith({String? object, String? pythonCode}) {
-    return PythonGenConfig(
-      object: object ?? this.object,
-      pythonCode: pythonCode ?? this.pythonCode,
+sealed class GenConfig {
+  const GenConfig();
+  factory GenConfig.fromDynamic(dynamic value) {
+    if (value is LLMGenConfig) {
+      return value;
+    }
+    if (value is EmbedGenConfig) {
+      return value;
+    }
+    if (value is PythonGenConfig) {
+      return value;
+    }
+    if (value is CodeGenConfig) {
+      return value;
+    }
+    throw ArgumentError(
+      'Value be be type of LLMGenConfig | EmbedGenConfig | PythonGenConfig | CodeGenConfig',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'object': object, 'python_code': pythonCode};
   }
 }
 
-/// Generation configuration union type
-typedef GenConfig = dynamic; // LLMGenConfig | EmbedGenConfig | PythonGenConfig
+@MappableClass(caseStyle: CaseStyle.snakeCase, discriminatorKey: 'object')
+sealed class DiscriminatedGenConfig with DiscriminatedGenConfigMappable {}
 
-// @freezed
-// abstract class GenConfig with _$Genconfig{
+// discriminated gen configs
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: GenConfigTypes.llm,
+)
+class DiscriminatedLLMGenConfig extends LLMGenConfig
+    with DiscriminatedLLMGenConfigMappable
+    implements DiscriminatedGenConfig {
+  DiscriminatedLLMGenConfig({
+    // Base class fields
+    super.model = '',
+    super.ragParams,
+    super.tools,
+    super.toolChoice,
+    super.temperature = 0.2,
+    super.topP = 0.6,
+    super.stream = true,
+    super.maxTokens = 2048,
+    super.stop,
+    super.presencePenalty = 0.0,
+    super.frequencyPenalty = 0.0,
+    super.logitBias = const {},
+    super.thinkingBudget = 1,
+    super.reasoningEffort,
+    super.reasoningBudget,
+    super.reasoningSummary = ReasoningSummary.auto,
+    // Subclass fields
+    super.object = GenConfigTypes.llm,
+    super.systemPrompt = '',
+    super.prompt = '',
+    super.multiTurn = false,
+  });
+}
 
-// }
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: GenConfigTypes.chat,
+)
+class DiscriminatedChatGenConfig extends LLMGenConfig
+    with DiscriminatedChatGenConfigMappable
+    implements DiscriminatedGenConfig {
+  DiscriminatedChatGenConfig({
+    // Same parameters as DiscriminatedLLMGenConfig
+    super.model = '',
+    super.ragParams,
+    super.tools,
+    super.toolChoice,
+    super.temperature = 0.2,
+    super.topP = 0.6,
+    super.stream = true,
+    super.maxTokens = 2048,
+    super.stop,
+    super.presencePenalty = 0.0,
+    super.frequencyPenalty = 0.0,
+    super.logitBias = const {},
+    super.thinkingBudget = 1,
+    super.reasoningEffort,
+    super.reasoningBudget,
+    super.reasoningSummary = ReasoningSummary.auto,
+    super.object = GenConfigTypes.chat, // Different default
+    super.systemPrompt = '',
+    super.prompt = '',
+    super.multiTurn = false,
+  });
+}
 
-/// Column schema
-// @freezed
-// abstract class ColumnSchema with _$ColumnSchema {
-//   ColumnSchema._({
-//     required this.id,
-//     this.dtype = ColumnSchemaDtype.str,
-//     this.vlen = 0,
-//     this.index = true,
-//     this.genConfig,
-//   });
-//   factory ColumnSchema({
-//     required String id,
-//     @Default(ColumnSchemaDtype.str) ColumnSchemaDtype dtype,
-//     @Default(0) int vlen,
-//     @Default(true) bool index,
-//     dynamic genConfig,
-//   }) = _ColumnSchema;
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: GenConfigTypes.python,
+)
+class DiscriminatedPythonGenConfig extends PythonGenConfig
+    with DiscriminatedPythonGenConfigMappable
+    implements DiscriminatedGenConfig {
+  DiscriminatedPythonGenConfig({
+    super.object = GenConfigTypes.python,
+    required super.pythonCode,
+  });
+}
 
-//   @override
-//   final String id;
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: GenConfigTypes.embed,
+)
+class DiscriminatedEmbedGenConfig extends EmbedGenConfig
+    with DiscriminatedEmbedGenConfigMappable
+    implements DiscriminatedGenConfig {
+  DiscriminatedEmbedGenConfig({
+    super.object = GenConfigTypes.embed,
+    required super.embeddingModel,
+    required super.sourceColumn,
+  });
+}
 
-//   @override
-//   final ColumnSchemaDtype dtype;
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: GenConfigTypes.code,
+)
+class DiscriminatedCodeGenConfig extends CodeGenConfig
+    with DiscriminatedCodeGenConfigMappable
+    implements DiscriminatedGenConfig {
+  DiscriminatedCodeGenConfig({
+    super.object = GenConfigTypes.code,
+    required super.sourceColumn,
+  });
+}
 
-//   @override
-//   final int vlen;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+abstract class ColumnSchema with ColumnSchemaMappable {
+  final String id;
+  final ColumnSchemaDtype dtype;
+  final int vlen;
+  final bool index;
+  final DiscriminatedGenConfig? genConfig;
 
-//   @override
-//   final bool index;
+  const ColumnSchema({
+    required this.id,
+    this.dtype = ColumnSchemaDtype.str,
+    this.vlen = 0,
+    this.index = true,
+    this.genConfig,
+  });
+}
 
-//   @override
-//   final dynamic genConfig;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ColumnSchemaCreate extends ColumnSchema with ColumnSchemaCreateMappable {
+  factory ColumnSchemaCreate({
+    required String id,
+    ColumnSchemaDtype dtype = ColumnSchemaDtype.str,
+    int vlen = 0,
+    bool index = true,
+    DiscriminatedGenConfig? genConfig,
+  }) {
+    final sanitizedString = SanitizedNotEmptyString(id).value;
 
-//   factory ColumnSchema.fromJson(Map<String, dynamic> json) {
-//     return ColumnSchema(
-//       id: json['id'] as String? ?? '',
-//       dtype: ColumnSchemaDtype.values.firstWhere(
-//         (e) => e.value == json['dtype'],
-//         orElse: () => ColumnSchemaDtype.str,
-//       ),
-//       vlen: json['vlen'] as int? ?? 0,
-//       index: json['index'] as bool? ?? true,
-//       genConfig: json['gen_config'],
-//     );
-//   }
+    return ColumnSchemaCreate._(
+      id: sanitizedString,
+      dtype: dtype,
+      vlen: vlen,
+      index: index,
+      genConfig: genConfig,
+    );
+  }
+  const ColumnSchemaCreate._({
+    required super.id,
+    super.dtype = ColumnSchemaDtype.str,
+    super.vlen = 0,
+    super.index = true,
+    super.genConfig,
+  });
+}
 
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'id': id,
-//       'dtype': dtype,
-//       'vlen': vlen,
-//       'index': index,
-//       'gen_config': genConfig?.toJson(),
-//     };
-//   }
-// }
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+abstract class TableSchemaCreate with TableSchemaCreateMappable {
+  final String id;
+  final List<ColumnSchemaCreate> cols;
 
-/// Column schema for creation
-/// need to update to use sanitized non empty string
-// @freezed
-// abstract class ColumnSchemaCreate extends ColumnSchema
-//     with _$ColumnSchemaCreate {
-//   ColumnSchemaCreate._({
-//     required this.id,
-//     ColumnSchemaDtype dtype = ColumnSchemaDtype.str,
-//     int vlen = 0,
-//     bool index = true,
-//     dynamic genConfig,
-//   }) : super._(
-//          id: id,
-//          dtype: dtype,
-//          vlen: vlen,
-//          index: index,
-//          genConfig: genConfig,
-//        );
+  const TableSchemaCreate({required this.id, required this.cols});
+}
 
-//   @override
-//   final SanitizedNotEmptyString id;
-// }
+/// Knowledge table schema for creation
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class KnowledgeTableSchemaCreate extends TableSchemaCreate
+    with KnowledgeTableSchemaCreateMappable {
+  final String embeddingModel;
 
-/// Table schema for creation
-// @freezed
-// abstract class TableSchemaCreate with _$TableSchemaCreate {
-//   factory TableSchemaCreate({
-//     required String id,
-//     required List<ColumnSchemaCreate> cols,
-//   }) = _TableSchemaCreate;
+  const KnowledgeTableSchemaCreate({
+    required super.id,
+    required super.cols,
+    required this.embeddingModel,
+  });
+}
 
-//   factory TableSchemaCreate.fromJson(Map<String, dynamic> json) =>
-//       _$TableSchemaCreateFromJson(json);
-// }
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TableMeta with TableMetaMappable {
+  final String id;
+  final Map<String, dynamic>? meta;
+  final List<ColumnSchema> cols;
+  final String? parentId;
+  final String title;
+  final String? createdBy;
+  final DatetimeUTC updatedAt;
+  final int numRows;
+  final String version;
 
-// /// Knowledge table schema for creation
-// class KnowledgeTableSchemaCreate extends TableSchemaCreate {
-//   final String embeddingModel;
-
-//   const KnowledgeTableSchemaCreate({
-//     required super.id,
-//     required super.cols,
-//     required this.embeddingModel,
-//   });
-
-//   @override
-//   KnowledgeTableSchemaCreate copyWith({
-//     String? id,
-//     List<ColumnSchemaCreate>? cols,
-//     String? embeddingModel,
-//   }) {
-//     return KnowledgeTableSchemaCreate(
-//       id: id ?? this.id,
-//       cols: cols ?? this.cols,
-//       embeddingModel: embeddingModel ?? this.embeddingModel,
-//     );
-//   }
-
-//   @override
-//   Map<String, dynamic> toJson() {
-//     return {...super.toJson(), 'embedding_model': embeddingModel};
-//   }
-// }
-
-/// Table metadata
-// class TableMeta extends TableBase {
-//   final Map<String, dynamic>? meta;
-//   final List<ColumnSchema> cols;
-//   final String? parentId;
-//   final String title;
-//   final String? createdBy;
-//   final DatetimeUTC updatedAt;
-//   final int numRows;
-//   final String version;
-
-//   const TableMeta({
-//     required super.id,
-//     this.meta,
-//     required this.cols,
-//     this.parentId,
-//     this.title = '',
-//     this.createdBy,
-//     required this.updatedAt,
-//     this.numRows = -1,
-//     required this.version,
-//   });
-
-//   Map<String, ColumnSchema> get colMap => {for (var c in cols) c.id: c};
-
-//   Map<String, dynamic> get cfgMap => {for (var c in cols) c.id: c.genConfig};
-
-//   /// Creates a copy with updated fields
-//   TableMeta copyWith({
-//     String? id,
-//     Map<String, dynamic>? meta,
-//     List<ColumnSchema>? cols,
-//     String? parentId,
-//     String? title,
-//     String? createdBy,
-//     DatetimeUTC? updatedAt,
-//     int? numRows,
-//     String? version,
-//   }) {
-//     return TableMeta(
-//       id: id ?? this.id,
-//       meta: meta ?? this.meta,
-//       cols: cols ?? this.cols,
-//       parentId: parentId ?? this.parentId,
-//       title: title ?? this.title,
-//       createdBy: createdBy ?? this.createdBy,
-//       updatedAt: updatedAt ?? this.updatedAt,
-//       numRows: numRows ?? this.numRows,
-//       version: version ?? this.version,
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'id': id,
-//       'meta': meta,
-//       'cols': cols.map((col) => col.toJson()).toList(),
-//       'parent_id': parentId,
-//       'title': title,
-//       'created_by': createdBy,
-//       'updated_at': updatedAt.toIso8601String(),
-//       'num_rows': numRows,
-//       'version': version,
-//     };
-//   }
-// }
-
-/// Table metadata response
-// class TableMetaResponse extends TableMeta {
-//   final String? indexedAtFts;
-//   final String? indexedAtVec;
-//   final String? indexedAtSca;
-
-//   TableMetaResponse({
-//     required super.id,
-//     super.meta,
-//     required List<ColumnSchema> cols,
-//     super.parentId,
-//     super.title,
-//     super.createdBy,
-//     required super.updatedAt,
-//     super.numRows,
-//     required super.version,
-//     this.indexedAtFts,
-//     this.indexedAtVec,
-//     this.indexedAtSca,
-//   }) : super(cols: cols.where((c) => !c.id.endsWith('_')).toList());
-
-//   factory TableMetaResponse.fromJson(Map<String, dynamic> json) {
-//     return TableMetaResponse(
-//       id: json['id'] as String? ?? '',
-//       meta: json['meta'] as Map<String, dynamic>?,
-//       cols:
-//           (json['cols'] as List<dynamic>?)
-//               ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
-//               .toList() ??
-//           [],
-//       parentId: json['parent_id'] as String?,
-//       title: json['title'] as String? ?? '',
-//       createdBy: json['created_by'] as String?,
-//       updatedAt: DatetimeUTC.parse(json['updated_at'] as String? ?? ''),
-//       numRows: json['num_rows'] as int? ?? -1,
-//       version: json['version'] as String? ?? '',
-//       indexedAtFts: json['indexed_at_fts'] as String?,
-//       indexedAtVec: json['indexed_at_vec'] as String?,
-//       indexedAtSca: json['indexed_at_sca'] as String?,
-//     );
-//   }
-
-//   @override
-//   TableMetaResponse copyWith({
-//     String? id,
-//     Map<String, dynamic>? meta,
-//     List<ColumnSchema>? cols,
-//     String? parentId,
-//     String? title,
-//     String? createdBy,
-//     DatetimeUTC? updatedAt,
-//     int? numRows,
-//     String? version,
-//     String? indexedAtFts,
-//     String? indexedAtVec,
-//     String? indexedAtSca,
-//   }) {
-//     return TableMetaResponse(
-//       id: id ?? this.id,
-//       meta: meta ?? this.meta,
-//       cols: cols ?? this.cols,
-//       parentId: parentId ?? this.parentId,
-//       title: title ?? this.title,
-//       createdBy: createdBy ?? this.createdBy,
-//       updatedAt: updatedAt ?? this.updatedAt,
-//       numRows: numRows ?? this.numRows,
-//       version: version ?? this.version,
-//       indexedAtFts: indexedAtFts ?? this.indexedAtFts,
-//       indexedAtVec: indexedAtVec ?? this.indexedAtVec,
-//       indexedAtSca: indexedAtSca ?? this.indexedAtSca,
-//     );
-//   }
-
-//   @override
-//   Map<String, dynamic> toJson() {
-//     return {
-//       ...super.toJson(),
-//       'indexed_at_fts': indexedAtFts,
-//       'indexed_at_vec': indexedAtVec,
-//       'indexed_at_sca': indexedAtSca,
-//     };
-//   }
-// }
-
-/// Generation config update request
-class GenConfigUpdateRequest {
-  final String tableId;
-  final Map<String, dynamic> columnMap;
-
-  const GenConfigUpdateRequest({
-    required this.tableId,
-    required this.columnMap,
+  const TableMeta({
+    required this.id,
+    this.meta,
+    required this.cols,
+    this.parentId,
+    this.title = '',
+    this.createdBy,
+    required this.updatedAt,
+    this.numRows = -1,
+    required this.version,
   });
 
-  void checkColumnMap() {
+  Map<String, ColumnSchema> get colMap => {for (var c in cols) c.id: c};
+
+  Map<String, dynamic> get cfgMap => {for (var c in cols) c.id: c.genConfig};
+}
+
+/// Table metadata response
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TableMetaResponse extends TableMeta with TableMetaResponseMappable {
+  final String? indexedAtFts;
+  final String? indexedAtVec;
+  final String? indexedAtSca;
+
+  TableMetaResponse({
+    required super.id,
+    super.meta,
+    required List<ColumnSchema> cols,
+    super.parentId,
+    super.title,
+    super.createdBy,
+    required super.updatedAt,
+    super.numRows,
+    required super.version,
+    this.indexedAtFts,
+    this.indexedAtVec,
+    this.indexedAtSca,
+  }) : super(cols: cols.where((c) => !c.id.endsWith('_')).toList());
+}
+
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class GenConfigUpdateRequest with GenConfigUpdateRequestMappable {
+  final String tableId;
+  final Map<String, DiscriminatedGenConfig?> columnMap;
+
+  factory GenConfigUpdateRequest({
+    required String tableId,
+    required Map<String, DiscriminatedGenConfig?> columnMap,
+  }) {
     if (columnMap.keys.any(
       (n) => n.toLowerCase() == 'id' || n.toLowerCase() == 'updated at',
     )) {
@@ -633,114 +498,93 @@ class GenConfigUpdateRequest {
         "column_map cannot contain keys: 'ID' or 'Updated at'.",
       );
     }
+    return GenConfigUpdateRequest._(tableId: tableId, columnMap: columnMap);
   }
-
-  /// Creates a copy with updated fields
-  GenConfigUpdateRequest copyWith({
-    String? tableId,
-    Map<String, dynamic>? columnMap,
-  }) {
-    return GenConfigUpdateRequest(
-      tableId: tableId ?? this.tableId,
-      columnMap: columnMap ?? this.columnMap,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'column_map': columnMap};
-  }
+  const GenConfigUpdateRequest._({
+    required this.tableId,
+    required this.columnMap,
+  });
 }
 
-/// Column rename request
-class ColumnRenameRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ColumnRenameRequest with ColumnRenameRequestMappable {
   final String tableId;
   final Map<String, String> columnMap;
 
-  const ColumnRenameRequest({required this.tableId, required this.columnMap});
+  // Private constructor for internal use after validation
+  const ColumnRenameRequest._({required this.tableId, required this.columnMap});
 
-  void checkColumnMap() {
+  // Factory constructor for validation and creation
+  factory ColumnRenameRequest({
+    required String tableId,
+    required Map<String, String> columnMap,
+  }) {
+    // Perform validation here
     if (columnMap.keys.any(
-      (n) => n.toLowerCase() == 'id' || n.toLowerCase() == 'updated at',
+      (n) =>
+          n.toLowerCase() == 'id' ||
+          n.toLowerCase() ==
+              'updated_at', // Note: using 'updated_at' to match snake_case
     )) {
       throw ArgumentError(
         "`column_map` cannot contain keys: 'ID' or 'Updated at'.",
       );
     }
-  }
 
-  /// Creates a copy with updated fields
-  ColumnRenameRequest copyWith({
-    String? tableId,
-    Map<String, String>? columnMap,
-  }) {
-    return ColumnRenameRequest(
-      tableId: tableId ?? this.tableId,
-      columnMap: columnMap ?? this.columnMap,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'column_map': columnMap};
+    // If validation passes, return a new instance using the private constructor
+    return ColumnRenameRequest._(tableId: tableId, columnMap: columnMap);
   }
 }
 
-/// Column reorder request
-class ColumnReorderRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ColumnReorderRequest with ColumnReorderRequestMappable {
   final String tableId;
   final List<String> columnNames;
 
-  const ColumnReorderRequest({
-    required this.tableId,
-    required this.columnNames,
-  });
-
-  void checkColumnOrder() {
-    final names = List<String>.from(columnNames);
-    if (names.isNotEmpty && names[0].toLowerCase() != 'id') {
-      names.insert(0, 'ID');
-    }
-    if (names.length > 1 && names[1].toLowerCase() != 'updated at') {
-      names.insert(1, 'Updated at');
-    }
-    // Update the list
-    // In Python it's modifying self, but in Dart, perhaps return new
-  }
-
-  void checkUniqueColumnNames() {
+  factory ColumnReorderRequest({
+    required String tableId,
+    required List<String> columnNames,
+  }) {
+    // Check unique column names
     final lowerNames = columnNames.map((n) => n.toLowerCase()).toSet();
     if (lowerNames.length != columnNames.length) {
       throw ArgumentError('Column names must be unique (case-insensitive).');
     }
-  }
 
-  void checkStateColumn() {
+    // Check state columns
     final invalidCols = columnNames.where((n) => n.endsWith('_')).toList();
     if (invalidCols.isNotEmpty) {
       throw ArgumentError('State columns cannot be reordered: $invalidCols');
     }
+
+    // Adjust column order by inserting 'ID' and 'Updated at' if missing
+    List<String> adjustedNames = List<String>.from(columnNames);
+    if (adjustedNames.isNotEmpty && adjustedNames[0].toLowerCase() != 'id') {
+      adjustedNames.insert(0, 'ID');
+    }
+    if (adjustedNames.length > 1 &&
+        adjustedNames[1].toLowerCase() != 'updated at') {
+      adjustedNames.insert(1, 'Updated at');
+    }
+
+    return ColumnReorderRequest._(tableId: tableId, columnNames: adjustedNames);
   }
 
-  /// Creates a copy with updated fields
-  ColumnReorderRequest copyWith({String? tableId, List<String>? columnNames}) {
-    return ColumnReorderRequest(
-      tableId: tableId ?? this.tableId,
-      columnNames: columnNames ?? this.columnNames,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'column_names': columnNames};
-  }
+  const ColumnReorderRequest._({
+    required this.tableId,
+    required this.columnNames,
+  });
 }
 
-/// Column drop request
-class ColumnDropRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ColumnDropRequest with ColumnDropRequestMappable {
   final String tableId;
   final List<String> columnNames;
 
-  const ColumnDropRequest({required this.tableId, required this.columnNames});
-
-  void checkColumnNames() {
+  factory ColumnDropRequest({
+    required String tableId,
+    required List<String> columnNames,
+  }) {
     if (columnNames.any(
       (n) => n.toLowerCase() == 'id' || n.toLowerCase() == 'updated at',
     )) {
@@ -748,23 +592,15 @@ class ColumnDropRequest {
         "`column_names` cannot contain keys: 'ID' or 'Updated at'.",
       );
     }
+
+    return ColumnDropRequest._(tableId: tableId, columnNames: columnNames);
   }
 
-  /// Creates a copy with updated fields
-  ColumnDropRequest copyWith({String? tableId, List<String>? columnNames}) {
-    return ColumnDropRequest(
-      tableId: tableId ?? this.tableId,
-      columnNames: columnNames ?? this.columnNames,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'column_names': columnNames};
-  }
+  const ColumnDropRequest._({required this.tableId, required this.columnNames});
 }
 
-/// Multi-row add request
-class MultiRowAddRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowAddRequest with MultiRowAddRequestMappable {
   final String tableId;
   final List<Map<String, dynamic>> data;
   final bool stream;
@@ -776,49 +612,10 @@ class MultiRowAddRequest {
     this.stream = true,
     this.concurrent = true,
   });
-
-  @override
-  String toString() {
-    final dataRepr = data
-        .map(
-          (d) => d.map(
-            (k, v) => MapEntry(
-              k,
-              v is List ? {'type': 'List', 'length': v.length} : v,
-            ),
-          ),
-        )
-        .toList();
-    return 'MultiRowAddRequest(table_id=$tableId stream=$stream concurrent=$concurrent data=$dataRepr)';
-  }
-
-  /// Creates a copy with updated fields
-  MultiRowAddRequest copyWith({
-    String? tableId,
-    List<Map<String, dynamic>>? data,
-    bool? stream,
-    bool? concurrent,
-  }) {
-    return MultiRowAddRequest(
-      tableId: tableId ?? this.tableId,
-      data: data ?? this.data,
-      stream: stream ?? this.stream,
-      concurrent: concurrent ?? this.concurrent,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'table_id': tableId,
-      'data': data,
-      'stream': stream,
-      'concurrent': concurrent,
-    };
-  }
 }
 
-/// Row update request
-class RowUpdateRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RowUpdateRequest with RowUpdateRequestMappable {
   final String tableId;
   final String rowId;
   final Map<String, dynamic> data;
@@ -828,69 +625,27 @@ class RowUpdateRequest {
     required this.rowId,
     required this.data,
   });
-
-  /// Creates a copy with updated fields
-  RowUpdateRequest copyWith({
-    String? tableId,
-    String? rowId,
-    Map<String, dynamic>? data,
-  }) {
-    return RowUpdateRequest(
-      tableId: tableId ?? this.tableId,
-      rowId: rowId ?? this.rowId,
-      data: data ?? this.data,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'row_id': rowId, 'data': data};
-  }
 }
 
-/// Multi-row update request
-class MultiRowUpdateRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowUpdateRequest with MultiRowUpdateRequestMappable {
   final String tableId;
   final Map<String, Map<String, dynamic>> data;
 
   const MultiRowUpdateRequest({required this.tableId, required this.data});
-
-  /// Creates a copy with updated fields
-  MultiRowUpdateRequest copyWith({
-    String? tableId,
-    Map<String, Map<String, dynamic>>? data,
-  }) {
-    return MultiRowUpdateRequest(
-      tableId: tableId ?? this.tableId,
-      data: data ?? this.data,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'data': data};
-  }
 }
 
-/// Multi-row update request with limit
-class MultiRowUpdateRequestWithLimit extends MultiRowUpdateRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowUpdateRequestWithLimit extends MultiRowUpdateRequest
+    with MultiRowUpdateRequestWithLimitMappable {
   const MultiRowUpdateRequestWithLimit({
     required super.tableId,
     required super.data,
   });
-
-  @override
-  MultiRowUpdateRequestWithLimit copyWith({
-    String? tableId,
-    Map<String, Map<String, dynamic>>? data,
-  }) {
-    return MultiRowUpdateRequestWithLimit(
-      tableId: tableId ?? this.tableId,
-      data: data ?? this.data,
-    );
-  }
 }
 
-/// Row regeneration request
-class RowRegen {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RowRegen with RowRegenMappable {
   final String tableId;
   final String rowId;
   final RegenStrategy regenStrategy;
@@ -906,40 +661,10 @@ class RowRegen {
     this.stream = true,
     this.concurrent = true,
   });
-
-  /// Creates a copy with updated fields
-  RowRegen copyWith({
-    String? tableId,
-    String? rowId,
-    RegenStrategy? regenStrategy,
-    String? outputColumnId,
-    bool? stream,
-    bool? concurrent,
-  }) {
-    return RowRegen(
-      tableId: tableId ?? this.tableId,
-      rowId: rowId ?? this.rowId,
-      regenStrategy: regenStrategy ?? this.regenStrategy,
-      outputColumnId: outputColumnId ?? this.outputColumnId,
-      stream: stream ?? this.stream,
-      concurrent: concurrent ?? this.concurrent,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'table_id': tableId,
-      'row_id': rowId,
-      'regen_strategy': regenStrategy,
-      'output_column_id': outputColumnId,
-      'stream': stream,
-      'concurrent': concurrent,
-    };
-  }
 }
 
-/// Multi-row regeneration request
-class MultiRowRegenRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowRegenRequest with MultiRowRegenRequestMappable {
   final String tableId;
   final List<String> rowIds;
   final RegenStrategy regenStrategy;
@@ -955,40 +680,10 @@ class MultiRowRegenRequest {
     this.stream = true,
     this.concurrent = true,
   });
-
-  /// Creates a copy with updated fields
-  MultiRowRegenRequest copyWith({
-    String? tableId,
-    List<String>? rowIds,
-    RegenStrategy? regenStrategy,
-    String? outputColumnId,
-    bool? stream,
-    bool? concurrent,
-  }) {
-    return MultiRowRegenRequest(
-      tableId: tableId ?? this.tableId,
-      rowIds: rowIds ?? this.rowIds,
-      regenStrategy: regenStrategy ?? this.regenStrategy,
-      outputColumnId: outputColumnId ?? this.outputColumnId,
-      stream: stream ?? this.stream,
-      concurrent: concurrent ?? this.concurrent,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'table_id': tableId,
-      'row_ids': rowIds,
-      'regen_strategy': regenStrategy,
-      'output_column_id': outputColumnId,
-      'stream': stream,
-      'concurrent': concurrent,
-    };
-  }
 }
 
-/// Multi-row delete request
-class MultiRowDeleteRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MultiRowDeleteRequest with MultiRowDeleteRequestMappable {
   final String tableId;
   final List<String>? rowIds;
   final String where;
@@ -998,27 +693,10 @@ class MultiRowDeleteRequest {
     this.rowIds,
     this.where = '',
   });
-
-  /// Creates a copy with updated fields
-  MultiRowDeleteRequest copyWith({
-    String? tableId,
-    List<String>? rowIds,
-    String? where,
-  }) {
-    return MultiRowDeleteRequest(
-      tableId: tableId ?? this.tableId,
-      rowIds: rowIds ?? this.rowIds,
-      where: where ?? this.where,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'table_id': tableId, 'row_ids': rowIds, 'where': where};
-  }
 }
 
-/// Search request
-class SearchRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class SearchRequest with SearchRequestMappable {
   final String tableId;
   final String query;
   final int limit;
@@ -1036,43 +714,10 @@ class SearchRequest {
     this.vecDecimals = 0,
     this.rerankingModel,
   });
-
-  /// Creates a copy with updated fields
-  SearchRequest copyWith({
-    String? tableId,
-    String? query,
-    int? limit,
-    VectorMetric? metric,
-    int? floatDecimals,
-    int? vecDecimals,
-    String? rerankingModel,
-  }) {
-    return SearchRequest(
-      tableId: tableId ?? this.tableId,
-      query: query ?? this.query,
-      limit: limit ?? this.limit,
-      metric: metric ?? this.metric,
-      floatDecimals: floatDecimals ?? this.floatDecimals,
-      vecDecimals: vecDecimals ?? this.vecDecimals,
-      rerankingModel: rerankingModel ?? this.rerankingModel,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'table_id': tableId,
-      'query': query,
-      'limit': limit,
-      'metric': metric,
-      'float_decimals': floatDecimals,
-      'vec_decimals': vecDecimals,
-      'reranking_model': rerankingModel,
-    };
-  }
 }
 
-/// Table data import request
-class TableDataImportRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TableDataImportRequest with TableDataImportRequestMappable {
   final String filePath;
   final String tableId;
   final bool stream;
@@ -1084,34 +729,10 @@ class TableDataImportRequest {
     this.stream = true,
     this.delimiter = CSVDelimiter.comma,
   });
-
-  /// Creates a copy with updated fields
-  TableDataImportRequest copyWith({
-    String? filePath,
-    String? tableId,
-    bool? stream,
-    CSVDelimiter? delimiter,
-  }) {
-    return TableDataImportRequest(
-      filePath: filePath ?? this.filePath,
-      tableId: tableId ?? this.tableId,
-      stream: stream ?? this.stream,
-      delimiter: delimiter ?? this.delimiter,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'file_path': filePath,
-      'table_id': tableId,
-      'stream': stream,
-      'delimiter': delimiter,
-    };
-  }
 }
 
-/// Table import request
-class TableImportRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TableImportRequest with TableImportRequestMappable {
   final String filePath;
   final String? tableIdDst;
   final bool blocking;
@@ -1121,25 +742,4 @@ class TableImportRequest {
     this.tableIdDst,
     this.blocking = true,
   });
-
-  /// Creates a copy with updated fields
-  TableImportRequest copyWith({
-    String? filePath,
-    String? tableIdDst,
-    bool? blocking,
-  }) {
-    return TableImportRequest(
-      filePath: filePath ?? this.filePath,
-      tableIdDst: tableIdDst ?? this.tableIdDst,
-      blocking: blocking ?? this.blocking,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'file_path': filePath,
-      'table_id_dst': tableIdDst,
-      'blocking': blocking,
-    };
-  }
 }

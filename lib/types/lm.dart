@@ -7,17 +7,30 @@ part 'lm.mapper.dart';
 final RegExp citationPattern = RegExp(r'\[(@[0-9]+)[; ]*\]');
 
 /// Enum for API response object types
-@MappableEnum(caseStyle: CaseStyle.snakeCase)
+@MappableEnum()
 enum ObjectType {
+  @MappableValue('chat.references')
   chatReferences('chat.references'),
+  @MappableValue('gen_table.references')
   genTableReferences('gen_table.references'),
+  @MappableValue('chat.completion')
   chatCompletion('chat.completion'),
+  @MappableValue('chat.completion.chunk')
   chatCompletionChunk('chat.completion.chunk'),
+  @MappableValue('embedding')
   embedding('embedding'),
+  @MappableValue('list')
   list('list'),
+  @MappableValue('reranking')
   reranking('reranking'),
+  @MappableValue('chat.thread')
   chatThread('chat.thread'),
-  chatThreads('chat.threads');
+  @MappableValue('chat.threads')
+  chatThreads('chat.threads'),
+  @MappableValue('gen_table.completion.rows')
+  completionRows('gen_table.completion.rows'),
+  @MappableValue('gen_table.completion.chunk')
+  completionChunk('gen_table.completion.chunk');
 
   final String value;
   const ObjectType(this.value);

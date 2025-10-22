@@ -26,24 +26,28 @@ class ObjectTypeMapper extends EnumMapper<ObjectType> {
   @override
   ObjectType decode(dynamic value) {
     switch (value) {
-      case r'chat_references':
+      case 'chat.references':
         return ObjectType.chatReferences;
-      case r'gen_table_references':
+      case 'gen_table.references':
         return ObjectType.genTableReferences;
-      case r'chat_completion':
+      case 'chat.completion':
         return ObjectType.chatCompletion;
-      case r'chat_completion_chunk':
+      case 'chat.completion.chunk':
         return ObjectType.chatCompletionChunk;
-      case r'embedding':
+      case 'embedding':
         return ObjectType.embedding;
-      case r'list':
+      case 'list':
         return ObjectType.list;
-      case r'reranking':
+      case 'reranking':
         return ObjectType.reranking;
-      case r'chat_thread':
+      case 'chat.thread':
         return ObjectType.chatThread;
-      case r'chat_threads':
+      case 'chat.threads':
         return ObjectType.chatThreads;
+      case 'gen_table.completion.rows':
+        return ObjectType.completionRows;
+      case 'gen_table.completion.chunk':
+        return ObjectType.completionChunk;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -53,31 +57,35 @@ class ObjectTypeMapper extends EnumMapper<ObjectType> {
   dynamic encode(ObjectType self) {
     switch (self) {
       case ObjectType.chatReferences:
-        return r'chat_references';
+        return 'chat.references';
       case ObjectType.genTableReferences:
-        return r'gen_table_references';
+        return 'gen_table.references';
       case ObjectType.chatCompletion:
-        return r'chat_completion';
+        return 'chat.completion';
       case ObjectType.chatCompletionChunk:
-        return r'chat_completion_chunk';
+        return 'chat.completion.chunk';
       case ObjectType.embedding:
-        return r'embedding';
+        return 'embedding';
       case ObjectType.list:
-        return r'list';
+        return 'list';
       case ObjectType.reranking:
-        return r'reranking';
+        return 'reranking';
       case ObjectType.chatThread:
-        return r'chat_thread';
+        return 'chat.thread';
       case ObjectType.chatThreads:
-        return r'chat_threads';
+        return 'chat.threads';
+      case ObjectType.completionRows:
+        return 'gen_table.completion.rows';
+      case ObjectType.completionChunk:
+        return 'gen_table.completion.chunk';
     }
   }
 }
 
 extension ObjectTypeMapperExtension on ObjectType {
-  String toValue() {
+  dynamic toValue() {
     ObjectTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<ObjectType>(this) as String;
+    return MapperContainer.globals.toValue<ObjectType>(this);
   }
 }
 
