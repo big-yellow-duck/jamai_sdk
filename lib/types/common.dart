@@ -496,7 +496,7 @@ class StripePaymentInfo with StripePaymentInfoMappable {
 
 /// Stripe event data
 @MappableClass(caseStyle: CaseStyle.snakeCase)
-class StripeEventData {
+class StripeEventData with StripeEventDataMappable {
   final String eventType;
   final String eventId;
   final String? invoiceId;

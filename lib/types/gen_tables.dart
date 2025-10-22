@@ -1,11 +1,11 @@
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/lm.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:dart_mappable/dart_mappable.dart';
 
-part 'gen_tables.freezed.dart';
-part 'gen_tables.g.dart';
+part 'gen_tables.mapper.dart';
 
 /// CSV delimiter options
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum CSVDelimiter {
   comma(','),
   tab('\t');
@@ -18,6 +18,7 @@ enum CSVDelimiter {
 }
 
 /// Table type enumeration
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum TableType {
   action('action'),
   knowledge('knowledge'),
@@ -30,6 +31,7 @@ enum TableType {
   String toString() => apiString;
 }
 
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ColumnSchemaDtype {
   int('int'),
   float('float'),
@@ -48,6 +50,7 @@ enum ColumnSchemaDtype {
 }
 
 /// Regeneration strategy enumeration
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum RegenStrategy {
   runAll('run_all'),
   runBefore('run_before'),
@@ -62,6 +65,7 @@ enum RegenStrategy {
 }
 
 /// Vector search metric enumeration
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum VectorMetric {
   cosine('cosine'),
   euclidean('euclidean'),
@@ -74,6 +78,7 @@ enum VectorMetric {
   String toString() => value;
 }
 
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum GenConfigTypes {
   llm('gen_config.llm'),
   python('gen_config.python'),
@@ -89,6 +94,7 @@ enum GenConfigTypes {
 
 // / Cell references response
 /// Cell completion response
+@MappableClass(caseStyle: CaseStyle.snakeCase)
 class CellCompletionResponse extends ChatCompletionChunkResponse {
   final String outputColumnName;
   final String rowId;
@@ -102,97 +108,23 @@ class CellCompletionResponse extends ChatCompletionChunkResponse {
     required super.model,
     required super.choices,
   });
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'output_column_name': outputColumnName,
-      'row_id': rowId,
-    };
-  }
 }
 
-// @freezed
-// abstract class CellReferencesResponse extends References
-//     with _$CellReferencesResponse {
-//   const CellReferencesResponse._({
-//     super.object = ObjectType.chatReferences,
-//     super.chunks = const [],
-//     required super.searchQuery,
-//     super.finishReason,
-//     required this.outputColumnName,
-//     required this.rowId,
-//   });
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class CellReferencesResponse extends References
+    with CellReferencesResponseMappable {
+  final String outputColumnName;
+  final String rowId;
 
-//   factory CellReferencesResponse({
-//     @Default(ObjectType.chatReferences) ObjectType object,
-//     @Default([]) List<Chunk> chunks,
-//     required String searchQuery,
-//     FinishReason? finishReason,
-//     required String outputColumnName,
-//     required String rowId,
-//   }) = _CellReferencesResponse;
-
-//   @override
-//   final String outputColumnName;
-
-//   @override
-//   final String rowId;
-
-//   @override
-//   Map<String, dynamic> toJson() {
-//     return {
-//       ...super.toJson(),
-//       'output_column_name': outputColumnName,
-//       'row_id': rowId,
-//     };
-//   }
-
-//   factory CellReferencesResponse.fromJson(Map<String, dynamic> json) {
-//     return CellReferencesResponse(
-//       object: ObjectType.values.firstWhere(
-//         (e) => e.value == json['object'],
-//         orElse: () => ObjectType.chatReferences,
-//       ),
-//       chunks:
-//           (json['chunks'] as List<dynamic>?)
-//               ?.map((c) => Chunk.fromJson(c as Map<String, dynamic>))
-//               .toList() ??
-//           [],
-//       searchQuery: json['search_query'] ?? '',
-//       finishReason: json['finish_reason'] != null
-//           ? FinishReason.values.firstWhere(
-//               (e) => e.value == json['finish_reason'],
-//               orElse: () => FinishReason.stop,
-//             )
-//           : null,
-//       outputColumnName: json['output_column_name'] ?? '',
-//       rowId: json['row_id'] ?? '',
-//     );
-//   }
-// }
-
-@freezed
-abstract class Balls extends Person with _$Balls{
-  Balls._({
-    required super.firstName,
-    required super.lastName,
-    required super.age
-  }): super();
-
-  factory Balls({
-    required String wee
-  }) = _Balls;
-  
+  CellReferencesResponse({
+    super.object = ObjectType.genTableReferences,
+    super.chunks = const [],
+    required super.searchQuery,
+    super.finishReason,
+    required this.outputColumnName,
+    required this.rowId,
+  });
 }
-
-// @freezed
-// abstract class CellReferencesResponse extends References with _$CellReferencesResponse{
-//   CellReferencesResponse._({
-//     super.obect
-//   }): super._();
-// }
 
 /// Row completion response
 class RowCompletionResponse {
@@ -412,61 +344,61 @@ typedef GenConfig = dynamic; // LLMGenConfig | EmbedGenConfig | PythonGenConfig
 // }
 
 /// Column schema
-@freezed
-abstract class ColumnSchema with _$ColumnSchema {
-  ColumnSchema._({
-    required this.id,
-    this.dtype = ColumnSchemaDtype.str,
-    this.vlen = 0,
-    this.index = true,
-    this.genConfig,
-  });
-  factory ColumnSchema({
-    required String id,
-    @Default(ColumnSchemaDtype.str) ColumnSchemaDtype dtype,
-    @Default(0) int vlen,
-    @Default(true) bool index,
-    dynamic genConfig,
-  }) = _ColumnSchema;
+// @freezed
+// abstract class ColumnSchema with _$ColumnSchema {
+//   ColumnSchema._({
+//     required this.id,
+//     this.dtype = ColumnSchemaDtype.str,
+//     this.vlen = 0,
+//     this.index = true,
+//     this.genConfig,
+//   });
+//   factory ColumnSchema({
+//     required String id,
+//     @Default(ColumnSchemaDtype.str) ColumnSchemaDtype dtype,
+//     @Default(0) int vlen,
+//     @Default(true) bool index,
+//     dynamic genConfig,
+//   }) = _ColumnSchema;
 
-  @override
-  final String id;
+//   @override
+//   final String id;
 
-  @override
-  final ColumnSchemaDtype dtype;
+//   @override
+//   final ColumnSchemaDtype dtype;
 
-  @override
-  final int vlen;
+//   @override
+//   final int vlen;
 
-  @override
-  final bool index;
+//   @override
+//   final bool index;
 
-  @override
-  final dynamic genConfig;
+//   @override
+//   final dynamic genConfig;
 
-  factory ColumnSchema.fromJson(Map<String, dynamic> json) {
-    return ColumnSchema(
-      id: json['id'] as String? ?? '',
-      dtype: ColumnSchemaDtype.values.firstWhere(
-        (e) => e.value == json['dtype'],
-        orElse: () => ColumnSchemaDtype.str,
-      ),
-      vlen: json['vlen'] as int? ?? 0,
-      index: json['index'] as bool? ?? true,
-      genConfig: json['gen_config'],
-    );
-  }
+//   factory ColumnSchema.fromJson(Map<String, dynamic> json) {
+//     return ColumnSchema(
+//       id: json['id'] as String? ?? '',
+//       dtype: ColumnSchemaDtype.values.firstWhere(
+//         (e) => e.value == json['dtype'],
+//         orElse: () => ColumnSchemaDtype.str,
+//       ),
+//       vlen: json['vlen'] as int? ?? 0,
+//       index: json['index'] as bool? ?? true,
+//       genConfig: json['gen_config'],
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'dtype': dtype,
-      'vlen': vlen,
-      'index': index,
-      'gen_config': genConfig?.toJson(),
-    };
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': id,
+//       'dtype': dtype,
+//       'vlen': vlen,
+//       'index': index,
+//       'gen_config': genConfig?.toJson(),
+//     };
+//   }
+// }
 
 /// Column schema for creation
 /// need to update to use sanitized non empty string
@@ -533,155 +465,155 @@ abstract class ColumnSchema with _$ColumnSchema {
 // }
 
 /// Table metadata
-class TableMeta extends TableBase {
-  final Map<String, dynamic>? meta;
-  final List<ColumnSchema> cols;
-  final String? parentId;
-  final String title;
-  final String? createdBy;
-  final DatetimeUTC updatedAt;
-  final int numRows;
-  final String version;
+// class TableMeta extends TableBase {
+//   final Map<String, dynamic>? meta;
+//   final List<ColumnSchema> cols;
+//   final String? parentId;
+//   final String title;
+//   final String? createdBy;
+//   final DatetimeUTC updatedAt;
+//   final int numRows;
+//   final String version;
 
-  const TableMeta({
-    required super.id,
-    this.meta,
-    required this.cols,
-    this.parentId,
-    this.title = '',
-    this.createdBy,
-    required this.updatedAt,
-    this.numRows = -1,
-    required this.version,
-  });
+//   const TableMeta({
+//     required super.id,
+//     this.meta,
+//     required this.cols,
+//     this.parentId,
+//     this.title = '',
+//     this.createdBy,
+//     required this.updatedAt,
+//     this.numRows = -1,
+//     required this.version,
+//   });
 
-  Map<String, ColumnSchema> get colMap => {for (var c in cols) c.id: c};
+//   Map<String, ColumnSchema> get colMap => {for (var c in cols) c.id: c};
 
-  Map<String, dynamic> get cfgMap => {for (var c in cols) c.id: c.genConfig};
+//   Map<String, dynamic> get cfgMap => {for (var c in cols) c.id: c.genConfig};
 
-  /// Creates a copy with updated fields
-  TableMeta copyWith({
-    String? id,
-    Map<String, dynamic>? meta,
-    List<ColumnSchema>? cols,
-    String? parentId,
-    String? title,
-    String? createdBy,
-    DatetimeUTC? updatedAt,
-    int? numRows,
-    String? version,
-  }) {
-    return TableMeta(
-      id: id ?? this.id,
-      meta: meta ?? this.meta,
-      cols: cols ?? this.cols,
-      parentId: parentId ?? this.parentId,
-      title: title ?? this.title,
-      createdBy: createdBy ?? this.createdBy,
-      updatedAt: updatedAt ?? this.updatedAt,
-      numRows: numRows ?? this.numRows,
-      version: version ?? this.version,
-    );
-  }
+//   /// Creates a copy with updated fields
+//   TableMeta copyWith({
+//     String? id,
+//     Map<String, dynamic>? meta,
+//     List<ColumnSchema>? cols,
+//     String? parentId,
+//     String? title,
+//     String? createdBy,
+//     DatetimeUTC? updatedAt,
+//     int? numRows,
+//     String? version,
+//   }) {
+//     return TableMeta(
+//       id: id ?? this.id,
+//       meta: meta ?? this.meta,
+//       cols: cols ?? this.cols,
+//       parentId: parentId ?? this.parentId,
+//       title: title ?? this.title,
+//       createdBy: createdBy ?? this.createdBy,
+//       updatedAt: updatedAt ?? this.updatedAt,
+//       numRows: numRows ?? this.numRows,
+//       version: version ?? this.version,
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'meta': meta,
-      'cols': cols.map((col) => col.toJson()).toList(),
-      'parent_id': parentId,
-      'title': title,
-      'created_by': createdBy,
-      'updated_at': updatedAt.toIso8601String(),
-      'num_rows': numRows,
-      'version': version,
-    };
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': id,
+//       'meta': meta,
+//       'cols': cols.map((col) => col.toJson()).toList(),
+//       'parent_id': parentId,
+//       'title': title,
+//       'created_by': createdBy,
+//       'updated_at': updatedAt.toIso8601String(),
+//       'num_rows': numRows,
+//       'version': version,
+//     };
+//   }
+// }
 
 /// Table metadata response
-class TableMetaResponse extends TableMeta {
-  final String? indexedAtFts;
-  final String? indexedAtVec;
-  final String? indexedAtSca;
+// class TableMetaResponse extends TableMeta {
+//   final String? indexedAtFts;
+//   final String? indexedAtVec;
+//   final String? indexedAtSca;
 
-  TableMetaResponse({
-    required super.id,
-    super.meta,
-    required List<ColumnSchema> cols,
-    super.parentId,
-    super.title,
-    super.createdBy,
-    required super.updatedAt,
-    super.numRows,
-    required super.version,
-    this.indexedAtFts,
-    this.indexedAtVec,
-    this.indexedAtSca,
-  }) : super(cols: cols.where((c) => !c.id.endsWith('_')).toList());
+//   TableMetaResponse({
+//     required super.id,
+//     super.meta,
+//     required List<ColumnSchema> cols,
+//     super.parentId,
+//     super.title,
+//     super.createdBy,
+//     required super.updatedAt,
+//     super.numRows,
+//     required super.version,
+//     this.indexedAtFts,
+//     this.indexedAtVec,
+//     this.indexedAtSca,
+//   }) : super(cols: cols.where((c) => !c.id.endsWith('_')).toList());
 
-  factory TableMetaResponse.fromJson(Map<String, dynamic> json) {
-    return TableMetaResponse(
-      id: json['id'] as String? ?? '',
-      meta: json['meta'] as Map<String, dynamic>?,
-      cols:
-          (json['cols'] as List<dynamic>?)
-              ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
-              .toList() ??
-          [],
-      parentId: json['parent_id'] as String?,
-      title: json['title'] as String? ?? '',
-      createdBy: json['created_by'] as String?,
-      updatedAt: DatetimeUTC.parse(json['updated_at'] as String? ?? ''),
-      numRows: json['num_rows'] as int? ?? -1,
-      version: json['version'] as String? ?? '',
-      indexedAtFts: json['indexed_at_fts'] as String?,
-      indexedAtVec: json['indexed_at_vec'] as String?,
-      indexedAtSca: json['indexed_at_sca'] as String?,
-    );
-  }
+//   factory TableMetaResponse.fromJson(Map<String, dynamic> json) {
+//     return TableMetaResponse(
+//       id: json['id'] as String? ?? '',
+//       meta: json['meta'] as Map<String, dynamic>?,
+//       cols:
+//           (json['cols'] as List<dynamic>?)
+//               ?.map((c) => ColumnSchema.fromJson(c as Map<String, dynamic>))
+//               .toList() ??
+//           [],
+//       parentId: json['parent_id'] as String?,
+//       title: json['title'] as String? ?? '',
+//       createdBy: json['created_by'] as String?,
+//       updatedAt: DatetimeUTC.parse(json['updated_at'] as String? ?? ''),
+//       numRows: json['num_rows'] as int? ?? -1,
+//       version: json['version'] as String? ?? '',
+//       indexedAtFts: json['indexed_at_fts'] as String?,
+//       indexedAtVec: json['indexed_at_vec'] as String?,
+//       indexedAtSca: json['indexed_at_sca'] as String?,
+//     );
+//   }
 
-  @override
-  TableMetaResponse copyWith({
-    String? id,
-    Map<String, dynamic>? meta,
-    List<ColumnSchema>? cols,
-    String? parentId,
-    String? title,
-    String? createdBy,
-    DatetimeUTC? updatedAt,
-    int? numRows,
-    String? version,
-    String? indexedAtFts,
-    String? indexedAtVec,
-    String? indexedAtSca,
-  }) {
-    return TableMetaResponse(
-      id: id ?? this.id,
-      meta: meta ?? this.meta,
-      cols: cols ?? this.cols,
-      parentId: parentId ?? this.parentId,
-      title: title ?? this.title,
-      createdBy: createdBy ?? this.createdBy,
-      updatedAt: updatedAt ?? this.updatedAt,
-      numRows: numRows ?? this.numRows,
-      version: version ?? this.version,
-      indexedAtFts: indexedAtFts ?? this.indexedAtFts,
-      indexedAtVec: indexedAtVec ?? this.indexedAtVec,
-      indexedAtSca: indexedAtSca ?? this.indexedAtSca,
-    );
-  }
+//   @override
+//   TableMetaResponse copyWith({
+//     String? id,
+//     Map<String, dynamic>? meta,
+//     List<ColumnSchema>? cols,
+//     String? parentId,
+//     String? title,
+//     String? createdBy,
+//     DatetimeUTC? updatedAt,
+//     int? numRows,
+//     String? version,
+//     String? indexedAtFts,
+//     String? indexedAtVec,
+//     String? indexedAtSca,
+//   }) {
+//     return TableMetaResponse(
+//       id: id ?? this.id,
+//       meta: meta ?? this.meta,
+//       cols: cols ?? this.cols,
+//       parentId: parentId ?? this.parentId,
+//       title: title ?? this.title,
+//       createdBy: createdBy ?? this.createdBy,
+//       updatedAt: updatedAt ?? this.updatedAt,
+//       numRows: numRows ?? this.numRows,
+//       version: version ?? this.version,
+//       indexedAtFts: indexedAtFts ?? this.indexedAtFts,
+//       indexedAtVec: indexedAtVec ?? this.indexedAtVec,
+//       indexedAtSca: indexedAtSca ?? this.indexedAtSca,
+//     );
+//   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'indexed_at_fts': indexedAtFts,
-      'indexed_at_vec': indexedAtVec,
-      'indexed_at_sca': indexedAtSca,
-    };
-  }
-}
+//   @override
+//   Map<String, dynamic> toJson() {
+//     return {
+//       ...super.toJson(),
+//       'indexed_at_fts': indexedAtFts,
+//       'indexed_at_vec': indexedAtVec,
+//       'indexed_at_sca': indexedAtSca,
+//     };
+//   }
+// }
 
 /// Generation config update request
 class GenConfigUpdateRequest {
@@ -1211,4 +1143,3 @@ class TableImportRequest {
     };
   }
 }
-

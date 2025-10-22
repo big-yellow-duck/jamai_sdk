@@ -957,7 +957,7 @@ class ChatCompletionChunkResponse with ChatCompletionChunkResponseMappable {
 }
 
 @MappableClass(discriminatorKey: 'type')
-sealed class ChatContent extends ChatEntryContent with ChatContentMappable {
+sealed class ChatContent with ChatContentMappable {
   const ChatContent();
 }
 
@@ -976,8 +976,6 @@ class TextContent extends ChatContent
 
   factory TextContent.fromMap(Map<String, dynamic> map) =>
       TextContentMapper.fromMap(map);
-
-  // Map<String, dynamic> toMap => TextContentMapper.toMap();
 }
 
 @MappableClass()
@@ -1158,6 +1156,7 @@ class ChatContentList extends ChatEntryContent {
 }
 
 class ChatEntryContentHook extends MappingHook {
+  const ChatEntryContentHook();
   @override
   beforeDecode(dynamic value) {
     return ChatEntryContent.fromDynamic(value);
@@ -1172,12 +1171,13 @@ class ChatEntryContentHook extends MappingHook {
     if (value is ChatContentList) {
       return value.contents.map((content) {
         if (content is TextContent) {
-          return TextContent.toMap(content);
+          return content.toMap();
         } else if (content is ImageContent) {
-          return ImageContent.toMap(content);
+          return content.toMap();
         } else if (content is AudioContent) {
-          return AudioContent.toMap(content);
+          return content.toMap();
         }
+
         throw ArgumentError('Unknown ChatContent type: ${content.runtimeType}');
       }).toList();
     }
@@ -1186,381 +1186,113 @@ class ChatEntryContentHook extends MappingHook {
 }
 
 /// Chat entry
-class ChatEntry {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ChatEntry with ChatEntryMappable {
   final ChatRole role;
-  final dynamic content; // EmptyIfNoneStr | list[ChatContent]
+  @MappableField(hook: ChatEntryContentHook())
+  final ChatEntryContent content; // EmptyIfNoneStr | list[ChatContent]
   final String? name;
 
   const ChatEntry({required this.role, required this.content, this.name});
 
-  /// Creates a copy with updated fields
-  ChatEntry copyWith({ChatRole? role, dynamic content, String? name}) {
-    return ChatEntry(
-      role: role ?? this.role,
-      content: content ?? this.content,
-      name: name ?? this.name,
-    );
-  }
+  String get textContent => switch (content) {
+    EmptyIfNoneString(:final value) => value,
+    ChatContentList(:final contents) =>
+      contents.whereType<TextContent>().map((c) => c.text ?? '').join('\n'),
+  };
 
-  Map<String, dynamic> toJson() {
-    return {'role': role.value, 'content': content, 'name': name};
-  }
+  bool get hasTextOnly => switch (content) {
+    EmptyIfNoneString() => true,
+    ChatContentList(:final contents) => contents.every((c) => c is TextContent),
+  };
 
-  factory ChatEntry.fromJson(Map<String, dynamic> json) {
-    return ChatEntry(
-      role: ChatRole.values.firstWhere((e) => e.value == json['role']),
-      content: json['content'],
-      name: json['name'],
-    );
-  }
+  /// Check if content contains any images
+  bool get hasImage => switch (content) {
+    EmptyIfNoneString() => false,
+    ChatContentList(:final contents) => contents.any((c) => c is ImageContent),
+  };
 
-  String get textContent {
-    if (content is String) {
-      return content;
-    }
-    if (content is List) {
-      final textContents = content.whereType<TextContent>();
-      if (textContents.isNotEmpty) {
-        return textContents.map((c) => c.text).join('\n');
-      }
-    }
-    return '';
-  }
+  /// Check if content contains any audio
+  bool get hasAudio => switch (content) {
+    EmptyIfNoneString() => false,
+    ChatContentList(:final contents) => contents.any((c) => c is AudioContent),
+  };
 
-  bool get hasTextOnly {
-    if (content is String) return true;
-    if (content is List) {
-      return content.every((c) => c is TextContent);
-    }
-    return false;
-  }
-
-  bool get hasImage {
-    if (content is String) return false;
-    if (content is List) {
-      return content.any((c) => c is ImageContent);
-    }
-    return false;
-  }
-
-  bool get hasAudio {
-    if (content is String) return false;
-    if (content is List) {
-      return content.any((c) => c is AudioContent);
-    }
-    return false;
-  }
-
-  static ChatEntry system(dynamic content, {String? name}) {
+  /// Create a new system message
+  static ChatEntry system(ChatEntryContent content, {String? name}) {
     return ChatEntry(role: ChatRole.system, content: content, name: name);
   }
 
-  static ChatEntry user(dynamic content, {String? name}) {
+  /// Create a new user message
+  static ChatEntry user(ChatEntryContent content, {String? name}) {
     return ChatEntry(role: ChatRole.user, content: content, name: name);
   }
 
-  static ChatEntry assistant(String? content, {String? name}) {
+  /// Create a new assistant message
+  static ChatEntry assistant(ChatEntryContent content, {String? name}) {
     return ChatEntry(role: ChatRole.assistant, content: content, name: name);
   }
 }
 
 /// Chat thread entry
-// class ChatThreadEntry extends ChatEntry {
-//   final String? userPrompt;
-//   final References? references;
-//   final String? rowId;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ChatThreadEntry extends ChatEntry with ChatThreadEntryMappable {
+  final String? userPrompt;
+  final References? references;
+  final String? rowId;
 
-//   const ChatThreadEntry({
-//     required super.role,
-//     required super.content,
-//     super.name,
-//     this.userPrompt,
-//     this.references,
-//     this.rowId,
-//   });
-
-//   /// Creates a copy with updated fields
-//   @override
-//   ChatThreadEntry copyWith({
-//     ChatRole? role,
-//     dynamic content,
-//     String? name,
-//     String? userPrompt,
-//     References? references,
-//     String? rowId,
-//   }) {
-//     return ChatThreadEntry(
-//       role: role ?? this.role,
-//       content: content ?? this.content,
-//       name: name ?? this.name,
-//       userPrompt: userPrompt ?? this.userPrompt,
-//       references: references ?? this.references,
-//       rowId: rowId ?? this.rowId,
-//     );
-//   }
-
-//   @override
-//   Map<String, dynamic> toJson() {
-//     final json = super.toJson();
-//     json['user_prompt'] = userPrompt;
-//     json['references'] = references?.toJson();
-//     json['row_id'] = rowId;
-//     return json;
-//   }
-
-//   factory ChatThreadEntry.fromJson(Map<String, dynamic> json) {
-//     return ChatThreadEntry(
-//       role: ChatRole.values.firstWhere((e) => e.value == json['role']),
-//       content: json['content'],
-//       name: json['name'],
-//       userPrompt: json['user_prompt'],
-//       references: json['references'] != null
-//           ? References.fromJson(json['references'] as Map<String, dynamic>)
-//           : null,
-//       rowId: json['row_id'],
-//     );
-//   }
-// }
+  const ChatThreadEntry({
+    required super.role,
+    required super.content,
+    super.name,
+    this.userPrompt,
+    this.references,
+    this.rowId,
+  });
+}
 
 /// Chat thread response
-// class ChatThreadResponse {
-//   final ObjectType object;
-//   final List<ChatThreadEntry> thread;
-//   final String columnId;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ChatThreadResponse with ChatThreadResponseMappable {
+  final ObjectType object;
+  final List<ChatThreadEntry> thread;
+  final String columnId;
 
-//   const ChatThreadResponse({
-//     this.object = ObjectType.chatThread,
-//     this.thread = const [],
-//     this.columnId = '',
-//   });
-
-//   /// Creates a copy with updated fields
-//   ChatThreadResponse copyWith({
-//     ObjectType? object,
-//     List<ChatThreadEntry>? thread,
-//     String? columnId,
-//   }) {
-//     return ChatThreadResponse(
-//       object: object ?? this.object,
-//       thread: thread ?? this.thread,
-//       columnId: columnId ?? this.columnId,
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'object': object.value,
-//       'thread': thread.map((entry) => entry.toJson()).toList(),
-//       'column_id': columnId,
-//     };
-//   }
-
-//   factory ChatThreadResponse.fromJson(Map<String, dynamic> json) {
-//     return ChatThreadResponse(
-//       object: ObjectType.values.firstWhere(
-//         (e) => e.value == json['object'],
-//         orElse: () => ObjectType.chatThread,
-//       ),
-//       thread:
-//           (json['thread'] as List<dynamic>?)
-//               ?.map((e) => ChatThreadEntry.fromJson(e as Map<String, dynamic>))
-//               .toList() ??
-//           [],
-//       columnId: json['column_id'] ?? '',
-//     );
-//   }
-// }
+  const ChatThreadResponse({
+    this.object = ObjectType.chatThread,
+    this.thread = const [],
+    this.columnId = '',
+  });
+}
 
 /// Base class for chat threads responses
-// // class ChatThreadsBase {
-// //   final ObjectType object;
-// //   final Map<String, ChatThreadResponse> threads;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ChatThreadsBase with ChatThreadsBaseMappable {
+  final ObjectType object;
+  final Map<String, ChatThreadResponse> threads;
 
-// //   const ChatThreadsBase({
-// //     this.object = ObjectType.chatThreads,
-// //     this.threads = const {},
-// //   });
-
-// //   /// Creates a copy with updated fields
-// //   ChatThreadsBase copyWith({
-// //     ObjectType? object,
-// //     Map<String, ChatThreadResponse>? threads,
-// //   }) {
-// //     return ChatThreadsBase(
-// //       object: object ?? this.object,
-// //       threads: threads ?? this.threads,
-// //     );
-// //   }
-
-// //   Map<String, dynamic> toJson() {
-// //     return {
-// //       'object': object.value,
-// //       'threads': threads.map((key, value) => MapEntry(key, value.toJson())),
-// //     };
-// //   }
-
-// //   factory ChatThreadsBase.fromJson(Map<String, dynamic> json) {
-// //     return ChatThreadsBase(
-// //       object: ObjectType.values.firstWhere(
-// //         (e) => e.value == json['object'],
-// //         orElse: () => ObjectType.chatThreads,
-// //       ),
-// //       threads:
-// //           (json['threads'] as Map<String, dynamic>?)?.map(
-// //             (key, value) => MapEntry(
-// //               key,
-// //               ChatThreadResponse.fromJson(value as Map<String, dynamic>),
-// //             ),
-// //           ) ??
-// //           {},
-// //     );
-// //   }
-// // }
-
-// // /// Chat threads response
-// // class ChatThreadsResponse extends ChatThreadsBase {
-// //   final String tableId;
-
-// //   const ChatThreadsResponse({super.object, super.threads, this.tableId = ''});
-
-// //   @override
-// //   ChatThreadsResponse copyWith({
-// //     ObjectType? object,
-// //     Map<String, ChatThreadResponse>? threads,
-// //     String? tableId,
-// //   }) {
-// //     return ChatThreadsResponse(
-// //       object: object ?? this.object,
-// //       threads: threads ?? this.threads,
-// //       tableId: tableId ?? this.tableId,
-// //     );
-// //   }
-
-// //   @override
-// //   Map<String, dynamic> toJson() {
-// //     final json = super.toJson();
-// //     json['table_id'] = tableId;
-// //     return json;
-// //   }
-
-// //   factory ChatThreadsResponse.fromJson(Map<String, dynamic> json) {
-// //     return ChatThreadsResponse(
-// //       object: ObjectType.values.firstWhere(
-// //         (e) => e.value == json['object'],
-// //         orElse: () => ObjectType.chatThreads,
-// //       ),
-// //       threads:
-// //           (json['threads'] as Map<String, dynamic>?)?.map(
-// //             (key, value) => MapEntry(
-// //               key,
-// //               ChatThreadResponse.fromJson(value as Map<String, dynamic>),
-// //             ),
-// //           ) ??
-// //           {},
-// //       tableId: json['table_id'] ?? '',
-// //     );
-// //   }
-// // }
-
-// /// Conversation threads response
-// class ConversationThreadsResponse extends ChatThreadsBase {
-//   final String conversationId;
-
-//   const ConversationThreadsResponse({
-//     super.object,
-//     super.threads,
-//     this.conversationId = '',
-//   });
-
-//   @override
-//   ConversationThreadsResponse copyWith({
-//     ObjectType? object,
-//     Map<String, ChatThreadResponse>? threads,
-//     String? conversationId,
-//   }) {
-//     return ConversationThreadsResponse(
-//       object: object ?? this.object,
-//       threads: threads ?? this.threads,
-//       conversationId: conversationId ?? this.conversationId,
-//     );
-//   }
-
-//   @override
-//   Map<String, dynamic> toJson() {
-//     final json = super.toJson();
-//     json['conversation_id'] = conversationId;
-//     return json;
-//   }
-
-//   factory ConversationThreadsResponse.fromJson(Map<String, dynamic> json) {
-//     return ConversationThreadsResponse(
-//       object: ObjectType.values.firstWhere(
-//         (e) => e.value == json['object'],
-//         orElse: () => ObjectType.chatThreads,
-//       ),
-//       threads:
-//           (json['threads'] as Map<String, dynamic>?)?.map(
-//             (key, value) => MapEntry(
-//               key,
-//               ChatThreadResponse.fromJson(value as Map<String, dynamic>),
-//             ),
-//           ) ??
-//           {},
-//       conversationId: json['conversation_id'] ?? '',
-//     );
-//   }
-// }
-
-// @MappableClass(caseStyle: CaseStyle.snakeCase)
-// class ChatRequestBase with ChatRequestBaseMappable {
-//   final String model;
-
-//   @MappableField(hook: ToolChoiceHook())
-//   final ToolChoiceOption? toolChoice;
-
-//   final double temperature;
-
-//   const ChatRequestBase({
-//     required this.model,
-//     this.toolChoice,
-//     this.temperature = 0.2,
-//   });
-// }
-
-// Usage:
-void main() {
-  // Serialization
-  final request = ChatRequestBase(
-    model: 'gpt-4',
-    toolChoice: ToolChoiceOption.fromDynamic(ToolChoiceType.auto),
-    temperature: 0.5,
-  );
-
-  final json = request.toMap();
-  // json = {
-  //   'model': 'gpt-4',
-  //   'tool_choice': 'auto',  // Hook converted it!
-  //   'temperature': 0.5
-  // }
-
-  print(json);
-
-  // Deserialization
-  final fromJson = ChatRequestBaseMapper.fromMap({
-    'model': 'gpt-4',
-    'tool_choice': 'auto', // Hook will convert this to ToolChoiceOption
-    'temperature': 0.5,
+  const ChatThreadsBase({
+    this.object = ObjectType.chatThreads,
+    this.threads = const {},
   });
+}
 
-  // decode a toolChoice
-  final toolJson = ChatRequestBaseMapper.fromMap({
-    'model': 'niama',
-    'tool_choice': {
-      'type': 'function',
-      'function': {'name': 'as'},
-    },
+/// Chat threads response
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ChatThreadsResponse extends ChatThreadsBase
+    with ChatThreadsResponseMappable {
+  final String tableId;
+
+  const ChatThreadsResponse({super.object, super.threads, this.tableId = ''});
+}
+
+/// Conversation threads response
+class ConversationThreadsResponse extends ChatThreadsBase {
+  final String conversationId;
+
+  const ConversationThreadsResponse({
+    super.object,
+    super.threads,
+    this.conversationId = '',
   });
-
-  print(toolJson.toolChoice);
-  // Output: ToolChoiceOptionToolChoiceType
 }
