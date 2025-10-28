@@ -162,14 +162,7 @@ class MultiRowCompletionResponse with MultiRowCompletionResponseMappable {
 }
 
 /// LLM generation configuration
-@MappableClass(
-  caseStyle: CaseStyle.snakeCase,
-  generateMethods:
-      GenerateMethods.decode |
-      GenerateMethods.encode |
-      GenerateMethods.equals |
-      GenerateMethods.stringify,
-)
+@MappableClass()
 class LLMGenConfig extends ChatRequestBase
     with LLMGenConfigMappable
     implements GenConfig {
@@ -261,26 +254,13 @@ sealed class GenConfig {
   }
 }
 
-@MappableClass(
-  caseStyle: CaseStyle.snakeCase,
-  discriminatorKey: 'object',
-  generateMethods:
-      GenerateMethods.decode |
-      GenerateMethods.encode |
-      GenerateMethods.equals |
-      GenerateMethods.stringify,
-)
+@MappableClass(caseStyle: CaseStyle.snakeCase, discriminatorKey: 'object')
 sealed class DiscriminatedGenConfig with DiscriminatedGenConfigMappable {}
 
 // discriminated gen configs
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
   discriminatorValue: GenConfigTypes.llm,
-  generateMethods:
-      GenerateMethods.decode |
-      GenerateMethods.encode |
-      GenerateMethods.equals |
-      GenerateMethods.stringify,
 )
 class DiscriminatedLLMGenConfig extends LLMGenConfig
     with DiscriminatedLLMGenConfigMappable
@@ -314,11 +294,6 @@ class DiscriminatedLLMGenConfig extends LLMGenConfig
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
   discriminatorValue: GenConfigTypes.chat,
-  generateMethods:
-      GenerateMethods.decode |
-      GenerateMethods.encode |
-      GenerateMethods.equals |
-      GenerateMethods.stringify,
 )
 class DiscriminatedChatGenConfig extends LLMGenConfig
     with DiscriminatedChatGenConfigMappable

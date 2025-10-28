@@ -14,7 +14,6 @@ class DemoPersonMapper extends ClassMapperBase<DemoPerson> {
   static DemoPersonMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DemoPersonMapper._());
-      DemoBallsMapper.ensureInitialized();
     }
     return _instance!;
   }
