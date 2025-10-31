@@ -1,90 +1,88 @@
 
-library;
+import 'package:dart_mappable/dart_mappable.dart';
+
+part "mcp.mapper.dart";
 
 /// MCP (Model Context Protocol) types for JamAI SDK
 /// Based on the MCP specification for JSON-RPC communication
 
-/// Standard JSON-RPC error codes
+@MappableEnum()
 enum JSONRPCErrorCode {
+  @MappableValue(-32700)
   parseError(-32700),
+  @MappableValue(-32600)
   invalidRequest(-32600),
+  @MappableValue(-32601)
   methodNotFound(-32601),
+  @MappableValue(-32602)
   invalidParams(-32602),
+  @MappableValue(-32603)
   internalError(-32603),
+  @MappableValue(-32001)
   unauthorized(-32001),
+  @MappableValue(-32003)
   forbidden(-32003);
 
-  const JSONRPCErrorCode(this.code);
   final int code;
+  const JSONRPCErrorCode(this.code);
 }
 
 /// Type aliases
 typedef ProgressToken = dynamic;
 typedef Cursor = String;
 
-/// Role enum
+@MappableEnum()
 enum MCPRole {
+  @MappableValue('user')
   user('user'),
+  @MappableValue('assistant')
   assistant('assistant');
 
-  const MCPRole(this.value);
   final String value;
+  const MCPRole(this.value);
 }
 
-/// Request parameters metadata
-class RequestParamsMeta {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RequestParamsMeta with RequestParamsMetaMappable {
   final ProgressToken? progressToken;
 
   const RequestParamsMeta({this.progressToken});
 
-  Map<String, dynamic> toJson() => {
-        if (progressToken != null) 'progressToken': progressToken,
-      };
-
-  factory RequestParamsMeta.fromJson(Map<String, dynamic> json) =>
-      RequestParamsMeta(progressToken: json['progressToken']);
+  factory RequestParamsMeta.fromJson(String json) => RequestParamsMetaMapper.fromJson(json);
+  factory RequestParamsMeta.fromMap(Map<String, dynamic> map) => RequestParamsMetaMapper.fromMap(map);
 }
 
-/// Base params class
-class Params {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Params with ParamsMappable {
   final Map<String, dynamic>? meta;
 
   const Params({this.meta});
 
-  Map<String, dynamic> toJson() => {if (meta != null) '_meta': meta};
-
-  factory Params.fromJson(Map<String, dynamic> json) =>
-      Params(meta: json['_meta'] as Map<String, dynamic>?);
+  factory Params.fromJson(String json) => ParamsMapper.fromJson(json);
+  factory Params.fromMap(Map<String, dynamic> map) => ParamsMapper.fromMap(map);
 }
 
-/// Paginated request parameters
-class PaginatedRequestParams extends Params {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PaginatedRequestParams extends Params with PaginatedRequestParamsMappable {
   final String? cursor;
 
   const PaginatedRequestParams({this.cursor, super.meta});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        if (cursor != null) 'cursor': cursor,
-      };
-
-  factory PaginatedRequestParams.fromJson(Map<String, dynamic> json) =>
-      PaginatedRequestParams(
-        cursor: json['cursor'] as String?,
-        meta: json['_meta'] as Map<String, dynamic>?,
-      );
+  factory PaginatedRequestParams.fromJson(String json) => PaginatedRequestParamsMapper.fromJson(json);
+  factory PaginatedRequestParams.fromMap(Map<String, dynamic> map) => PaginatedRequestParamsMapper.fromMap(map);
 }
 
-/// Base JSON-RPC class
-abstract class JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+abstract class JSONRPCBase with JSONRPCBaseMappable {
   final String jsonrpc;
   const JSONRPCBase({this.jsonrpc = '2.0'});
-  Map<String, dynamic> toJson();
+
+  factory JSONRPCBase.fromJson(String json) => JSONRPCBaseMapper.fromJson(json);
+  factory JSONRPCBase.fromMap(Map<String, dynamic> map) => JSONRPCBaseMapper.fromMap(map);
 }
 
-/// JSON-RPC request
-class JSONRPCRequest<T extends Params> extends JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class JSONRPCRequest<T extends Params> extends JSONRPCBase with JSONRPCRequestMappable {
   final dynamic id;
   final String method;
   final T? params;
@@ -96,74 +94,65 @@ class JSONRPCRequest<T extends Params> extends JSONRPCBase {
     super.jsonrpc,
   });
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'jsonrpc': jsonrpc,
-        'id': id,
-        'method': method,
-        if (params != null) 'params': params!.toJson(),
-      };
+  factory JSONRPCRequest.fromJson(String json) => JSONRPCRequestMapper.fromJson(json);
+  factory JSONRPCRequest.fromMap(Map<String, dynamic> map) => JSONRPCRequestMapper.fromMap(map);
 }
 
-/// Paginated request
-class PaginatedRequest extends JSONRPCRequest<PaginatedRequestParams> {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PaginatedRequest extends JSONRPCRequest<PaginatedRequestParams> with PaginatedRequestMappable {
   const PaginatedRequest({
     required super.id,
     required super.method,
     super.params,
   });
+
+  factory PaginatedRequest.fromJson(String json) => PaginatedRequestMapper.fromJson(json);
+  factory PaginatedRequest.fromMap(Map<String, dynamic> map) => PaginatedRequestMapper.fromMap(map);
 }
 
-/// JSON-RPC notification
-class JSONRPCNotification<T extends Params> extends JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class JSONRPCNotification<T extends Params> extends JSONRPCBase with JSONRPCNotificationMappable {
   final String method;
   final T? params;
 
   const JSONRPCNotification({required this.method, this.params, super.jsonrpc});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'jsonrpc': jsonrpc,
-        'method': method,
-        if (params != null) 'params': params!.toJson(),
-      };
+  factory JSONRPCNotification.fromJson(String json) => JSONRPCNotificationMapper.fromJson(json);
+  factory JSONRPCNotification.fromMap(Map<String, dynamic> map) => JSONRPCNotificationMapper.fromMap(map);
 }
 
-/// Initialized notification
-class InitializedNotification extends JSONRPCNotification<Params> {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class InitializedNotification extends JSONRPCNotification<Params> with InitializedNotificationMappable {
   const InitializedNotification({super.params})
       : super(method: 'notifications/initialized');
+
+  factory InitializedNotification.fromJson(String json) => InitializedNotificationMapper.fromJson(json);
+  factory InitializedNotification.fromMap(Map<String, dynamic> map) => InitializedNotificationMapper.fromMap(map);
 }
 
-/// Base result class
-class Result {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Result with ResultMappable {
   final Map<String, dynamic>? meta;
 
   const Result({this.meta});
 
-  Map<String, dynamic> toJson() => {if (meta != null) '_meta': meta};
-
-  factory Result.fromJson(Map<String, dynamic> json) =>
-      Result(meta: json['_meta'] as Map<String, dynamic>?);
+  factory Result.fromJson(String json) => ResultMapper.fromJson(json);
+  factory Result.fromMap(Map<String, dynamic> map) => ResultMapper.fromMap(map);
 }
 
-/// JSON-RPC response
-class JSONRPCResponse<T extends Result> extends JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class JSONRPCResponse<T extends Result> extends JSONRPCBase with JSONRPCResponseMappable {
   final dynamic id;
   final T? result;
 
   const JSONRPCResponse({required this.id, this.result, super.jsonrpc});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'jsonrpc': jsonrpc,
-        'id': id,
-        if (result != null) 'result': result!.toJson(),
-      };
+  factory JSONRPCResponse.fromJson(String json) => JSONRPCResponseMapper.fromJson(json);
+  factory JSONRPCResponse.fromMap(Map<String, dynamic> map) => JSONRPCResponseMapper.fromMap(map);
 }
 
-/// JSON-RPC empty response
-class JSONRPCEmptyResponse extends JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class JSONRPCEmptyResponse extends JSONRPCBase with JSONRPCEmptyResponseMappable {
   final dynamic id;
   final Map<String, dynamic> result;
 
@@ -173,89 +162,55 @@ class JSONRPCEmptyResponse extends JSONRPCBase {
     super.jsonrpc,
   });
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'jsonrpc': jsonrpc,
-        'id': id,
-        'result': result,
-      };
+  factory JSONRPCEmptyResponse.fromJson(String json) => JSONRPCEmptyResponseMapper.fromJson(json);
+  factory JSONRPCEmptyResponse.fromMap(Map<String, dynamic> map) => JSONRPCEmptyResponseMapper.fromMap(map);
 }
 
-/// Error data
-class ErrorData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ErrorData with ErrorDataMappable {
   final int code;
   final String message;
   final dynamic data;
 
   const ErrorData({required this.code, required this.message, this.data});
 
-  Map<String, dynamic> toJson() => {
-        'code': code,
-        'message': message,
-        if (data != null) 'data': data,
-      };
-
-  factory ErrorData.fromJson(Map<String, dynamic> json) => ErrorData(
-        code: json['code'] as int,
-        message: json['message'] as String,
-        data: json['data'],
-      );
+  factory ErrorData.fromJson(String json) => ErrorDataMapper.fromJson(json);
+  factory ErrorData.fromMap(Map<String, dynamic> map) => ErrorDataMapper.fromMap(map);
 }
 
-/// JSON-RPC error
-class JSONRPCError extends JSONRPCBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class JSONRPCError extends JSONRPCBase with JSONRPCErrorMappable {
   final dynamic id;
   final ErrorData error;
 
   const JSONRPCError({required this.id, required this.error, super.jsonrpc});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'jsonrpc': jsonrpc,
-        'id': id,
-        'error': error.toJson(),
-      };
-
-  factory JSONRPCError.fromJson(Map<String, dynamic> json) => JSONRPCError(
-        id: json['id'],
-        error: ErrorData.fromJson(json['error'] as Map<String, dynamic>),
-        jsonrpc: json['jsonrpc'] as String? ?? '2.0',
-      );
+  factory JSONRPCError.fromJson(String json) => JSONRPCErrorMapper.fromJson(json);
+  factory JSONRPCError.fromMap(Map<String, dynamic> map) => JSONRPCErrorMapper.fromMap(map);
 }
 
-/// Capability
-class Capability {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Capability with CapabilityMappable {
   final bool listChanged;
 
   const Capability({this.listChanged = false});
 
-  Map<String, dynamic> toJson() => {'listChanged': listChanged};
-
-  factory Capability.fromJson(Map<String, dynamic> json) =>
-      Capability(listChanged: json['listChanged'] as bool? ?? false);
+  factory Capability.fromJson(String json) => CapabilityMapper.fromJson(json);
+  factory Capability.fromMap(Map<String, dynamic> map) => CapabilityMapper.fromMap(map);
 }
 
-/// Resources capability
-class ResourcesCapability extends Capability {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ResourcesCapability extends Capability with ResourcesCapabilityMappable {
   final bool? subscribe;
 
   const ResourcesCapability({this.subscribe, super.listChanged});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        if (subscribe != null) 'subscribe': subscribe,
-      };
-
-  factory ResourcesCapability.fromJson(Map<String, dynamic> json) =>
-      ResourcesCapability(
-        subscribe: json['subscribe'] as bool?,
-        listChanged: json['listChanged'] as bool? ?? false,
-      );
+  factory ResourcesCapability.fromJson(String json) => ResourcesCapabilityMapper.fromJson(json);
+  factory ResourcesCapability.fromMap(Map<String, dynamic> map) => ResourcesCapabilityMapper.fromMap(map);
 }
 
-/// Server capabilities
-class ServerCapabilities {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ServerCapabilities with ServerCapabilitiesMappable {
   final Map<String, Map<String, dynamic>>? experimental;
   final Map<String, dynamic>? logging;
   final Map<String, dynamic>? completions;
@@ -272,49 +227,23 @@ class ServerCapabilities {
     this.tools = const Capability(listChanged: false),
   });
 
-  Map<String, dynamic> toJson() => {
-        if (experimental != null) 'experimental': experimental,
-        if (logging != null) 'logging': logging,
-        if (completions != null) 'completions': completions,
-        if (prompts != null) 'prompts': prompts!.toJson(),
-        if (resources != null) 'resources': resources!.toJson(),
-        if (tools != null) 'tools': tools!.toJson(),
-      };
-
-  factory ServerCapabilities.fromJson(Map<String, dynamic> json) =>
-      ServerCapabilities(
-        experimental: json['experimental'] as Map<String, Map<String, dynamic>>?,
-        logging: json['logging'] as Map<String, dynamic>?,
-        completions: json['completions'] as Map<String, dynamic>?,
-        prompts: json['prompts'] != null
-            ? Capability.fromJson(json['prompts'] as Map<String, dynamic>)
-            : null,
-        resources: json['resources'] != null
-            ? ResourcesCapability.fromJson(json['resources'] as Map<String, dynamic>)
-            : null,
-        tools: json['tools'] != null
-            ? Capability.fromJson(json['tools'] as Map<String, dynamic>)
-            : const Capability(listChanged: false),
-      );
+  factory ServerCapabilities.fromJson(String json) => ServerCapabilitiesMapper.fromJson(json);
+  factory ServerCapabilities.fromMap(Map<String, dynamic> map) => ServerCapabilitiesMapper.fromMap(map);
 }
 
-/// Implementation info
-class Implementation {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Implementation with ImplementationMappable {
   final String name;
   final String version;
 
   const Implementation({required this.name, required this.version});
 
-  Map<String, dynamic> toJson() => {'name': name, 'version': version};
-
-  factory Implementation.fromJson(Map<String, dynamic> json) => Implementation(
-        name: json['name'] as String,
-        version: json['version'] as String,
-      );
+  factory Implementation.fromJson(String json) => ImplementationMapper.fromJson(json);
+  factory Implementation.fromMap(Map<String, dynamic> map) => ImplementationMapper.fromMap(map);
 }
 
-/// Initialize request parameters
-class InitializeRequestParams {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class InitializeRequestParams with InitializeRequestParamsMappable {
   final String protocolVersion;
   final Map<String, dynamic> capabilities;
   final Implementation clientInfo;
@@ -325,28 +254,21 @@ class InitializeRequestParams {
     required this.clientInfo,
   });
 
-  Map<String, dynamic> toJson() => {
-        'protocolVersion': protocolVersion,
-        'capabilities': capabilities,
-        'clientInfo': clientInfo.toJson(),
-      };
-
-  factory InitializeRequestParams.fromJson(Map<String, dynamic> json) =>
-      InitializeRequestParams(
-        protocolVersion: json['protocolVersion'] as String,
-        capabilities: json['capabilities'] as Map<String, dynamic>,
-        clientInfo: Implementation.fromJson(json['clientInfo'] as Map<String, dynamic>),
-      );
+  factory InitializeRequestParams.fromJson(String json) => InitializeRequestParamsMapper.fromJson(json);
+  factory InitializeRequestParams.fromMap(Map<String, dynamic> map) => InitializeRequestParamsMapper.fromMap(map);
 }
 
-/// Initialize request
-class InitializeRequest extends JSONRPCRequest<Params> {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class InitializeRequest extends JSONRPCRequest<Params> with InitializeRequestMappable {
   const InitializeRequest({required super.id, super.params})
       : super(method: 'initialize');
+
+  factory InitializeRequest.fromJson(String json) => InitializeRequestMapper.fromJson(json);
+  factory InitializeRequest.fromMap(Map<String, dynamic> map) => InitializeRequestMapper.fromMap(map);
 }
 
-/// Initialize result
-class InitializeResult extends Result {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class InitializeResult extends Result with InitializeResultMappable {
   final String protocolVersion;
   final ServerCapabilities capabilities;
   final Implementation serverInfo;
@@ -359,34 +281,19 @@ class InitializeResult extends Result {
     this.instructions,
     super.meta,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'protocolVersion': protocolVersion,
-        'capabilities': capabilities.toJson(),
-        'serverInfo': serverInfo.toJson(),
-        if (instructions != null) 'instructions': instructions,
-      };
-
-  factory InitializeResult.fromJson(Map<String, dynamic> json) =>
-      InitializeResult(
-        protocolVersion: json['protocolVersion'] as String? ?? '2025-03-26',
-        capabilities: ServerCapabilities.fromJson(json['capabilities'] as Map<String, dynamic>),
-        serverInfo: Implementation.fromJson(json['serverInfo'] as Map<String, dynamic>),
-        instructions: json['instructions'] as String?,
-        meta: json['_meta'] as Map<String, dynamic>?,
-      );
 }
 
-/// List tools request
-class ListToolsRequest extends PaginatedRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ListToolsRequest extends PaginatedRequest with ListToolsRequestMappable {
   const ListToolsRequest({required super.id, super.params})
       : super(method: 'tools/list');
+
+  factory ListToolsRequest.fromJson(String json) => ListToolsRequestMapper.fromJson(json);
+  factory ListToolsRequest.fromMap(Map<String, dynamic> map) => ListToolsRequestMapper.fromMap(map);
 }
 
-/// Tool annotations
-class ToolAnnotations {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ToolAnnotations with ToolAnnotationsMappable {
   final String? title;
   final bool? readOnlyHint;
   final bool? destructiveHint;
@@ -400,27 +307,12 @@ class ToolAnnotations {
     this.idempotentHint = false,
     this.openWorldHint = true,
   });
-
-  Map<String, dynamic> toJson() => {
-        if (title != null) 'title': title,
-        if (readOnlyHint != null) 'readOnlyHint': readOnlyHint,
-        if (destructiveHint != null) 'destructiveHint': destructiveHint,
-        if (idempotentHint != null) 'idempotentHint': idempotentHint,
-        if (openWorldHint != null) 'openWorldHint': openWorldHint,
-      };
-
-  factory ToolAnnotations.fromJson(Map<String, dynamic> json) =>
-      ToolAnnotations(
-        title: json['title'] as String?,
-        readOnlyHint: json['readOnlyHint'] as bool? ?? false,
-        destructiveHint: json['destructiveHint'] as bool? ?? true,
-        idempotentHint: json['idempotentHint'] as bool? ?? false,
-        openWorldHint: json['openWorldHint'] as bool? ?? true,
-      );
+  factory ToolAnnotations.fromJson(String json) => ToolAnnotationsMapper.fromJson(json);
+  factory ToolAnnotations.fromMap(Map<String, dynamic> map) => ToolAnnotationsMapper.fromMap(map);
 }
 
-/// Tool input schema
-class ToolInputSchema {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ToolInputSchema with ToolInputSchemaMappable {
   final String type;
   final Map<String, Map<String, dynamic>>? properties;
   final List<String>? required;
@@ -430,23 +322,12 @@ class ToolInputSchema {
     this.properties,
     this.required,
   });
-
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        if (properties != null) 'properties': properties,
-        if (required != null) 'required': required,
-      };
-
-  factory ToolInputSchema.fromJson(Map<String, dynamic> json) =>
-      ToolInputSchema(
-        type: json['type'] as String? ?? 'object',
-        properties: json['properties'] as Map<String, Map<String, dynamic>>?,
-        required: json['required'] as List<String>?,
-      );
+  factory ToolInputSchema.fromJson(String json) => ToolInputSchemaMapper.fromJson(json);
+  factory ToolInputSchema.fromMap(Map<String, dynamic> map) => ToolInputSchemaMapper.fromMap(map);
 }
 
-/// Tool API info
-class ToolAPIInfo {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ToolAPIInfo with ToolAPIInfoMappable {
   final String path;
   final String method;
   final Map<String, String> argsTypes;
@@ -458,24 +339,12 @@ class ToolAPIInfo {
     required this.argsTypes,
     required this.methodInfo,
   });
-
-  Map<String, dynamic> toJson() => {
-        'path': path,
-        'method': method,
-        'args_types': argsTypes,
-        'method_info': methodInfo,
-      };
-
-  factory ToolAPIInfo.fromJson(Map<String, dynamic> json) => ToolAPIInfo(
-        path: json['path'] as String,
-        method: json['method'] as String,
-        argsTypes: Map<String, String>.from(json['args_types'] as Map),
-        methodInfo: json['method_info'] as Map<String, dynamic>,
-      );
+  factory ToolAPIInfo.fromJson(String json) => ToolAPIInfoMapper.fromJson(json);
+  factory ToolAPIInfo.fromMap(Map<String, dynamic> map) => ToolAPIInfoMapper.fromMap(map);
 }
 
-/// Tool definition
-class Tool {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Tool with ToolMappable {
   final String name;
   final String? description;
   final ToolInputSchema inputSchema;
@@ -488,25 +357,12 @@ class Tool {
     this.annotations,
   });
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        if (description != null) 'description': description,
-        'inputSchema': inputSchema.toJson(),
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
-
-  factory Tool.fromJson(Map<String, dynamic> json) => Tool(
-        name: json['name'] as String,
-        description: json['description'] as String?,
-        inputSchema: ToolInputSchema.fromJson(json['inputSchema'] as Map<String, dynamic>),
-        annotations: json['annotations'] != null
-            ? ToolAnnotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-      );
+  factory Tool.fromJson(String json) => ToolMapper.fromJson(json);
+  factory Tool.fromMap(Map<String, dynamic> map) => ToolMapper.fromMap(map);
 }
 
-/// Tool with API info
-class ToolAPI extends Tool {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ToolAPI extends Tool with ToolAPIMappable {
   final ToolAPIInfo? apiInfo;
 
   const ToolAPI({
@@ -517,48 +373,22 @@ class ToolAPI extends Tool {
     this.apiInfo,
   });
 
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        if (apiInfo != null) 'api_info': apiInfo!.toJson(),
-      };
-
-  factory ToolAPI.fromJson(Map<String, dynamic> json) => ToolAPI(
-        name: json['name'] as String,
-        description: json['description'] as String?,
-        inputSchema: ToolInputSchema.fromJson(json['inputSchema'] as Map<String, dynamic>),
-        annotations: json['annotations'] != null
-            ? ToolAnnotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-        apiInfo: json['api_info'] != null
-            ? ToolAPIInfo.fromJson(json['api_info'] as Map<String, dynamic>)
-            : null,
-      );
+  factory ToolAPI.fromJson(String json) => ToolAPIMapper.fromJson(json);
+  factory ToolAPI.fromMap(Map<String, dynamic> map) => ToolAPIMapper.fromMap(map);
 }
 
-/// List tools result
-class ListToolsResult extends Result {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ListToolsResult extends Result with ListToolsResultMappable {
   final List<Tool> tools;
 
   const ListToolsResult({required this.tools, super.meta});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'tools': tools.map((t) => t.toJson()).toList(),
-      };
-
-  factory ListToolsResult.fromJson(Map<String, dynamic> json) =>
-      ListToolsResult(
-        tools: (json['tools'] as List)
-            .map((t) => Tool.fromJson(t as Map<String, dynamic>))
-            .toList(),
-        meta: json['_meta'] as Map<String, dynamic>?,
-      );
+  factory ListToolsResult.fromJson(String json) => ListToolsResultMapper.fromJson(json);
+  factory ListToolsResult.fromMap(Map<String, dynamic> map) => ListToolsResultMapper.fromMap(map);
 }
 
-/// Call tool request parameters
-class CallToolRequestParams extends Params {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class CallToolRequestParams extends Params with CallToolRequestParamsMappable {
   final String name;
   final Map<String, dynamic>? arguments;
 
@@ -567,30 +397,19 @@ class CallToolRequestParams extends Params {
     this.arguments,
     super.meta,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'name': name,
-        if (arguments != null) 'arguments': arguments,
-      };
-
-  factory CallToolRequestParams.fromJson(Map<String, dynamic> json) =>
-      CallToolRequestParams(
-        name: json['name'] as String,
-        arguments: json['arguments'] as Map<String, dynamic>?,
-        meta: json['_meta'] as Map<String, dynamic>?,
-      );
 }
 
-/// Call tool request
-class CallToolRequest extends JSONRPCRequest<CallToolRequestParams> {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class CallToolRequest extends JSONRPCRequest<CallToolRequestParams> with CallToolRequestMappable {
   const CallToolRequest({required super.id, super.params})
       : super(method: 'tools/call');
+
+  factory CallToolRequest.fromJson(String json) => CallToolRequestMapper.fromJson(json);
+  factory CallToolRequest.fromMap(Map<String, dynamic> map) => CallToolRequestMapper.fromMap(map);
 }
 
-/// Annotations for content
-class Annotations {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Annotations with AnnotationsMappable {
   final List<MCPRole>? audience;
   final double? priority;
 
@@ -599,53 +418,32 @@ class Annotations {
     this.priority,
   }) : assert(priority == null || (priority >= 0.0 && priority <= 1.0));
 
-  Map<String, dynamic> toJson() => {
-        if (audience != null) 'audience': audience!.map((r) => r.value).toList(),
-        if (priority != null) 'priority': priority,
-      };
-
-  factory Annotations.fromJson(Map<String, dynamic> json) => Annotations(
-        audience: json['audience'] != null
-            ? (json['audience'] as List).map((r) => MCPRole.values.firstWhere((e) => e.value == r)).toList()
-            : null,
-        priority: json['priority'] as double?,
-      );
+  factory Annotations.fromJson(String json) => AnnotationsMapper.fromJson(json);
+  factory Annotations.fromMap(Map<String, dynamic> map) => AnnotationsMapper.fromMap(map);
 }
 
-/// Base content class
-class Content {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Content with ContentMappable {
   final Annotations? annotations;
 
   const Content({this.annotations});
 
-  Map<String, dynamic> toJson() => {
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
+  factory Content.fromJson(String json) => ContentMapper.fromJson(json);
+  factory Content.fromMap(Map<String, dynamic> map) => ContentMapper.fromMap(map);
 }
 
-/// Text content
-class TextContent extends Content {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TextContent extends Content with TextContentMappable {
   final String text;
 
   const TextContent({required this.text, super.annotations});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'type': 'text',
-        'text': text,
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
-
-  factory TextContent.fromJson(Map<String, dynamic> json) => TextContent(
-        text: json['text'] as String,
-        annotations: json['annotations'] != null
-            ? Annotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-      );
+  factory TextContent.fromJson(String json) => TextContentMapper.fromJson(json);
+  factory TextContent.fromMap(Map<String, dynamic> map) => TextContentMapper.fromMap(map);
 }
 
-/// Image content
-class ImageContent extends Content {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ImageContent extends Content with ImageContentMappable {
   final String data;
   final String mimeType;
 
@@ -655,25 +453,12 @@ class ImageContent extends Content {
     super.annotations,
   });
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'type': 'image',
-        'data': data,
-        'mimeType': mimeType,
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
-
-  factory ImageContent.fromJson(Map<String, dynamic> json) => ImageContent(
-        data: json['data'] as String,
-        mimeType: json['mimeType'] as String,
-        annotations: json['annotations'] != null
-            ? Annotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-      );
+  factory ImageContent.fromJson(String json) => ImageContentMapper.fromJson(json);
+  factory ImageContent.fromMap(Map<String, dynamic> map) => ImageContentMapper.fromMap(map);
 }
 
-/// Audio content
-class AudioContent extends Content {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class AudioContent extends Content with AudioContentMappable {
   final String data;
   final String mimeType;
 
@@ -683,44 +468,23 @@ class AudioContent extends Content {
     super.annotations,
   });
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'type': 'audio',
-        'data': data,
-        'mimeType': mimeType,
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
-
-  factory AudioContent.fromJson(Map<String, dynamic> json) => AudioContent(
-        data: json['data'] as String,
-        mimeType: json['mimeType'] as String,
-        annotations: json['annotations'] != null
-            ? Annotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-      );
+  factory AudioContent.fromJson(String json) => AudioContentMapper.fromJson(json);
+  factory AudioContent.fromMap(Map<String, dynamic> map) => AudioContentMapper.fromMap(map);
 }
 
-/// Resource contents
-class ResourceContents {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ResourceContents with ResourceContentsMappable {
   final String uri;
   final String? mimeType;
 
   const ResourceContents({required this.uri, this.mimeType});
 
-  Map<String, dynamic> toJson() => {
-        'uri': uri,
-        if (mimeType != null) 'mimeType': mimeType,
-      };
-
-  factory ResourceContents.fromJson(Map<String, dynamic> json) =>
-      ResourceContents(
-        uri: json['uri'] as String,
-        mimeType: json['mimeType'] as String?,
-      );
+  factory ResourceContents.fromJson(String json) => ResourceContentsMapper.fromJson(json);
+  factory ResourceContents.fromMap(Map<String, dynamic> map) => ResourceContentsMapper.fromMap(map);
 }
 
-/// Text resource contents
-class TextResourceContents extends ResourceContents {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class TextResourceContents extends ResourceContents with TextResourceContentsMappable {
   final String text;
 
   const TextResourceContents({
@@ -728,23 +492,10 @@ class TextResourceContents extends ResourceContents {
     super.mimeType,
     required this.text,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'text': text,
-      };
-
-  factory TextResourceContents.fromJson(Map<String, dynamic> json) =>
-      TextResourceContents(
-        uri: json['uri'] as String,
-        mimeType: json['mimeType'] as String?,
-        text: json['text'] as String,
-      );
 }
 
-/// Blob resource contents
-class BlobResourceContents extends ResourceContents {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class BlobResourceContents extends ResourceContents with BlobResourceContentsMappable {
   final String blob;
 
   const BlobResourceContents({
@@ -752,45 +503,20 @@ class BlobResourceContents extends ResourceContents {
     super.mimeType,
     required this.blob,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'blob': blob,
-      };
-
-  factory BlobResourceContents.fromJson(Map<String, dynamic> json) =>
-      BlobResourceContents(
-        uri: json['uri'] as String,
-        mimeType: json['mimeType'] as String?,
-        blob: json['blob'] as String,
-      );
 }
 
-/// Embedded resource
-class EmbeddedResource extends Content {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class EmbeddedResource extends Content with EmbeddedResourceMappable {
   final TextResourceContents resource;
 
   const EmbeddedResource({required this.resource, super.annotations});
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'type': 'resource',
-        'resource': resource.toJson(),
-        if (annotations != null) 'annotations': annotations!.toJson(),
-      };
-
-  factory EmbeddedResource.fromJson(Map<String, dynamic> json) =>
-      EmbeddedResource(
-        resource: TextResourceContents.fromJson(json['resource'] as Map<String, dynamic>),
-        annotations: json['annotations'] != null
-            ? Annotations.fromJson(json['annotations'] as Map<String, dynamic>)
-            : null,
-      );
+  factory EmbeddedResource.fromJson(String json) => EmbeddedResourceMapper.fromJson(json);
+  factory EmbeddedResource.fromMap(Map<String, dynamic> map) => EmbeddedResourceMapper.fromMap(map);
 }
 
-/// Call tool result
-class CallToolResult extends Result {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class CallToolResult extends Result with CallToolResultMappable {
   final List<Content> content;
   final bool? isError;
 
@@ -799,22 +525,6 @@ class CallToolResult extends Result {
     this.isError = false,
     super.meta,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'content': content.map((c) => c.toJson()).toList(),
-        if (isError != null) 'isError': isError,
-      };
-
-  factory CallToolResult.fromJson(Map<String, dynamic> json) =>
-      CallToolResult(
-        content: (json['content'] as List)
-            .map((c) => _parseContent(c as Map<String, dynamic>))
-            .toList(),
-        isError: json['isError'] as bool? ?? false,
-        meta: json['_meta'] as Map<String, dynamic>?,
-      );
 }
 
 /// Helper function to parse content
@@ -822,13 +532,13 @@ Content _parseContent(Map<String, dynamic> json) {
   final type = json['type'] as String;
   switch (type) {
     case 'text':
-      return TextContent.fromJson(json);
+      return TextContent.fromMap(json);
     case 'image':
-      return ImageContent.fromJson(json);
+      return ImageContent.fromMap(json);
     case 'audio':
-      return AudioContent.fromJson(json);
+      return AudioContent.fromMap(json);
     case 'resource':
-      return EmbeddedResource.fromJson(json);
+      return EmbeddedResource.fromMap(json);
     default:
       throw ArgumentError('Unknown content type: $type');
   }

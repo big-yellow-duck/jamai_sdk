@@ -34,7 +34,7 @@ class Conversations {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -339,7 +339,7 @@ class Conversations {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -369,7 +369,7 @@ class Conversations {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -450,7 +450,7 @@ class Conversations {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {

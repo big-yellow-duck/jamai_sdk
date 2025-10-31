@@ -1,16 +1,9 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/gen_tables.dart';
 import 'package:sealed_currencies/sealed_currencies.dart';
 
-/// Base model mixin for database models
-mixin BaseModelMixin {
-  Map<String, dynamic> get meta => {};
-
-  /// Create a meta field from JSON
-  static Map<String, dynamic> _metaFromJson(Map<String, dynamic> json) {
-    return json['meta'] as Map<String, dynamic>? ?? {};
-  }
-}
+part 'db.mapper.dart';
 
 /// Table base mixin
 mixin TableBaseMixin {
@@ -47,15 +40,11 @@ mixin TableBaseMixin {
         return [];
     }
   }
-
-  /// Parse datetime fields from JSON
-  static DatetimeUTC _parseDateTime(String? dateTimeStr) {
-    return DatetimeUTC.parse(dateTimeStr ?? '');
-  }
 }
 
 /// Price tier model
-class PriceTier {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PriceTier with PriceTierMappable {
   final double unitCost;
   final double? upTo;
 
@@ -69,20 +58,13 @@ class PriceTier {
     return PriceTier(unitCost: unitCost, upTo: null);
   }
 
-  factory PriceTier.fromJson(Map<String, dynamic> json) {
-    return PriceTier(
-      unitCost: (json['unit_cost'] as num?)?.toDouble() ?? 0.0,
-      upTo: (json['up_to'] as num?)?.toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'unit_cost': unitCost, 'up_to': upTo};
-  }
+  factory PriceTier.fromJson(String json) => PriceTierMapper.fromJson(json);
+  factory PriceTier.fromMap(Map<String, dynamic> map) => PriceTierMapper.fromMap(map);
 }
 
 /// Product model
-class Product {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Product with ProductMappable {
   final String name;
   final PriceTier included;
   final List<PriceTier> tiers;
@@ -113,33 +95,13 @@ class Product {
     );
   }
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      name: json['name'] as String? ?? '',
-      included: PriceTier.fromJson(
-        json['included'] as Map<String, dynamic>? ?? {},
-      ),
-      tiers:
-          (json['tiers'] as List<dynamic>?)
-              ?.map((t) => PriceTier.fromJson(t as Map<String, dynamic>))
-              .toList() ??
-          [],
-      unit: json['unit'] as String? ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'included': included.toJson(),
-      'tiers': tiers.map((t) => t.toJson()).toList(),
-      'unit': unit,
-    };
-  }
+  factory Product.fromJson(String json) => ProductMapper.fromJson(json);
+  factory Product.fromMap(Map<String, dynamic> map) => ProductMapper.fromMap(map);
 }
 
 /// Products collection
-class Products {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Products with ProductsMappable {
   final Product llmTokens;
   final Product embeddingTokens;
   final Product rerankerSearches;
@@ -149,6 +111,7 @@ class Products {
 
   const Products({
     required this.llmTokens,
+
     required this.embeddingTokens,
     required this.rerankerSearches,
     required this.dbStorage,
@@ -200,40 +163,12 @@ class Products {
     );
   }
 
-  factory Products.fromJson(Map<String, dynamic> json) {
-    return Products(
-      llmTokens: Product.fromJson(
-        json['llm_tokens'] as Map<String, dynamic>? ?? {},
-      ),
-      embeddingTokens: Product.fromJson(
-        json['embedding_tokens'] as Map<String, dynamic>? ?? {},
-      ),
-      rerankerSearches: Product.fromJson(
-        json['reranker_searches'] as Map<String, dynamic>? ?? {},
-      ),
-      dbStorage: Product.fromJson(
-        json['db_storage'] as Map<String, dynamic>? ?? {},
-      ),
-      fileStorage: Product.fromJson(
-        json['file_storage'] as Map<String, dynamic>? ?? {},
-      ),
-      egress: Product.fromJson(json['egress'] as Map<String, dynamic>? ?? {}),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'llm_tokens': llmTokens.toJson(),
-      'embedding_tokens': embeddingTokens.toJson(),
-      'reranker_searches': rerankerSearches.toJson(),
-      'db_storage': dbStorage.toJson(),
-      'file_storage': fileStorage.toJson(),
-      'egress': egress.toJson(),
-    };
-  }
+  factory Products.fromJson(String json) => ProductsMapper.fromJson(json);
+  factory Products.fromMap(Map<String, dynamic> map) => ProductsMapper.fromMap(map);
 }
 
 /// Product type enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ProductType {
   credit("credit"),
   creditGrant("credit_grant"),
@@ -297,51 +232,57 @@ enum ProductType {
 }
 
 /// Price plan update model
-class PricePlanUpdate with BaseModelMixin {
-  final String stripePriceIdLive;
-  final String stripePriceIdTest;
-  final String name;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PricePlanUpdate with PricePlanUpdateMappable {
+  final SanitizedNonEmptyString stripePriceIdLive;
+  final SanitizedNonEmptyString stripePriceIdTest;
+  final SanitizedNonEmptyString name;
   final double flatCost;
   final double creditGrant;
   final int? maxUsers;
   final Products products;
   final List<String> allowedOrgs;
 
-  PricePlanUpdate({
-    this.stripePriceIdLive = "",
-    this.stripePriceIdTest = "",
-    this.name = "",
+  factory PricePlanUpdate({
+    required SanitizedNonEmptyString stripePriceIdLive,
+    required SanitizedNonEmptyString stripePriceIdTest,
+    required SanitizedNonEmptyString name,
+    double flatCost = 0.0,
+    double creditGrant = 0.0,
+    int? maxUsers,
+    Products? products,
+    List<String> allowedOrgs = const [],
+  }) {
+    return PricePlanUpdate._(
+      stripePriceIdLive: stripePriceIdLive,
+      stripePriceIdTest: stripePriceIdTest,
+      name: name,
+      flatCost: flatCost,
+      creditGrant: creditGrant,
+      maxUsers: maxUsers,
+      products: products ?? Products.nullProducts(),
+      allowedOrgs: allowedOrgs,
+    );
+  }
+  PricePlanUpdate._({
+    required this.stripePriceIdLive,
+    required this.stripePriceIdTest,
+    required this.name,
     this.flatCost = 0.0,
     this.creditGrant = 0.0,
     this.maxUsers,
-    Products? products,
+    required this.products,
     this.allowedOrgs = const [],
-  }) : products = products ?? Products.nullProducts();
-
-  factory PricePlanUpdate.fromJson(Map<String, dynamic> json) {
-    return PricePlanUpdate(
-      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
-      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
-      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
-      maxUsers: json['max_users'] as int?,
-      products: json['products'] != null
-          ? Products.fromJson(json['products'] as Map<String, dynamic>)
-          : Products.nullProducts(),
-      allowedOrgs:
-          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
-    );
-  }
+  });
 
   factory PricePlanUpdate.free({
     String stripePriceIdLive = "price_123",
     String stripePriceIdTest = "price_1RT2CqCcpbd72IcYEvy6U3GR",
   }) {
     return PricePlanUpdate(
-      name: "Free plan",
-      stripePriceIdLive: stripePriceIdLive,
-      stripePriceIdTest: stripePriceIdTest,
+      name: SanitizedNonEmptyString("Free plan"),
+      stripePriceIdLive: SanitizedNonEmptyString(stripePriceIdLive),
+      stripePriceIdTest: SanitizedNonEmptyString(stripePriceIdTest),
       flatCost: 0.0,
       creditGrant: 0.0,
       maxUsers: 2, // For ease of testing
@@ -386,23 +327,13 @@ class PricePlanUpdate with BaseModelMixin {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'stripe_price_id_live': stripePriceIdLive,
-      'stripe_price_id_test': stripePriceIdTest,
-      'name': name,
-      'flat_cost': flatCost,
-      'credit_grant': creditGrant,
-      'max_users': maxUsers,
-      'products': products.toJson(),
-      'allowed_orgs': allowedOrgs,
-      'meta': meta,
-    };
-  }
+  factory PricePlanUpdate.fromJson(String json) => PricePlanUpdateMapper.fromJson(json);
+  factory PricePlanUpdate.fromMap(Map<String, dynamic> map) => PricePlanUpdateMapper.fromMap(map);
 }
 
 /// Price plan create model
-class PricePlanCreate extends PricePlanUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PricePlanCreate extends PricePlanUpdate with PricePlanCreateMappable {
   final String id;
 
   PricePlanCreate({
@@ -415,41 +346,17 @@ class PricePlanCreate extends PricePlanUpdate {
     required super.maxUsers,
     required super.products,
     super.allowedOrgs = const [],
-    Map<String, dynamic> meta = const {},
-  });
+  }) : super._();
 
-  factory PricePlanCreate.fromJson(Map<String, dynamic> json) {
-    return PricePlanCreate(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
-      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
-      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
-      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
-      maxUsers: json['max_users'] as int?,
-      products: json['products'] != null
-          ? Products.fromJson(json['products'] as Map<String, dynamic>)
-          : Products.nullProducts(),
-      allowedOrgs:
-          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
-      meta: BaseModelMixin._metaFromJson(json),
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'id': id};
-  }
+  factory PricePlanCreate.fromJson(String json) => PricePlanCreateMapper.fromJson(json);
+  factory PricePlanCreate.fromMap(Map<String, dynamic> map) => PricePlanCreateMapper.fromMap(map);
 }
 
 /// Price plan model
-class PricePlan extends PricePlanCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PricePlan extends PricePlanCreate with PricePlanMappable {
   final bool isPrivate;
   final String stripePriceId;
-  @override
-  final DatetimeUTC createdAt;
-  @override
-  final DatetimeUTC updatedAt;
 
   PricePlan({
     required super.id,
@@ -461,47 +368,17 @@ class PricePlan extends PricePlanCreate with TableBaseMixin {
     required super.maxUsers,
     required super.products,
     super.allowedOrgs,
-    super.meta,
     required this.isPrivate,
     required this.stripePriceId,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  factory PricePlan.fromJson(Map<String, dynamic> json) {
-    return PricePlan(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
-      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
-      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
-      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
-      maxUsers: json['max_users'] as int?,
-      products: json['products'] != null
-          ? Products.fromJson(json['products'] as Map<String, dynamic>)
-          : Products.nullProducts(),
-      allowedOrgs:
-          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
-      meta: BaseModelMixin._metaFromJson(json),
-      isPrivate: json['is_private'] as bool? ?? false,
-      stripePriceId: json['stripe_price_id'] as String? ?? '',
-      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
-      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'is_private': isPrivate,
-      'stripe_price_id': stripePriceId,
-    };
-  }
+  factory PricePlan.fromJson(String json) => PricePlanMapper.fromJson(json);
+  factory PricePlan.fromMap(Map<String, dynamic> map) => PricePlanMapper.fromMap(map);
 }
 
 /// Price plan read model
-class PricePlanRead extends PricePlan {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class PricePlanRead extends PricePlan with PricePlanReadMappable {
   PricePlanRead({
     required super.id,
     required super.name,
@@ -512,37 +389,16 @@ class PricePlanRead extends PricePlan {
     required super.maxUsers,
     required super.products,
     super.allowedOrgs,
-    super.meta,
     required super.isPrivate,
     required super.stripePriceId,
-    required super.createdAt,
-    required super.updatedAt,
   });
 
-  factory PricePlanRead.fromJson(Map<String, dynamic> json) {
-    return PricePlanRead(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      stripePriceIdLive: json['stripe_price_id_live'] as String? ?? '',
-      stripePriceIdTest: json['stripe_price_id_test'] as String? ?? '',
-      flatCost: (json['flat_cost'] as num?)?.toDouble() ?? 0.0,
-      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
-      maxUsers: json['max_users'] as int?,
-      products: json['products'] != null
-          ? Products.fromJson(json['products'] as Map<String, dynamic>)
-          : Products.nullProducts(),
-      allowedOrgs:
-          (json['allowed_orgs'] as List<dynamic>?)?.cast<String>() ?? [],
-      meta: BaseModelMixin._metaFromJson(json),
-      isPrivate: json['is_private'] as bool? ?? false,
-      stripePriceId: json['stripe_price_id'] as String? ?? '',
-      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
-      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
-    );
-  }
+  factory PricePlanRead.fromJson(String json) => PricePlanReadMapper.fromJson(json);
+  factory PricePlanRead.fromMap(Map<String, dynamic> map) => PricePlanReadMapper.fromMap(map);
 }
 
 /// On-prem provider enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum OnPremProvider {
   vllm("vllm"),
   vllmAmd("vllm_amd"),
@@ -558,6 +414,7 @@ enum OnPremProvider {
 }
 
 /// Cloud provider enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum CloudProvider {
   anthropic("anthropic"),
   azure("azure"),
@@ -588,6 +445,7 @@ enum CloudProvider {
 }
 
 /// Model provider enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ModelProvider {
   anthropic("anthropic"),
   cohere("cohere"),
@@ -604,6 +462,7 @@ enum ModelProvider {
 }
 
 /// Deployment status enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum DeploymentStatus {
   active("active");
 
@@ -612,9 +471,8 @@ enum DeploymentStatus {
 }
 
 /// Deployment update model
-class DeploymentUpdate with BaseModelMixin {
-  @override
-  final Map<String, dynamic> meta;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class DeploymentUpdate with DeploymentUpdateMappable {
   final String name;
   final String routingId;
   final String apiBase;
@@ -629,24 +487,15 @@ class DeploymentUpdate with BaseModelMixin {
     this.provider = "",
     this.weight = 1,
     required this.cooldownUntil,
-    this.meta = const {},
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'routing_id': routingId,
-      'api_base': apiBase,
-      'provider': provider,
-      'weight': weight,
-      'cooldown_until': cooldownUntil.toIso8601String(),
-      'meta': meta,
-    };
-  }
+  factory DeploymentUpdate.fromJson(String json) => DeploymentUpdateMapper.fromJson(json);
+  factory DeploymentUpdate.fromMap(Map<String, dynamic> map) => DeploymentUpdateMapper.fromMap(map);
 }
 
 /// Deployment create model
-class DeploymentCreate extends DeploymentUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class DeploymentCreate extends DeploymentUpdate with DeploymentCreateMappable {
   final String modelId;
 
   const DeploymentCreate({
@@ -657,17 +506,16 @@ class DeploymentCreate extends DeploymentUpdate {
     required super.provider,
     super.weight = 1,
     required super.cooldownUntil,
-    super.meta = const {},
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'model_id': modelId};
-  }
+  factory DeploymentCreate.fromJson(String json) => DeploymentCreateMapper.fromJson(json);
+  factory DeploymentCreate.fromMap(Map<String, dynamic> map) => DeploymentCreateMapper.fromMap(map);
 }
 
 /// Deployment model
-class Deployment extends DeploymentCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Deployment extends DeploymentCreate
+    with TableBaseMixin, DeploymentMappable {
   final String id;
   @override
   final DatetimeUTC createdAt;
@@ -683,19 +531,17 @@ class Deployment extends DeploymentCreate with TableBaseMixin {
     required super.provider,
     super.weight,
     required super.cooldownUntil,
-    super.meta,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'id': id};
-  }
+  factory Deployment.fromJson(String json) => DeploymentMapper.fromJson(json);
+  factory Deployment.fromMap(Map<String, dynamic> map) => DeploymentMapper.fromMap(map);
 }
 
 /// Deployment read model
-class DeploymentRead extends Deployment {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class DeploymentRead extends Deployment with DeploymentReadMappable {
   final ModelConfig model;
 
   DeploymentRead({
@@ -707,7 +553,6 @@ class DeploymentRead extends Deployment {
     required super.provider,
     super.weight,
     required super.cooldownUntil,
-    super.meta,
     required super.createdAt,
     required super.updatedAt,
     required this.model,
@@ -716,13 +561,12 @@ class DeploymentRead extends Deployment {
   /// Status of the deployment. Will always be "ACTIVE".
   String get status => DeploymentStatus.active.value;
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'model': model.toJson(), 'status': status};
-  }
+  factory DeploymentRead.fromJson(String json) => DeploymentReadMapper.fromJson(json);
+  factory DeploymentRead.fromMap(Map<String, dynamic> map) => DeploymentReadMapper.fromMap(map);
 }
 
 /// Model type enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ModelType {
   completion("completion"),
   llm("llm"),
@@ -734,6 +578,7 @@ enum ModelType {
 }
 
 /// Model capability enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ModelCapability {
   completion("completion"),
   chat("chat"),
@@ -749,7 +594,8 @@ enum ModelCapability {
 }
 
 /// Model info model
-class ModelInfo with BaseModelMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelInfo with ModelInfoMappable {
   final String id;
   final ModelType type;
   final String name;
@@ -770,25 +616,6 @@ class ModelInfo with BaseModelMixin {
     this.maxOutputTokens,
   });
 
-  static ModelInfo? fromJson(Map<String, dynamic> json) {
-    // Implementation needed
-    return null;
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type.value,
-      'name': name,
-      'owned_by': ownedBy,
-      'capabilities': capabilities.map((c) => c.value).toList(),
-      'context_length': contextLength,
-      'languages': languages,
-      'max_output_tokens': maxOutputTokens,
-      'meta': meta,
-    };
-  }
-
   Set<String> get capabilitiesSet => capabilities.map((c) => c.value).toSet();
 
   void validateId() {
@@ -798,10 +625,15 @@ class ModelInfo with BaseModelMixin {
       );
     }
   }
+
+  factory ModelInfo.fromJson(String json) => ModelInfoMapper.fromJson(json);
+  factory ModelInfo.fromMap(Map<String, dynamic> map) => ModelInfoMapper.fromMap(map);
 }
 
 /// Model info read model
-class ModelInfoRead extends ModelInfo with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelInfoRead extends ModelInfo
+    with TableBaseMixin, ModelInfoReadMappable {
   @override
   final DatetimeUTC createdAt;
   @override
@@ -820,37 +652,13 @@ class ModelInfoRead extends ModelInfo with TableBaseMixin {
     required this.updatedAt,
   });
 
-  factory ModelInfoRead.fromJson(Map<String, dynamic> json) {
-    return ModelInfoRead(
-      id: json['id'] ?? '',
-      type: ModelType.values.firstWhere(
-        (e) => e.value == json['type'],
-        orElse: () => ModelType.llm,
-      ),
-      name: json['name'] ?? '',
-      ownedBy: json['owned_by'] ?? '',
-      capabilities:
-          (json['capabilities'] as List<dynamic>?)
-              ?.map(
-                (c) => ModelCapability.values.firstWhere(
-                  (e) => e.value == c,
-                  orElse: () => ModelCapability.completion,
-                ),
-              )
-              .toList() ??
-          [],
-      contextLength: json['context_length'] ?? 4096,
-      languages:
-          (json['languages'] as List<dynamic>?)?.cast<String>() ?? const ["en"],
-      maxOutputTokens: json['max_output_tokens'],
-      createdAt: DatetimeUTC.parse(json['created_at'] ?? ''),
-      updatedAt: DatetimeUTC.parse(json['updated_at'] ?? ''),
-    );
-  }
+  factory ModelInfoRead.fromJson(String json) => ModelInfoReadMapper.fromJson(json);
+  factory ModelInfoRead.fromMap(Map<String, dynamic> map) => ModelInfoReadMapper.fromMap(map);
 }
 
 /// Model config update model
-class ModelConfigUpdate extends ModelInfo {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelConfigUpdate extends ModelInfo with ModelConfigUpdateMappable {
   final double timeout;
   final int priority;
   final List<String> allowedOrgs;
@@ -895,27 +703,14 @@ class ModelConfigUpdate extends ModelInfo {
     return embedSize;
   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'timeout': timeout,
-      'priority': priority,
-      'allowed_orgs': allowedOrgs,
-      'blocked_orgs': blockedOrgs,
-      'llm_input_cost_per_mtoken': llmInputCostPerMtoken,
-      'llm_output_cost_per_mtoken': llmOutputCostPerMtoken,
-      'embedding_size': embeddingSize,
-      'embedding_dimensions': embeddingDimensions,
-      'embedding_transform_query': embeddingTransformQuery,
-      'embedding_cost_per_mtoken': embeddingCostPerMtoken,
-      'reranking_cost_per_ksearch': rerankingCostPerKsearch,
-    };
-  }
+  factory ModelConfigUpdate.fromJson(String json) => ModelConfigUpdateMapper.fromJson(json);
+  factory ModelConfigUpdate.fromMap(Map<String, dynamic> map) => ModelConfigUpdateMapper.fromMap(map);
 }
 
 /// Model config create model
-class ModelConfigCreate extends ModelConfigUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelConfigCreate extends ModelConfigUpdate
+    with ModelConfigCreateMappable {
   const ModelConfigCreate({
     required super.id,
     required super.type,
@@ -937,10 +732,15 @@ class ModelConfigCreate extends ModelConfigUpdate {
     super.embeddingCostPerMtoken,
     super.rerankingCostPerKsearch,
   });
+
+  factory ModelConfigCreate.fromJson(String json) => ModelConfigCreateMapper.fromJson(json);
+  factory ModelConfigCreate.fromMap(Map<String, dynamic> map) => ModelConfigCreateMapper.fromMap(map);
 }
 
 /// Model config model
-class ModelConfig extends ModelConfigCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelConfig extends ModelConfigCreate
+    with TableBaseMixin, ModelConfigMappable {
   final bool isPrivate;
   @override
   final DatetimeUTC createdAt;
@@ -971,10 +771,14 @@ class ModelConfig extends ModelConfigCreate with TableBaseMixin {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory ModelConfig.fromJson(String json) => ModelConfigMapper.fromJson(json);
+  factory ModelConfig.fromMap(Map<String, dynamic> map) => ModelConfigMapper.fromMap(map);
 }
 
 /// Model config read model
-class ModelConfigRead extends ModelConfig {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelConfigRead extends ModelConfig with ModelConfigReadMappable {
   final List<Deployment> deployments;
   final bool isActive;
 
@@ -1004,9 +808,13 @@ class ModelConfigRead extends ModelConfig {
     required this.deployments,
     required this.isActive,
   });
+
+  factory ModelConfigRead.fromJson(String json) => ModelConfigReadMapper.fromJson(json);
+  factory ModelConfigRead.fromMap(Map<String, dynamic> map) => ModelConfigReadMapper.fromMap(map);
 }
 
 /// Role enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum Role {
   admin("ADMIN"),
   member("MEMBER"),
@@ -1019,6 +827,7 @@ enum Role {
 }
 
 /// Ranked role enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum RankedRole {
   guest(0),
   member(1),
@@ -1037,20 +846,19 @@ enum RankedRole {
 }
 
 /// Org member update model
-class OrgMemberUpdate with BaseModelMixin {
-  @override
-  final Map<String, dynamic> meta;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrgMemberUpdate with OrgMemberUpdateMappable {
   final Role role;
 
-  const OrgMemberUpdate({required this.role, this.meta = const {}});
+  const OrgMemberUpdate({required this.role});
 
-  Map<String, dynamic> toJson() {
-    return {'role': role.value, 'meta': meta};
-  }
+  factory OrgMemberUpdate.fromJson(String json) => OrgMemberUpdateMapper.fromJson(json);
+  factory OrgMemberUpdate.fromMap(Map<String, dynamic> map) => OrgMemberUpdateMapper.fromMap(map);
 }
 
 /// Org member create model
-class OrgMemberCreate extends OrgMemberUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrgMemberCreate extends OrgMemberUpdate with OrgMemberCreateMappable {
   final String userId;
   final String organizationId;
 
@@ -1058,21 +866,15 @@ class OrgMemberCreate extends OrgMemberUpdate {
     required this.userId,
     required this.organizationId,
     required super.role,
-    super.meta,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'user_id': userId,
-      'organization_id': organizationId,
-    };
-  }
+  factory OrgMemberCreate.fromJson(String json) => OrgMemberCreateMapper.fromJson(json);
+  factory OrgMemberCreate.fromMap(Map<String, dynamic> map) => OrgMemberCreateMapper.fromMap(map);
 }
 
 /// Org member model
-class OrgMember extends OrgMemberCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrgMember extends OrgMemberCreate with TableBaseMixin, OrgMemberMappable {
   @override
   final DatetimeUTC createdAt;
   @override
@@ -1082,14 +884,17 @@ class OrgMember extends OrgMemberCreate with TableBaseMixin {
     required super.userId,
     required super.organizationId,
     required super.role,
-    super.meta,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory OrgMember.fromJson(String json) => OrgMemberMapper.fromJson(json);
+  factory OrgMember.fromMap(Map<String, dynamic> map) => OrgMemberMapper.fromMap(map);
 }
 
 /// Org member read model
-class OrgMemberRead extends OrgMember {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrgMemberRead extends OrgMember with OrgMemberReadMappable {
   final User user;
   final Organization organization;
 
@@ -1097,29 +902,31 @@ class OrgMemberRead extends OrgMember {
     required super.userId,
     required super.organizationId,
     required super.role,
-    super.meta,
     required super.createdAt,
     required super.updatedAt,
     required this.user,
     required this.organization,
   });
+
+  factory OrgMemberRead.fromJson(String json) => OrgMemberReadMapper.fromJson(json);
+  factory OrgMemberRead.fromMap(Map<String, dynamic> map) => OrgMemberReadMapper.fromMap(map);
 }
 
 /// Project member update model
-class ProjectMemberUpdate with BaseModelMixin {
-  @override
-  final Map<String, dynamic> meta;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectMemberUpdate with ProjectMemberUpdateMappable {
   final Role role;
 
-  const ProjectMemberUpdate({required this.role, this.meta = const {}});
+  const ProjectMemberUpdate({required this.role});
 
-  Map<String, dynamic> toJson() {
-    return {'role': role.value, 'meta': meta};
-  }
+  factory ProjectMemberUpdate.fromJson(String json) => ProjectMemberUpdateMapper.fromJson(json);
+  factory ProjectMemberUpdate.fromMap(Map<String, dynamic> map) => ProjectMemberUpdateMapper.fromMap(map);
 }
 
 /// Project member create model
-class ProjectMemberCreate extends ProjectMemberUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectMemberCreate extends ProjectMemberUpdate
+    with ProjectMemberCreateMappable {
   final String userId;
   final String projectId;
 
@@ -1127,17 +934,16 @@ class ProjectMemberCreate extends ProjectMemberUpdate {
     required this.userId,
     required this.projectId,
     required super.role,
-    super.meta,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'user_id': userId, 'project_id': projectId};
-  }
+  factory ProjectMemberCreate.fromJson(String json) => ProjectMemberCreateMapper.fromJson(json);
+  factory ProjectMemberCreate.fromMap(Map<String, dynamic> map) => ProjectMemberCreateMapper.fromMap(map);
 }
 
 /// Project member model
-class ProjectMember extends ProjectMemberCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectMember extends ProjectMemberCreate
+    with TableBaseMixin, ProjectMemberMappable {
   @override
   final DatetimeUTC createdAt;
   @override
@@ -1147,14 +953,17 @@ class ProjectMember extends ProjectMemberCreate with TableBaseMixin {
     required super.userId,
     required super.projectId,
     required super.role,
-    super.meta,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory ProjectMember.fromJson(String json) => ProjectMemberMapper.fromJson(json);
+  factory ProjectMember.fromMap(Map<String, dynamic> map) => ProjectMemberMapper.fromMap(map);
 }
 
 /// Project member read model
-class ProjectMemberRead extends ProjectMember {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectMemberRead extends ProjectMember with ProjectMemberReadMappable {
   final User user;
   final Project project;
 
@@ -1162,16 +971,19 @@ class ProjectMemberRead extends ProjectMember {
     required super.userId,
     required super.projectId,
     required super.role,
-    super.meta,
     required super.createdAt,
     required super.updatedAt,
     required this.user,
     required this.project,
   });
+
+  factory ProjectMemberRead.fromJson(String json) => ProjectMemberReadMapper.fromJson(json);
+  factory ProjectMemberRead.fromMap(Map<String, dynamic> map) => ProjectMemberReadMapper.fromMap(map);
 }
 
 /// User base model
-class UserBase with BaseModelMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserBase with UserBaseMappable {
   final String name;
   final String email;
   final Uri? pictureUrl;
@@ -1206,30 +1018,13 @@ class UserBase with BaseModelMixin {
     this.githubUpdatedAt,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'email': email,
-      'picture_url': pictureUrl?.toString(),
-      'google_id': googleId,
-      'google_name': googleName,
-      'google_username': googleUsername,
-      'google_email': googleEmail,
-      'google_picture_url': googlePictureUrl?.toString(),
-      'google_updated_at': googleUpdatedAt?.toIso8601String(),
-      'github_id': githubId,
-      'github_name': githubName,
-      'github_username': githubUsername,
-      'github_email': githubEmail,
-      'github_picture_url': githubPictureUrl?.toString(),
-      'github_updated_at': githubUpdatedAt?.toIso8601String(),
-      'meta': meta,
-    };
-  }
+  factory UserBase.fromJson(String json) => UserBaseMapper.fromJson(json);
+  factory UserBase.fromMap(Map<String, dynamic> map) => UserBaseMapper.fromMap(map);
 }
 
 /// User update model
-class UserUpdate extends UserBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserUpdate extends UserBase with UserUpdateMappable {
   final String password;
 
   const UserUpdate({
@@ -1251,14 +1046,13 @@ class UserUpdate extends UserBase {
     super.githubUpdatedAt,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'password': password};
-  }
+  factory UserUpdate.fromJson(String json) => UserUpdateMapper.fromJson(json);
+  factory UserUpdate.fromMap(Map<String, dynamic> map) => UserUpdateMapper.fromMap(map);
 }
 
 /// User create model
-class UserCreate extends UserUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserCreate extends UserUpdate with UserCreateMappable {
   final String id;
 
   const UserCreate({
@@ -1281,14 +1075,13 @@ class UserCreate extends UserUpdate {
     super.githubUpdatedAt,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'id': id};
-  }
+  factory UserCreate.fromJson(String json) => UserCreateMapper.fromJson(json);
+  factory UserCreate.fromMap(Map<String, dynamic> map) => UserCreateMapper.fromMap(map);
 }
 
 /// User model
-class User extends UserBase with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class User extends UserBase with TableBaseMixin, UserMappable {
   final String id;
   final bool emailVerified;
   final String? passwordHash;
@@ -1330,24 +1123,13 @@ class User extends UserBase with TableBaseMixin {
     required this.updatedAt,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-      'email_verified': emailVerified,
-      'password_hash': passwordHash,
-      'refresh_counter': refreshCounter,
-      'preferred_name': preferredName,
-      'preferred_email': preferredEmail,
-      'preferred_picture_url': preferredPictureUrl?.toString(),
-      'preferred_username': preferredUsername,
-    };
-  }
+  factory User.fromJson(String json) => UserMapper.fromJson(json);
+  factory User.fromMap(Map<String, dynamic> map) => UserMapper.fromMap(map);
 }
 
 /// User auth model
-class UserAuth extends User {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserAuth extends User with UserAuthMappable {
   final List<OrgMember> orgMemberships;
   final List<ProjectMember> projMemberships;
 
@@ -1381,18 +1163,13 @@ class UserAuth extends User {
     required this.projMemberships,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'org_memberships': orgMemberships.map((m) => m.toJson()).toList(),
-      'proj_memberships': projMemberships.map((m) => m.toJson()).toList(),
-    };
-  }
+  factory UserAuth.fromJson(String json) => UserAuthMapper.fromJson(json);
+  factory UserAuth.fromMap(Map<String, dynamic> map) => UserAuthMapper.fromMap(map);
 }
 
 /// User read model
-class UserRead extends UserAuth {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserRead extends UserAuth with UserReadMappable {
   final List<Organization> organizations;
   final List<Project> projects;
 
@@ -1428,18 +1205,13 @@ class UserRead extends UserAuth {
     required this.projects,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'organizations': organizations.map((o) => o.toJson()).toList(),
-      'projects': projects.map((p) => p.toJson()).toList(),
-    };
-  }
+  factory UserRead.fromJson(String json) => UserReadMapper.fromJson(json);
+  factory UserRead.fromMap(Map<String, dynamic> map) => UserReadMapper.fromMap(map);
 }
 
 /// User read obscured model
-class UserReadObscured extends UserRead {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UserReadObscured extends UserRead with UserReadObscuredMappable {
   UserReadObscured({
     required super.id,
     super.name,
@@ -1476,16 +1248,12 @@ class UserReadObscured extends UserRead {
     return value != null ? "***" : null;
   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'password_hash': _obscurePasswordHash(passwordHash),
-    };
-  }
+  factory UserReadObscured.fromJson(String json) => UserReadObscuredMapper.fromJson(json);
+  factory UserReadObscured.fromMap(Map<String, dynamic> map) => UserReadObscuredMapper.fromMap(map);
 }
 
 /// Payment state enum
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum PaymentState {
   none("NONE"),
   success("SUCCESS"),
@@ -1497,7 +1265,8 @@ enum PaymentState {
 }
 
 /// Organization update model
-class OrganizationUpdate with BaseModelMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrganizationUpdate with OrganizationUpdateMappable {
   final String name;
   final FiatCurrency currency;
   final String? timezone;
@@ -1516,29 +1285,29 @@ class OrganizationUpdate with BaseModelMixin {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'currency': currency.code,
-      'timezone': timezone?.toString(),
-      'external_keys': externalKeys,
-      'meta': meta,
-    };
-  }
+  factory OrganizationUpdate.fromJson(String json) => OrganizationUpdateMapper.fromJson(json);
+  factory OrganizationUpdate.fromMap(Map<String, dynamic> map) => OrganizationUpdateMapper.fromMap(map);
 }
 
 /// Organization create model
-class OrganizationCreate extends OrganizationUpdate {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrganizationCreate extends OrganizationUpdate
+    with OrganizationCreateMappable {
   const OrganizationCreate({
     required super.name,
     required super.currency,
     super.timezone,
     super.externalKeys,
   });
+
+  factory OrganizationCreate.fromJson(String json) => OrganizationCreateMapper.fromJson(json);
+  factory OrganizationCreate.fromMap(Map<String, dynamic> map) => OrganizationCreateMapper.fromMap(map);
 }
 
 /// Organization model
-class Organization extends OrganizationCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Organization extends OrganizationCreate
+    with TableBaseMixin, OrganizationMappable {
   final String id;
   final String createdBy;
   final String owner;
@@ -1605,102 +1374,13 @@ class Organization extends OrganizationCreate with TableBaseMixin {
     required this.updatedAt,
   });
 
-  factory Organization.fromJson(Map<String, dynamic> json) {
-    return Organization(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      currency: FiatCurrency.fromCode(json['currency'] as String? ?? 'USD'),
-      timezone: json['timezone'] as String?,
-      externalKeys:
-          (json['external_keys'] as Map<String, dynamic>?)
-              ?.cast<String, String>() ??
-          {},
-      createdBy: json['created_by'] as String? ?? '',
-      owner: json['owner'] as String? ?? '',
-      stripeId: json['stripe_id'] as String?,
-      pricePlanId: json['price_plan_id'] as String?,
-      paymentState: PaymentState.values.firstWhere(
-        (e) => e.value == json['payment_state'],
-        orElse: () => PaymentState.none,
-      ),
-      lastSubscriptionPaymentAt: json['last_subscription_payment_at'] != null
-          ? DatetimeUTC.parse(json['last_subscription_payment_at'] as String)
-          : null,
-      quotaResetAt: TableBaseMixin._parseDateTime(
-        json['quota_reset_at'] as String?,
-      ),
-      credit: (json['credit'] as num?)?.toDouble() ?? 0.0,
-      creditGrant: (json['credit_grant'] as num?)?.toDouble() ?? 0.0,
-      llmTokensQuotaMtok: (json['llm_tokens_quota_mtok'] as num?)?.toDouble(),
-      llmTokensUsageMtok:
-          (json['llm_tokens_usage_mtok'] as num?)?.toDouble() ?? 0.0,
-      embeddingTokensQuotaMtok: (json['embedding_tokens_quota_mtok'] as num?)
-          ?.toDouble(),
-      embeddingTokensUsageMtok:
-          (json['embedding_tokens_usage_mtok'] as num?)?.toDouble() ?? 0.0,
-      rerankerQuotaKsearch: (json['reranker_quota_ksearch'] as num?)
-          ?.toDouble(),
-      rerankerUsageKsearch:
-          (json['reranker_usage_ksearch'] as num?)?.toDouble() ?? 0.0,
-      dbQuotaGib: (json['db_quota_gib'] as num?)?.toDouble(),
-      dbUsageGib: (json['db_usage_gib'] as num?)?.toDouble() ?? 0.0,
-      dbUsageUpdatedAt: TableBaseMixin._parseDateTime(
-        json['db_usage_updated_at'] as String?,
-      ),
-      fileQuotaGib: (json['file_quota_gib'] as num?)?.toDouble(),
-      fileUsageGib: (json['file_usage_gib'] as num?)?.toDouble() ?? 0.0,
-      fileUsageUpdatedAt: TableBaseMixin._parseDateTime(
-        json['file_usage_updated_at'] as String?,
-      ),
-      egressQuotaGib: (json['egress_quota_gib'] as num?)?.toDouble(),
-      egressUsageGib: (json['egress_usage_gib'] as num?)?.toDouble() ?? 0.0,
-      active: json['active'] as bool? ?? false,
-      quotas:
-          (json['quotas'] as Map<String, dynamic>?)
-              ?.cast<String, Map<String, double?>>() ??
-          {},
-      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
-      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-      'created_by': createdBy,
-      'owner': owner,
-      'stripe_id': stripeId,
-      'price_plan_id': pricePlanId,
-      'payment_state': paymentState.value,
-      'last_subscription_payment_at': lastSubscriptionPaymentAt
-          ?.toIso8601String(),
-      'quota_reset_at': quotaResetAt.toIso8601String(),
-      'credit': credit,
-      'credit_grant': creditGrant,
-      'llm_tokens_quota_mtok': llmTokensQuotaMtok,
-      'llm_tokens_usage_mtok': llmTokensUsageMtok,
-      'embedding_tokens_quota_mtok': embeddingTokensQuotaMtok,
-      'embedding_tokens_usage_mtok': embeddingTokensUsageMtok,
-      'reranker_quota_ksearch': rerankerQuotaKsearch,
-      'reranker_usage_ksearch': rerankerUsageKsearch,
-      'db_quota_gib': dbQuotaGib,
-      'db_usage_gib': dbUsageGib,
-      'db_usage_updated_at': dbUsageUpdatedAt.toIso8601String(),
-      'file_quota_gib': fileQuotaGib,
-      'file_usage_gib': fileUsageGib,
-      'file_usage_updated_at': fileUsageUpdatedAt.toIso8601String(),
-      'egress_quota_gib': egressQuotaGib,
-      'egress_usage_gib': egressUsageGib,
-      'active': active,
-      'quotas': quotas,
-    };
-  }
+  factory Organization.fromJson(String json) => OrganizationMapper.fromJson(json);
+  factory Organization.fromMap(Map<String, dynamic> map) => OrganizationMapper.fromMap(map);
 }
 
 /// Organization read model
-class OrganizationRead extends Organization {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class OrganizationRead extends Organization with OrganizationReadMappable {
   final PricePlan? pricePlan;
 
   OrganizationRead({
@@ -1739,46 +1419,93 @@ class OrganizationRead extends Organization {
     this.pricePlan,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'price_plan': pricePlan?.toJson()};
-  }
+  factory OrganizationRead.fromJson(String json) => OrganizationReadMapper.fromJson(json);
+  factory OrganizationRead.fromMap(Map<String, dynamic> map) => OrganizationReadMapper.fromMap(map);
 }
 
 /// Project update model
-class ProjectUpdate with BaseModelMixin {
-  @override
-  final Map<String, dynamic> meta;
-  final String? name;
-  final Map<String, dynamic>? quotas;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectUpdate with ProjectUpdateMappable {
+  final SanitizedNonEmptyString name;
+  final SanitizedMultilineString description;
+  final List<String> tags;
+  final String? profilePictureUrl;
+  final String? coverPictureUrl;
 
-  const ProjectUpdate({this.name, Map<String, dynamic>? meta, this.quotas})
-    : meta = meta ?? const {};
-
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'meta': meta, 'quotas': quotas};
+  factory ProjectUpdate({
+    required SanitizedNonEmptyString name,
+    SanitizedMultilineString? description,
+    List<String>? tags,
+    String? profilePictureUrl,
+    String? coverPictureUrl,
+  }) {
+    final descriptionValue = description ?? SanitizedMultilineString('');
+    return ProjectUpdate._(
+      name: name,
+      description: descriptionValue,
+      tags: tags ?? [],
+      profilePictureUrl: profilePictureUrl,
+      coverPictureUrl: coverPictureUrl,
+    );
   }
-}
 
-/// Project create model
-class ProjectCreate extends ProjectUpdate {
-  final String organizationId;
-
-  const ProjectCreate({
-    required this.organizationId,
-    required String super.name,
-    Map<String, dynamic> super.meta = const {},
-    super.quotas,
+  const ProjectUpdate._({
+    required this.name,
+    required this.description,
+    this.tags = const [],
+    this.profilePictureUrl,
+    this.coverPictureUrl,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'organization_id': organizationId};
-  }
+  factory ProjectUpdate.fromJson(String json) => ProjectUpdateMapper.fromJson(json);
+  factory ProjectUpdate.fromMap(Map<String, dynamic> map) => ProjectUpdateMapper.fromMap(map);
 }
 
-/// Project model
-class Project extends ProjectCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectCreate extends ProjectUpdate with ProjectCreateMappable {
+  final String organizationId;
+
+  const ProjectCreate._({
+    required this.organizationId,
+    required super.name,
+    required super.description,
+    super.tags,
+    super.profilePictureUrl,
+    super.coverPictureUrl,
+  }) : super._();
+
+  factory ProjectCreate({
+    required String organizationId,
+    required SanitizedNonEmptyString name,
+    SanitizedMultilineString? description,
+    List<String>? tags,
+    String? profilePictureUrl,
+    String? coverPictureUrl,
+  }) {
+    final parent = ProjectUpdate(
+      name: name,
+      description: description,
+      tags: tags,
+      profilePictureUrl: profilePictureUrl,
+      coverPictureUrl: coverPictureUrl,
+    );
+
+    return ProjectCreate._(
+      organizationId: organizationId,
+      name: parent.name,
+      description: parent.description,
+      tags: parent.tags,
+      profilePictureUrl: parent.profilePictureUrl,
+      coverPictureUrl: parent.coverPictureUrl,
+    );
+  }
+
+  factory ProjectCreate.fromJson(String json) => ProjectCreateMapper.fromJson(json);
+  factory ProjectCreate.fromMap(Map<String, dynamic> map) => ProjectCreateMapper.fromMap(map);
+}
+
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class Project extends ProjectCreate with TableBaseMixin, ProjectMappable {
   final String id;
   final String createdBy;
   final String owner;
@@ -1787,141 +1514,251 @@ class Project extends ProjectCreate with TableBaseMixin {
   @override
   final DatetimeUTC updatedAt;
 
-  const Project({
+  // 1. Private Named Constructor:
+  // This constructor can call the parent's private constructor (ProjectCreate._)
+  const Project._({
     required this.id,
     required super.organizationId,
     required super.name,
-    super.meta,
-    super.quotas,
+    required super.description, // must be required here
+    super.tags,
+    super.profilePictureUrl,
+    super.coverPictureUrl,
     required this.createdBy,
     required this.owner,
     required this.createdAt,
     required this.updatedAt,
-  });
+  }) : super._(); // Calls the private ProjectCreate._ constructor
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'id': id,
-      'created_by': createdBy,
-      'owner': owner,
-    };
+  // 2. Public Factory Constructor:
+  // This constructor calls the parent's public factory constructor (ProjectCreate)
+  factory Project({
+    required String id,
+    required String organizationId,
+    required SanitizedNonEmptyString name,
+    SanitizedMultilineString? description,
+    List<String>? tags,
+    String? profilePictureUrl,
+    String? coverPictureUrl,
+    required String createdBy,
+    required String owner,
+    required DatetimeUTC createdAt,
+    required DatetimeUTC updatedAt,
+  }) {
+    // A. Use the parent's public factory to handle its fields and logic
+    final parent = ProjectCreate(
+      organizationId: organizationId,
+      name: name,
+      description: description,
+      tags: tags,
+      profilePictureUrl: profilePictureUrl,
+      coverPictureUrl: coverPictureUrl,
+    );
+
+    // B. Use the private constructor to build the final Project instance
+    return Project._(
+      id: id,
+      organizationId: parent.organizationId,
+      name: parent.name,
+      description: parent.description,
+      tags: parent.tags,
+      profilePictureUrl: parent.profilePictureUrl,
+      coverPictureUrl: parent.coverPictureUrl,
+      createdBy: createdBy,
+      owner: owner,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
   }
+
+  factory Project.fromJson(String json) => ProjectMapper.fromJson(json);
+  factory Project.fromMap(Map<String, dynamic> map) => ProjectMapper.fromMap(map);
 }
 
-/// Project read model
-class ProjectRead extends Project {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectRead extends Project with ProjectReadMappable {
   final Organization? organization;
   final List<TableMetaResponse>? chatAgents;
 
-  ProjectRead({
+  // 1. Private Named Constructor:
+  // This generative constructor is used internally and can call the parent's private constructor (Project._)
+  const ProjectRead._({
     required super.id,
-    required super.name,
-    super.meta,
-    super.quotas,
     required super.organizationId,
+    required super.name,
+    required super.description, // Inherited field needed for Project._
+    super.tags, // Inherited field needed for Project._
+    super.profilePictureUrl, // Inherited field needed for Project._
+    super.coverPictureUrl, // Inherited field needed for Project._
     required super.createdBy,
     required super.owner,
     required super.createdAt,
     required super.updatedAt,
     this.organization,
     this.chatAgents,
-  });
+  }) : super._(); // Calls the private Project._ constructor
 
-  factory ProjectRead.fromJson(Map<String, dynamic> json) {
-    return ProjectRead(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      meta: json['meta'] ?? const {},
-      quotas: json['quotas'],
-      organizationId: json['organization_id'] ?? '',
-      createdBy: json['created_by'] ?? '',
-      owner: json['owner'] ?? '',
-      createdAt: DatetimeUTC.parse(json['created_at'] ?? ''),
-      updatedAt: DatetimeUTC.parse(json['updated_at'] ?? ''),
-      organization: json['organization'] != null
-          ? Organization.fromJson(json['organization'])
-          : null,
-      chatAgents: json['chat_agents'] != null
-          ? (json['chat_agents'] as List)
-                .map(
-                  (e) => TableMetaResponse.fromJson(e as Map<String, dynamic>),
-                )
-                .toList()
-          : null,
+  // 2. Public Factory Constructor:
+  // This is the public entry point, calling the parent's public factory constructor (Project)
+  factory ProjectRead({
+    required String id,
+    required String organizationId,
+    required SanitizedNonEmptyString name,
+    SanitizedMultilineString? description, // Passed to parent
+    List<String>? tags, // Passed to parent
+    String? profilePictureUrl, // Passed to parent
+    String? coverPictureUrl, // Passed to parent
+    required String createdBy,
+    required String owner,
+    required DatetimeUTC createdAt,
+    required DatetimeUTC updatedAt,
+    Organization? organization,
+    List<TableMetaResponse>? chatAgents,
+  }) {
+    // A. Use the parent's public factory to handle its fields and complex initialization (Project -> ProjectCreate -> ProjectUpdate)
+    final parent = Project(
+      id: id,
+      organizationId: organizationId,
+      name: name,
+      description: description,
+      tags: tags,
+      profilePictureUrl: profilePictureUrl,
+      coverPictureUrl: coverPictureUrl,
+      createdBy: createdBy,
+      owner: owner,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+
+    // B. Use the private constructor to build the final ProjectRead instance
+    return ProjectRead._(
+      id: parent.id,
+      organizationId: parent.organizationId,
+      name: parent.name,
+      description: parent.description,
+      tags: parent.tags,
+      profilePictureUrl: parent.profilePictureUrl,
+      coverPictureUrl: parent.coverPictureUrl,
+      createdBy: parent.createdBy,
+      owner: parent.owner,
+      createdAt: parent.createdAt,
+      updatedAt: parent.updatedAt,
+      organization: organization,
+      chatAgents: chatAgents,
     );
   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'organization': organization?.toJson(),
-      'chat_agents': chatAgents?.map((agent) => agent.toJson()).toList(),
-    };
-  }
+  factory ProjectRead.fromJson(String json) => ProjectReadMapper.fromJson(json);
+  factory ProjectRead.fromMap(Map<String, dynamic> map) => ProjectReadMapper.fromMap(map);
 }
 
 /// Verification code update model
-class VerificationCodeUpdate with BaseModelMixin {
-  @override
-  final Map<String, dynamic> meta;
-  final String name;
-  final String? role;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class VerificationCodeUpdate with VerificationCodeUpdateMappable {
+  final SanitizedString name;
+  final SanitizedNonEmptyString? role;
 
-  const VerificationCodeUpdate({
-    this.name = "",
-    this.role,
-    this.meta = const {},
-  });
-
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'role': role, 'meta': meta};
+  factory VerificationCodeUpdate({
+    SanitizedString? name,
+    SanitizedNonEmptyString? role,
+  }) {
+    return VerificationCodeUpdate._(
+      name: name ?? SanitizedString(''),
+      role: role,
+    );
   }
+  const VerificationCodeUpdate._({required this.name, this.role});
+
+  factory VerificationCodeUpdate.fromJson(String json) => VerificationCodeUpdateMapper.fromJson(json);
+  factory VerificationCodeUpdate.fromMap(Map<String, dynamic> map) => VerificationCodeUpdateMapper.fromMap(map);
 }
 
 /// Verification code create model
-class VerificationCodeCreate extends VerificationCodeUpdate {
-  final String userEmail;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class VerificationCodeCreate extends VerificationCodeUpdate
+    with VerificationCodeCreateMappable {
+  final SanitizedNonEmptyString userEmail;
   final DatetimeUTC expiry;
-  final String? organizationId;
-  final String? projectId;
+  final SanitizedNonEmptyString? organizationId;
+  final SanitizedNonEmptyString? projectId;
 
-  const VerificationCodeCreate({
-    super.name,
+  factory VerificationCodeCreate({
+    required SanitizedNonEmptyString userEmail,
+    required DatetimeUTC expiry,
+    SanitizedNonEmptyString? organizationId,
+    SanitizedNonEmptyString? projectId,
+    SanitizedString? name,
+    SanitizedNonEmptyString? role,
+  }) {
+    final parent = VerificationCodeUpdate(name: name, role: role);
+
+    return VerificationCodeCreate._(
+      userEmail: userEmail,
+      expiry: expiry,
+      organizationId: organizationId,
+      projectId: projectId,
+      name: parent.name,
+      role: parent.role,
+    );
+  }
+  const VerificationCodeCreate._({
+    required super.name,
     super.role,
-    super.meta,
     required this.userEmail,
     required this.expiry,
     this.organizationId,
     this.projectId,
-  });
+  }) : super._();
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'user_email': userEmail,
-      'expiry': expiry.toIso8601String(),
-      'organization_id': organizationId,
-      'project_id': projectId,
-    };
-  }
+  factory VerificationCodeCreate.fromJson(String json) => VerificationCodeCreateMapper.fromJson(json);
+  factory VerificationCodeCreate.fromMap(Map<String, dynamic> map) => VerificationCodeCreateMapper.fromMap(map);
 }
 
 /// Verification code model
-class VerificationCode extends VerificationCodeCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class VerificationCode extends VerificationCodeCreate
+    with TableBaseMixin, VerificationCodeMappable {
   final String id;
   @override
   final DatetimeUTC createdAt;
   @override
   final DatetimeUTC updatedAt;
 
-  const VerificationCode({
-    super.name,
+  factory VerificationCode({
+    required String id,
+    required SanitizedNonEmptyString userEmail,
+    required DatetimeUTC expiry,
+    SanitizedNonEmptyString? organizationId,
+    SanitizedNonEmptyString? projectId,
+    SanitizedString? name,
+    SanitizedNonEmptyString? role,
+    required DatetimeUTC createdAt,
+    required DatetimeUTC updatedAt,
+  }) {
+    final parent = VerificationCodeCreate(
+      userEmail: userEmail,
+      expiry: expiry,
+      organizationId: organizationId,
+      projectId: projectId,
+      name: name,
+      role: role,
+    );
+
+    return VerificationCode._(
+      id: id,
+      name: parent.name,
+      role: parent.role,
+      userEmail: parent.userEmail,
+      expiry: parent.expiry,
+      organizationId: parent.organizationId,
+      projectId: parent.projectId,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+  const VerificationCode._({
+    required super.name,
     super.role,
-    super.meta,
     required super.userEmail,
     required super.expiry,
     super.organizationId,
@@ -1929,20 +1766,51 @@ class VerificationCode extends VerificationCodeCreate with TableBaseMixin {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
-  });
+  }) : super._();
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'id': id};
-  }
+  factory VerificationCode.fromJson(String json) => VerificationCodeMapper.fromJson(json);
+  factory VerificationCode.fromMap(Map<String, dynamic> map) => VerificationCodeMapper.fromMap(map);
 }
 
 /// Verification code read model
-class VerificationCodeRead extends VerificationCode {
-  VerificationCodeRead({
-    super.name,
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class VerificationCodeRead extends VerificationCode
+    with VerificationCodeReadMappable {
+  factory VerificationCodeRead({
+    required String id,
+    required SanitizedNonEmptyString userEmail,
+    required DatetimeUTC expiry,
+    SanitizedNonEmptyString? organizationId,
+    SanitizedNonEmptyString? projectId,
+    SanitizedString? name,
+    SanitizedNonEmptyString? role,
+    required DatetimeUTC createdAt,
+    required DatetimeUTC updatedAt,
+  }) {
+    final parent = VerificationCodeCreate(
+      userEmail: userEmail,
+      expiry: expiry,
+      organizationId: organizationId,
+      projectId: projectId,
+      name: name,
+      role: role,
+    );
+
+    return VerificationCodeRead._(
+      name: parent.name,
+      role: parent.role,
+      userEmail: parent.userEmail,
+      expiry: parent.expiry,
+      organizationId: parent.organizationId,
+      projectId: parent.projectId,
+      id: id,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+  VerificationCodeRead._({
+    required super.name,
     super.role,
-    super.meta,
     required super.userEmail,
     required super.expiry,
     super.organizationId,
@@ -1950,50 +1818,39 @@ class VerificationCodeRead extends VerificationCode {
     required super.id,
     required super.createdAt,
     required super.updatedAt,
-  });
+  }) : super._();
 
-  factory VerificationCodeRead.fromJson(Map<String, dynamic> json) {
-    return VerificationCodeRead(
-      name: json['name'] as String? ?? '',
-      role: json['role'] as String?,
-      meta: BaseModelMixin._metaFromJson(json),
-      userEmail: json['user_email'] as String? ?? '',
-      expiry: DatetimeUTC.parse(json['expiry'] as String? ?? ''),
-      organizationId: json['organization_id'] as String?,
-      projectId: json['project_id'] as String?,
-      id: json['id'] as String? ?? '',
-      createdAt: TableBaseMixin._parseDateTime(json['created_at'] as String?),
-      updatedAt: TableBaseMixin._parseDateTime(json['updated_at'] as String?),
-    );
-  }
+  factory VerificationCodeRead.fromJson(String json) => VerificationCodeReadMapper.fromJson(json);
+  factory VerificationCodeRead.fromMap(Map<String, dynamic> map) => VerificationCodeReadMapper.fromMap(map);
 }
 
 /// Project key update model
-class ProjectKeyUpdate with BaseModelMixin {
-  final String name;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectKeyUpdate with ProjectKeyUpdateMappable {
+  final SanitizedNonEmptyString name;
   final DatetimeUTC? expiry;
 
-  const ProjectKeyUpdate({this.name = "", this.expiry});
+  const ProjectKeyUpdate({required this.name, this.expiry});
 
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'expiry': expiry?.toIso8601String(), 'meta': meta};
-  }
+  factory ProjectKeyUpdate.fromJson(String json) => ProjectKeyUpdateMapper.fromJson(json);
+  factory ProjectKeyUpdate.fromMap(Map<String, dynamic> map) => ProjectKeyUpdateMapper.fromMap(map);
 }
 
 /// Project key create model
-class ProjectKeyCreate extends ProjectKeyUpdate {
-  final String? projectId;
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectKeyCreate extends ProjectKeyUpdate with ProjectKeyCreateMappable {
+  final SanitizedNonEmptyString? projectId;
 
   const ProjectKeyCreate({required super.name, super.expiry, this.projectId});
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'project_id': projectId};
-  }
+  factory ProjectKeyCreate.fromJson(String json) => ProjectKeyCreateMapper.fromJson(json);
+  factory ProjectKeyCreate.fromMap(Map<String, dynamic> map) => ProjectKeyCreateMapper.fromMap(map);
 }
 
 /// Project key model
-class ProjectKey extends ProjectKeyCreate with TableBaseMixin {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectKey extends ProjectKeyCreate
+    with TableBaseMixin, ProjectKeyMappable {
   final String id;
   final String userId;
   @override
@@ -2002,7 +1859,7 @@ class ProjectKey extends ProjectKeyCreate with TableBaseMixin {
   final DatetimeUTC updatedAt;
 
   const ProjectKey({
-    super.name = "",
+    required super.name,
     super.expiry,
     super.projectId,
     required this.id,
@@ -2011,16 +1868,15 @@ class ProjectKey extends ProjectKeyCreate with TableBaseMixin {
     required this.updatedAt,
   });
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {...super.toJson(), 'id': id, 'user_id': userId};
-  }
+  factory ProjectKey.fromJson(String json) => ProjectKeyMapper.fromJson(json);
+  factory ProjectKey.fromMap(Map<String, dynamic> map) => ProjectKeyMapper.fromMap(map);
 }
 
 /// Project key read model
-class ProjectKeyRead extends ProjectKey {
-  ProjectKeyRead({
-    String name = "",
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ProjectKeyRead extends ProjectKey with ProjectKeyReadMappable {
+  const ProjectKeyRead({
+    required super.name,
     super.expiry,
     super.projectId,
     required super.id,
@@ -2028,4 +1884,7 @@ class ProjectKeyRead extends ProjectKey {
     required super.createdAt,
     required super.updatedAt,
   });
+
+  factory ProjectKeyRead.fromJson(String json) => ProjectKeyReadMapper.fromJson(json);
+  factory ProjectKeyRead.fromMap(Map<String, dynamic> map) => ProjectKeyReadMapper.fromMap(map);
 }

@@ -194,6 +194,9 @@ class Chunk with ChunkMappable {
     this.context = const {},
     this.metadata = const {},
   });
+  
+  factory Chunk.fromJson(String json) => ChunkMapper.fromJson(json);
+  factory Chunk.fromMap(Map<String, dynamic> map) => ChunkMapper.fromMap(map);
 }
 
 /// Split chunks parameters
@@ -208,6 +211,9 @@ class SplitChunksParams with SplitChunksParamsMappable {
     this.chunkSize = 1000,
     this.chunkOverlap = 200,
   });
+  
+  factory SplitChunksParams.fromJson(String json) => SplitChunksParamsMapper.fromJson(json);
+  factory SplitChunksParams.fromMap(Map<String, dynamic> map) => SplitChunksParamsMapper.fromMap(map);
 }
 
 /// References for RAG responses
@@ -224,6 +230,9 @@ class References with ReferencesMappable {
     required this.searchQuery,
     this.finishReason,
   });
+  
+  factory References.fromJson(String json) => ReferencesMapper.fromJson(json);
+  factory References.fromMap(Map<String, dynamic> map) => ReferencesMapper.fromMap(map);
 }
 
 /// RAG parameters
@@ -260,6 +269,9 @@ class FunctionCall with FunctionCallMappable {
   final String arguments;
 
   const FunctionCall({required this.name, required this.arguments});
+  
+  factory FunctionCall.fromJson(String json) => FunctionCallMapper.fromJson(json);
+  factory FunctionCall.fromMap(Map<String, dynamic> map) => FunctionCallMapper.fromMap(map);
 }
 
 /// Audio response
@@ -276,6 +288,9 @@ class AudioResponse with AudioResponseMappable {
     required this.data,
     required this.transcript,
   });
+  
+  factory AudioResponse.fromJson(String json) => AudioResponseMapper.fromJson(json);
+  factory AudioResponse.fromMap(Map<String, dynamic> map) => AudioResponseMapper.fromMap(map);
 }
 
 /// Chat completion delta
@@ -294,6 +309,9 @@ class ChatCompletionDelta with ChatCompletionDeltaMappable {
     this.refusal,
     this.toolCalls,
   });
+  
+  factory ChatCompletionDelta.fromJson(String json) => ChatCompletionDeltaMapper.fromJson(json);
+  factory ChatCompletionDelta.fromMap(Map<String, dynamic> map) => ChatCompletionDeltaMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -313,6 +331,9 @@ class ChatCompletionMessage with ChatCompletionMessageMappable {
     this.toolCalls,
     this.audio,
   });
+  
+  factory ChatCompletionMessage.fromJson(String json) => ChatCompletionMessageMapper.fromJson(json);
+  factory ChatCompletionMessage.fromMap(Map<String, dynamic> map) => ChatCompletionMessageMapper.fromMap(map);
 }
 
 /// Log probability token
@@ -327,6 +348,9 @@ class LogProbToken with LogProbTokenMappable {
     required this.logprob,
     required this.bytes,
   });
+  
+  factory LogProbToken.fromJson(String json) => LogProbTokenMapper.fromJson(json);
+  factory LogProbToken.fromMap(Map<String, dynamic> map) => LogProbTokenMapper.fromMap(map);
 }
 
 /// Log probabilities
@@ -336,6 +360,9 @@ class LogProbs with LogProbsMappable {
   final List<LogProbToken> refusal;
 
   const LogProbs({required this.content, required this.refusal});
+  
+  factory LogProbs.fromJson(String json) => LogProbsMapper.fromJson(json);
+  factory LogProbs.fromMap(Map<String, dynamic> map) => LogProbsMapper.fromMap(map);
 }
 
 /// Chat completion choice
@@ -354,6 +381,9 @@ class ChatCompletionChoice with ChatCompletionChoiceMappable {
     this.logprobs,
     this.finishReason,
   });
+  
+  factory ChatCompletionChoice.fromJson(String json) => ChatCompletionChoiceMapper.fromJson(json);
+  factory ChatCompletionChoice.fromMap(Map<String, dynamic> map) => ChatCompletionChoiceMapper.fromMap(map);
 }
 
 /// Zero if none int type
@@ -366,6 +396,9 @@ class PromptUsageDetails with PromptUsageDetailsMappable {
   final int audioTokens;
 
   const PromptUsageDetails({this.cachedTokens = 0, this.audioTokens = 0});
+  
+  factory PromptUsageDetails.fromJson(String json) => PromptUsageDetailsMapper.fromJson(json);
+  factory PromptUsageDetails.fromMap(Map<String, dynamic> map) => PromptUsageDetailsMapper.fromMap(map);
 }
 
 /// Completion usage details
@@ -382,6 +415,9 @@ class CompletionUsageDetails with CompletionUsageDetailsMappable {
     this.acceptedPredictionTokens = 0,
     this.rejectedPredictionTokens = 0,
   });
+  
+  factory CompletionUsageDetails.fromJson(String json) => CompletionUsageDetailsMapper.fromJson(json);
+  factory CompletionUsageDetails.fromMap(Map<String, dynamic> map) => CompletionUsageDetailsMapper.fromMap(map);
 }
 
 /// Tool usage details
@@ -394,6 +430,9 @@ class ToolUsageDetails with ToolUsageDetailsMappable {
     this.webSearchCalls = 0,
     this.codeInterpreterCalls = 0,
   });
+  
+  factory ToolUsageDetails.fromJson(String json) => ToolUsageDetailsMapper.fromJson(json);
+  factory ToolUsageDetails.fromMap(Map<String, dynamic> map) => ToolUsageDetailsMapper.fromMap(map);
 }
 
 /// Function parameters
@@ -410,6 +449,9 @@ class FunctionParameters with FunctionParametersMappable {
     this.required = const [],
     this.additionalProperties = false,
   });
+  
+  factory FunctionParameters.fromJson(String json) => FunctionParametersMapper.fromJson(json);
+  factory FunctionParameters.fromMap(Map<String, dynamic> map) => FunctionParametersMapper.fromMap(map);
 }
 
 /// Tool function
@@ -426,6 +468,9 @@ class ToolFunction with ToolFunctionMappable {
     this.parameters,
     this.strict = false,
   });
+  
+  factory ToolFunction.fromJson(String json) => ToolFunctionMapper.fromJson(json);
+  factory ToolFunction.fromMap(Map<String, dynamic> map) => ToolFunctionMapper.fromMap(map);
 }
 
 // 1. Main Union Class: Tool
@@ -461,6 +506,9 @@ class ToolChoiceFunction with ToolChoiceFunctionMappable {
   final String name;
 
   const ToolChoiceFunction({required this.name});
+  
+  factory ToolChoiceFunction.fromJson(String json) => ToolChoiceFunctionMapper.fromJson(json);
+  factory ToolChoiceFunction.fromMap(Map<String, dynamic> map) => ToolChoiceFunctionMapper.fromMap(map);
 }
 
 /// Tool call function
@@ -470,6 +518,9 @@ class ToolCallFunction with ToolCallFunctionMappable {
   final String? name;
 
   const ToolCallFunction({required this.arguments, this.name});
+  
+  factory ToolCallFunction.fromJson(String json) => ToolCallFunctionMapper.fromJson(json);
+  factory ToolCallFunction.fromMap(Map<String, dynamic> map) => ToolCallFunctionMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -483,6 +534,9 @@ class ToolCall with ToolCallMappable {
     this.type = ToolType.function,
     required this.function,
   });
+  
+  factory ToolCall.fromJson(String json) => ToolCallMapper.fromJson(json);
+  factory ToolCall.fromMap(Map<String, dynamic> map) => ToolCallMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -494,6 +548,9 @@ class ToolChoice with ToolChoiceMappable {
     this.type = ToolChoiceType.function,
     required this.function,
   });
+  
+  factory ToolChoice.fromJson(String json) => ToolChoiceMapper.fromJson(json);
+  factory ToolChoice.fromMap(Map<String, dynamic> map) => ToolChoiceMapper.fromMap(map);
 }
 
 sealed class ToolChoiceOption {
@@ -618,6 +675,7 @@ class ChatRequestBase with ChatRequestBaseMappable {
     return map; // Return the modified map
   }
 }
+
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class Niama extends ChatRequestBase with NiamaMappable {
   final GenConfigTypes object;
@@ -649,6 +707,7 @@ class Niama extends ChatRequestBase with NiamaMappable {
     this.multiTurn = false,
   });
 }
+
 /// Chat request
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class ChatRequest with ChatRequestMappable {
@@ -767,6 +826,9 @@ class EmbeddingRequest with EmbeddingRequestMappable {
     this.type = EmbeddingType.document,
     this.encodingFormat = EncodingFormat.float,
   });
+  
+  factory EmbeddingRequest.fromJson(String json) => EmbeddingRequestMapper.fromJson(json);
+  factory EmbeddingRequest.fromMap(Map<String, dynamic> map) => EmbeddingRequestMapper.fromMap(map);
 }
 
 /// Embedding response data
@@ -782,6 +844,9 @@ class EmbeddingResponseData with EmbeddingResponseDataMappable {
     required this.embedding,
     this.index = 0,
   });
+  
+  factory EmbeddingResponseData.fromJson(String json) => EmbeddingResponseDataMapper.fromJson(json);
+  factory EmbeddingResponseData.fromMap(Map<String, dynamic> map) => EmbeddingResponseDataMapper.fromMap(map);
 }
 
 /// Embedding usage
@@ -791,6 +856,9 @@ class EmbeddingUsage with EmbeddingUsageMappable {
   final int totalTokens;
 
   const EmbeddingUsage({this.promptTokens = 0, this.totalTokens = 0});
+  
+  factory EmbeddingUsage.fromJson(String json) => EmbeddingUsageMapper.fromJson(json);
+  factory EmbeddingUsage.fromMap(Map<String, dynamic> map) => EmbeddingUsageMapper.fromMap(map);
 }
 
 // / Embedding response
@@ -807,6 +875,11 @@ class EmbeddingResponse with EmbeddingResponseMappable {
     required this.model,
     required this.usage,
   });
+
+  factory EmbeddingResponse.fromJson(String json) =>
+      EmbeddingResponseMapper.fromJson(json);
+  factory EmbeddingResponse.fromMap(Map<String, dynamic> map) =>
+      EmbeddingResponseMapper.fromMap(map);
 }
 
 /// Reranking request
@@ -821,6 +894,9 @@ class RerankingRequest with RerankingRequestMappable {
     required this.documents,
     required this.query,
   });
+  
+  factory RerankingRequest.fromJson(String json) => RerankingRequestMapper.fromJson(json);
+  factory RerankingRequest.fromMap(Map<String, dynamic> map) => RerankingRequestMapper.fromMap(map);
 }
 
 /// Reranking data
@@ -835,6 +911,9 @@ class RerankingData with RerankingDataMappable {
     required this.index,
     required this.relevanceScore,
   });
+  
+  factory RerankingData.fromJson(String json) => RerankingDataMapper.fromJson(json);
+  factory RerankingData.fromMap(Map<String, dynamic> map) => RerankingDataMapper.fromMap(map);
 }
 
 /// Reranking API version
@@ -849,6 +928,9 @@ class RerankingApiVersion with RerankingApiVersionMappable {
     this.isDeprecated = false,
     this.isExperimental = false,
   });
+  
+  factory RerankingApiVersion.fromJson(String json) => RerankingApiVersionMapper.fromJson(json);
+  factory RerankingApiVersion.fromMap(Map<String, dynamic> map) => RerankingApiVersionMapper.fromMap(map);
 }
 
 /// Reranking billed units
@@ -867,6 +949,9 @@ class RerankingBilledUnits with RerankingBilledUnitsMappable {
     this.searchUnits,
     this.classifications,
   });
+  
+  factory RerankingBilledUnits.fromJson(String json) => RerankingBilledUnitsMapper.fromJson(json);
+  factory RerankingBilledUnits.fromMap(Map<String, dynamic> map) => RerankingBilledUnitsMapper.fromMap(map);
 }
 
 /// Reranking meta usage
@@ -876,6 +961,9 @@ class RerankingMetaUsage with RerankingMetaUsageMappable {
   final int? outputTokens;
 
   const RerankingMetaUsage({this.inputTokens, this.outputTokens});
+  
+  factory RerankingMetaUsage.fromJson(String json) => RerankingMetaUsageMapper.fromJson(json);
+  factory RerankingMetaUsage.fromMap(Map<String, dynamic> map) => RerankingMetaUsageMapper.fromMap(map);
 }
 
 /// Reranking usage
@@ -890,6 +978,9 @@ class RerankingUsage with RerankingUsageMappable {
     this.outputTokens,
     required this.documents,
   });
+  
+  factory RerankingUsage.fromJson(String json) => RerankingUsageMapper.fromJson(json);
+  factory RerankingUsage.fromMap(Map<String, dynamic> map) => RerankingUsageMapper.fromMap(map);
 }
 
 /// Reranking meta
@@ -908,6 +999,9 @@ class RerankingMeta with RerankingMetaMappable {
     this.tokens,
     this.warnings,
   });
+  
+  factory RerankingMeta.fromJson(String json) => RerankingMetaMapper.fromJson(json);
+  factory RerankingMeta.fromMap(Map<String, dynamic> map) => RerankingMetaMapper.fromMap(map);
 }
 
 /// Reranking response
@@ -924,6 +1018,9 @@ class RerankingResponse with RerankingResponseMappable {
     required this.usage,
     required this.meta,
   });
+
+  factory RerankingResponse.fromJson(String json)=> RerankingResponseMapper.fromJson(json);
+  factory RerankingResponse.fromMap(Map<String, dynamic> map) => RerankingResponseMapper.fromMap(map);
 }
 
 /// Function parameter
@@ -938,6 +1035,9 @@ class FunctionParameter with FunctionParameterMappable {
     this.description = '',
     this.enumValues = const [],
   });
+  
+  factory FunctionParameter.fromJson(String json) => FunctionParameterMapper.fromJson(json);
+  factory FunctionParameter.fromMap(Map<String, dynamic> map) => FunctionParameterMapper.fromMap(map);
 }
 
 /// Chat completion usage
@@ -960,6 +1060,9 @@ class ChatCompletionUsage with ChatCompletionUsageMappable {
   });
 
   int get reasoningTokens => completionTokensDetails?.reasoningTokens ?? 0;
+  
+  factory ChatCompletionUsage.fromJson(String json) => ChatCompletionUsageMapper.fromJson(json);
+  factory ChatCompletionUsage.fromMap(Map<String, dynamic> map) => ChatCompletionUsageMapper.fromMap(map);
 }
 
 /// Chat completion response
@@ -998,6 +1101,11 @@ class ChatCompletionChunkResponse with ChatCompletionChunkResponseMappable {
   int get completionTokens => usage?.completionTokens ?? 0;
   int get reasoningTokens => usage?.reasoningTokens ?? 0;
   int get totalTokens => usage?.totalTokens ?? 0;
+
+  factory ChatCompletionChunkResponse.fromJson(String json) =>
+      ChatCompletionChunkResponseMapper.fromJson(json);
+  factory ChatCompletionChunkResponse.fromMap(Map<String, dynamic> map) =>
+      ChatCompletionChunkResponseMapper.fromMap(map);
 }
 
 @MappableClass(discriminatorKey: 'type')
@@ -1276,6 +1384,9 @@ class ChatEntry with ChatEntryMappable {
   static ChatEntry assistant(ChatEntryContent content, {String? name}) {
     return ChatEntry(role: ChatRole.assistant, content: content, name: name);
   }
+  
+  factory ChatEntry.fromJson(String json) => ChatEntryMapper.fromJson(json);
+  factory ChatEntry.fromMap(Map<String, dynamic> map) => ChatEntryMapper.fromMap(map);
 }
 
 /// Chat thread entry
@@ -1293,6 +1404,9 @@ class ChatThreadEntry extends ChatEntry with ChatThreadEntryMappable {
     this.references,
     this.rowId,
   });
+  
+  factory ChatThreadEntry.fromJson(String json) => ChatThreadEntryMapper.fromJson(json);
+  factory ChatThreadEntry.fromMap(Map<String, dynamic> map) => ChatThreadEntryMapper.fromMap(map);
 }
 
 /// Chat thread response
@@ -1307,6 +1421,9 @@ class ChatThreadResponse with ChatThreadResponseMappable {
     this.thread = const [],
     this.columnId = '',
   });
+  
+  factory ChatThreadResponse.fromJson(String json) => ChatThreadResponseMapper.fromJson(json);
+  factory ChatThreadResponse.fromMap(Map<String, dynamic> map) => ChatThreadResponseMapper.fromMap(map);
 }
 
 /// Base class for chat threads responses
@@ -1319,6 +1436,9 @@ class ChatThreadsBase with ChatThreadsBaseMappable {
     this.object = ObjectType.chatThreads,
     this.threads = const {},
   });
+  
+  factory ChatThreadsBase.fromJson(String json) => ChatThreadsBaseMapper.fromJson(json);
+  factory ChatThreadsBase.fromMap(Map<String, dynamic> map) => ChatThreadsBaseMapper.fromMap(map);
 }
 
 /// Chat threads response
@@ -1328,10 +1448,14 @@ class ChatThreadsResponse extends ChatThreadsBase
   final String tableId;
 
   const ChatThreadsResponse({super.object, super.threads, this.tableId = ''});
+  
+  factory ChatThreadsResponse.fromJson(String json) => ChatThreadsResponseMapper.fromJson(json);
+  factory ChatThreadsResponse.fromMap(Map<String, dynamic> map) => ChatThreadsResponseMapper.fromMap(map);
 }
 
 /// Conversation threads response
-class ConversationThreadsResponse extends ChatThreadsBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ConversationThreadsResponse extends ChatThreadsBase with  ConversationThreadsResponseMappable {
   final String conversationId;
 
   const ConversationThreadsResponse({
@@ -1339,4 +1463,8 @@ class ConversationThreadsResponse extends ChatThreadsBase {
     super.threads,
     this.conversationId = '',
   });
+
+  factory ConversationThreadsResponse.fromJson(String json) =>
+      ConversationThreadsResponseMapper.fromJson(json);
+  factory ConversationThreadsResponse.fromMap(Map<String, dynamic> map) => ConversationThreadsResponseMapper.fromMap(map);
 }

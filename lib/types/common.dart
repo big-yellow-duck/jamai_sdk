@@ -247,6 +247,9 @@ class OkResponse with OkResponseMappable {
   final String progressKey;
 
   const OkResponse({this.ok = true, this.progressKey = ""});
+  factory OkResponse.fromJson(String json) => OkResponseMapper.fromJson(json);
+  factory OkResponse.fromMap(Map<String, dynamic> map) =>
+      OkResponseMapper.fromMap(map);
 }
 
 /// Generic paginated response
@@ -265,6 +268,9 @@ class Page<T> with PageMappable<T> {
     this.total = 0,
     this.endCursor,
   });
+
+  factory Page.fromJson(String json) => PageMapper.fromJson(json);
+  factory Page.fromMap(Map<String, dynamic> map) => PageMapper.fromMap(map);
 }
 
 /// User agent information for tracking requests
@@ -645,9 +651,6 @@ class StringValidator {
       return !allowNewline; // Bad if newlines are NOT allowed
     }
 
-    // 2. Check for other non-printable characters
-    if (char.isEmpty) return true;
-
     final rune = char.runes.first;
 
     // Control characters (excluding space and newline which we already handled)
@@ -685,10 +688,16 @@ class StringValidator {
     return false;
   }
 
-  static bool isValidString(String input, {bool allowNewline = false}) {
+  static bool isValidString(
+    String input, {
+    bool allowNewline = false,
+    bool allowEmpty = false,
+  }) {
     // Check if string is not empty after stripping
-    if (input.trim().isEmpty) {
-      return false;
+    if (allowEmpty == false) {
+      if (input.trim().isEmpty) {
+        return false;
+      }
     }
 
     // Check each character
@@ -703,17 +712,21 @@ class StringValidator {
 }
 
 @immutable
-class SanitizedNotEmptyString {
-  factory SanitizedNotEmptyString(String value) {
-    if (!StringValidator.isValidString(value)) {
+class SanitizedNonEmptyString {
+  factory SanitizedNonEmptyString(String value) {
+    if (!StringValidator.isValidString(
+      value,
+      allowEmpty: false,
+      allowNewline: false,
+    )) {
       throw ArgumentError(
         "Text contains disallowed or non-printable characters.",
       );
     }
-    return SanitizedNotEmptyString._(value);
+    return SanitizedNonEmptyString._(value);
   }
 
-  const SanitizedNotEmptyString._(this.value);
+  const SanitizedNonEmptyString._(this.value);
 
   final String value;
 
@@ -725,15 +738,15 @@ class SanitizedNotEmptyString {
   String get get => value;
 
   /// Optional operator for concatenation
-  SanitizedNotEmptyString operator +(Object other) {
-    return SanitizedNotEmptyString('$value$other');
+  SanitizedNonEmptyString operator +(Object other) {
+    return SanitizedNonEmptyString('$value$other');
   }
 
   /// Makes equality work properly with other SanitizedNotEmptyString instances
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SanitizedNotEmptyString && other.value == value;
+      other is SanitizedNonEmptyString && other.value == value;
 
   @override
   int get hashCode => value.hashCode;
@@ -742,3 +755,133 @@ class SanitizedNotEmptyString {
   String asString() => value;
 }
 
+@immutable
+class SanitizedString {
+  factory SanitizedString(String value) {
+    if (!StringValidator.isValidString(
+      value,
+      allowNewline: false,
+      allowEmpty: true,
+    )) {
+      throw ArgumentError(
+        "Text contains disallowed or non-printable characters.",
+      );
+    }
+    return SanitizedString._(value);
+  }
+  const SanitizedString._(this.value);
+
+  final String value;
+
+  /// Acts like a string when printed
+  @override
+  String toString() => value;
+
+  /// Optional convenience: allows you to get the underlying value
+  String get get => value;
+
+  /// Optional operator for concatenation
+  SanitizedString operator +(Object other) {
+    return SanitizedString('$value$other');
+  }
+
+  /// Makes equality work properly with other SanitizedString instances
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SanitizedString && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  /// Optional: convenience to convert back to `String`
+  String asString() => value;
+}
+
+@immutable
+class SanitizedMultilineString {
+  factory SanitizedMultilineString(String value) {
+    if (!StringValidator.isValidString(
+      value,
+      allowNewline: true,
+      allowEmpty: true,
+    )) {
+      throw ArgumentError(
+        "Text contains disallowed or non-printable characters.",
+      );
+    }
+    return SanitizedMultilineString._(value);
+  }
+
+  const SanitizedMultilineString._(this.value);
+
+  final String value;
+
+  /// Acts like a string when printed
+  @override
+  String toString() => value;
+
+  /// Optional convenience: allows you to get the underlying value
+  String get get => value;
+
+  /// Optional operator for concatenation
+  SanitizedMultilineString operator +(Object other) {
+    return SanitizedMultilineString('$value$other');
+  }
+
+  /// Makes equality work properly with other SanitizedMultilineString instances
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SanitizedMultilineString && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  /// Optional: convenience to convert back to `String`
+  String asString() => value;
+}
+
+@immutable
+class SanitizedNonEmptyMultilineString {
+  factory SanitizedNonEmptyMultilineString(String value) {
+    if (!StringValidator.isValidString(
+      value,
+      allowNewline: true,
+      allowEmpty: false,
+    )) {
+      throw ArgumentError(
+        "Text contains disallowed or non-printable characters.",
+      );
+    }
+    return SanitizedNonEmptyMultilineString._(value);
+  }
+
+  const SanitizedNonEmptyMultilineString._(this.value);
+
+  final String value;
+
+  /// Acts like a string when printed
+  @override
+  String toString() => value;
+
+  /// Optional convenience: allows you to get the underlying value
+  String get get => value;
+
+  /// Optional operator for concatenation
+  SanitizedNonEmptyMultilineString operator +(Object other) {
+    return SanitizedNonEmptyMultilineString('$value$other');
+  }
+
+  /// Makes equality work properly with other SanitizedNonEmptyMultilineString instances
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SanitizedNonEmptyMultilineString && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  /// Optional: convenience to convert back to `String`
+  String asString() => value;
+}

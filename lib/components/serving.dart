@@ -47,8 +47,8 @@ class Serving {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ModelInfoListResponse.fromJson(jsonResponse);
+      
+      return ModelInfoListResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to list models: ${response.statusCode} - ${response.body}',
@@ -88,7 +88,9 @@ class Serving {
   /// Returns a [ChatCompletionChunkResponse] containing the chat completion result.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<ChatCompletionChunkResponse> chatCompletion(ChatRequest request) async {
+  Future<ChatCompletionChunkResponse> chatCompletion(
+    ChatRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v1/chat_completions');
 
     final response = await http.post(
@@ -101,8 +103,7 @@ class Serving {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ChatCompletionChunkResponse.fromJson(jsonResponse);
+      return ChatCompletionChunkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create chat completion: ${response.statusCode} - ${response.body}',
@@ -130,8 +131,7 @@ class Serving {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return EmbeddingResponse.fromJson(jsonResponse);
+      return EmbeddingResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to generate embeddings: ${response.statusCode} - ${response.body}',
@@ -159,8 +159,8 @@ class Serving {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return RerankingResponse.fromJson(jsonResponse);
+      
+      return RerankingResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to generate rankings: ${response.statusCode} - ${response.body}',

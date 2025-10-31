@@ -9953,6 +9953,7 @@ class ChatThreadsBaseMapper extends ClassMapperBase<ChatThreadsBase> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ChatThreadsBaseMapper._());
       ChatThreadsResponseMapper.ensureInitialized();
+      ConversationThreadsResponseMapper.ensureInitialized();
       ObjectTypeMapper.ensureInitialized();
       ChatThreadResponseMapper.ensureInitialized();
     }
@@ -10286,5 +10287,214 @@ class _ChatThreadsResponseCopyWithImpl<$R, $Out>
   ChatThreadsResponseCopyWith<$R2, ChatThreadsResponse, $Out2>
   $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _ChatThreadsResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class ConversationThreadsResponseMapper
+    extends ClassMapperBase<ConversationThreadsResponse> {
+  ConversationThreadsResponseMapper._();
+
+  static ConversationThreadsResponseMapper? _instance;
+  static ConversationThreadsResponseMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = ConversationThreadsResponseMapper._(),
+      );
+      ChatThreadsBaseMapper.ensureInitialized();
+      ObjectTypeMapper.ensureInitialized();
+      ChatThreadResponseMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'ConversationThreadsResponse';
+
+  static ObjectType _$object(ConversationThreadsResponse v) => v.object;
+  static const Field<ConversationThreadsResponse, ObjectType> _f$object = Field(
+    'object',
+    _$object,
+    opt: true,
+    def: ObjectType.chatThreads,
+  );
+  static Map<String, ChatThreadResponse> _$threads(
+    ConversationThreadsResponse v,
+  ) => v.threads;
+  static const Field<
+    ConversationThreadsResponse,
+    Map<String, ChatThreadResponse>
+  >
+  _f$threads = Field('threads', _$threads, opt: true, def: const {});
+  static String _$conversationId(ConversationThreadsResponse v) =>
+      v.conversationId;
+  static const Field<ConversationThreadsResponse, String> _f$conversationId =
+      Field(
+        'conversationId',
+        _$conversationId,
+        key: r'conversation_id',
+        opt: true,
+        def: '',
+      );
+
+  @override
+  final MappableFields<ConversationThreadsResponse> fields = const {
+    #object: _f$object,
+    #threads: _f$threads,
+    #conversationId: _f$conversationId,
+  };
+
+  static ConversationThreadsResponse _instantiate(DecodingData data) {
+    return ConversationThreadsResponse(
+      object: data.dec(_f$object),
+      threads: data.dec(_f$threads),
+      conversationId: data.dec(_f$conversationId),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static ConversationThreadsResponse fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<ConversationThreadsResponse>(map);
+  }
+
+  static ConversationThreadsResponse fromJson(String json) {
+    return ensureInitialized().decodeJson<ConversationThreadsResponse>(json);
+  }
+}
+
+mixin ConversationThreadsResponseMappable {
+  String toJson() {
+    return ConversationThreadsResponseMapper.ensureInitialized()
+        .encodeJson<ConversationThreadsResponse>(
+          this as ConversationThreadsResponse,
+        );
+  }
+
+  Map<String, dynamic> toMap() {
+    return ConversationThreadsResponseMapper.ensureInitialized()
+        .encodeMap<ConversationThreadsResponse>(
+          this as ConversationThreadsResponse,
+        );
+  }
+
+  ConversationThreadsResponseCopyWith<
+    ConversationThreadsResponse,
+    ConversationThreadsResponse,
+    ConversationThreadsResponse
+  >
+  get copyWith =>
+      _ConversationThreadsResponseCopyWithImpl<
+        ConversationThreadsResponse,
+        ConversationThreadsResponse
+      >(this as ConversationThreadsResponse, $identity, $identity);
+  @override
+  String toString() {
+    return ConversationThreadsResponseMapper.ensureInitialized().stringifyValue(
+      this as ConversationThreadsResponse,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return ConversationThreadsResponseMapper.ensureInitialized().equalsValue(
+      this as ConversationThreadsResponse,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return ConversationThreadsResponseMapper.ensureInitialized().hashValue(
+      this as ConversationThreadsResponse,
+    );
+  }
+}
+
+extension ConversationThreadsResponseValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ConversationThreadsResponse, $Out> {
+  ConversationThreadsResponseCopyWith<$R, ConversationThreadsResponse, $Out>
+  get $asConversationThreadsResponse => $base.as(
+    (v, t, t2) => _ConversationThreadsResponseCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class ConversationThreadsResponseCopyWith<
+  $R,
+  $In extends ConversationThreadsResponse,
+  $Out
+>
+    implements ChatThreadsBaseCopyWith<$R, $In, $Out> {
+  @override
+  MapCopyWith<
+    $R,
+    String,
+    ChatThreadResponse,
+    ChatThreadResponseCopyWith<$R, ChatThreadResponse, ChatThreadResponse>
+  >
+  get threads;
+  @override
+  $R call({
+    ObjectType? object,
+    Map<String, ChatThreadResponse>? threads,
+    String? conversationId,
+  });
+  ConversationThreadsResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _ConversationThreadsResponseCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ConversationThreadsResponse, $Out>
+    implements
+        ConversationThreadsResponseCopyWith<
+          $R,
+          ConversationThreadsResponse,
+          $Out
+        > {
+  _ConversationThreadsResponseCopyWithImpl(
+    super.value,
+    super.then,
+    super.then2,
+  );
+
+  @override
+  late final ClassMapperBase<ConversationThreadsResponse> $mapper =
+      ConversationThreadsResponseMapper.ensureInitialized();
+  @override
+  MapCopyWith<
+    $R,
+    String,
+    ChatThreadResponse,
+    ChatThreadResponseCopyWith<$R, ChatThreadResponse, ChatThreadResponse>
+  >
+  get threads => MapCopyWith(
+    $value.threads,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(threads: v),
+  );
+  @override
+  $R call({
+    ObjectType? object,
+    Map<String, ChatThreadResponse>? threads,
+    String? conversationId,
+  }) => $apply(
+    FieldCopyWithData({
+      if (object != null) #object: object,
+      if (threads != null) #threads: threads,
+      if (conversationId != null) #conversationId: conversationId,
+    }),
+  );
+  @override
+  ConversationThreadsResponse $make(CopyWithData data) =>
+      ConversationThreadsResponse(
+        object: data.get(#object, or: $value.object),
+        threads: data.get(#threads, or: $value.threads),
+        conversationId: data.get(#conversationId, or: $value.conversationId),
+      );
+
+  @override
+  ConversationThreadsResponseCopyWith<$R2, ConversationThreadsResponse, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _ConversationThreadsResponseCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 

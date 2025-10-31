@@ -1,6 +1,12 @@
-/// Object type for file upload response
+import 'package:dart_mappable/dart_mappable.dart';
+
+part "file.mapper.dart";
+
+@MappableEnum()
 enum FileObjectType {
+  @MappableValue('file.upload')
   fileUpload('file.upload'),
+  @MappableValue('file.urls')
   fileUrls('file.urls');
 
   final String value;
@@ -10,9 +16,8 @@ enum FileObjectType {
   String toString() => value;
 }
 
-/// Response model for file upload operations
-class FileUploadResponse {
-  /// The object type, which is always "file.upload"
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class FileUploadResponse with FileUploadResponseMappable {
   final FileObjectType object;
 
   /// The URI of the uploaded file
@@ -27,43 +32,26 @@ class FileUploadResponse {
     required this.uri,
   });
 
-  /// Creates a FileUploadResponse from JSON
-  factory FileUploadResponse.fromJson(Map<String, dynamic> json) {
-    return FileUploadResponse(
-      object: json['object'] == 'file.upload'
-          ? FileObjectType.fileUpload
-          : FileObjectType.fileUpload,
-      uri: json['uri'] as String,
-    );
-  }
-
-  /// Converts the FileUploadResponse to JSON
-  Map<String, dynamic> toJson() {
-    return {'object': object.value, 'uri': uri};
-  }
+  factory FileUploadResponse.fromJson(String json) => FileUploadResponseMapper.fromJson(json);
+  factory FileUploadResponse.fromMap(Map<String, dynamic> map) => FileUploadResponseMapper.fromMap(map);
 }
 
 /// Request model for getting pre-signed URLs or local file paths
-class GetURLRequest {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class GetURLRequest with GetURLRequestMappable {
   /// A list of file URIs for which pre-signed URLs or local file paths are requested.
   /// The service will return a corresponding list of pre-signed URLs or local file paths.
   final List<String> uris;
 
   const GetURLRequest({required this.uris});
 
-  /// Creates a GetURLRequest from JSON
-  factory GetURLRequest.fromJson(Map<String, dynamic> json) {
-    return GetURLRequest(uris: (json['uris'] as List<dynamic>).cast<String>());
-  }
-
-  /// Converts the GetURLRequest to JSON
-  Map<String, dynamic> toJson() {
-    return {'uris': uris};
-  }
+  factory GetURLRequest.fromJson(String json) => GetURLRequestMapper.fromJson(json);
+  factory GetURLRequest.fromMap(Map<String, dynamic> map) => GetURLRequestMapper.fromMap(map);
 }
 
 /// Response model for getting pre-signed URLs or local file paths
-class GetURLResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class GetURLResponse with GetURLResponseMappable {
   /// The object type, which is always "file.urls"
   final FileObjectType object;
 
@@ -79,18 +67,6 @@ class GetURLResponse {
     required this.urls,
   });
 
-  /// Creates a GetURLResponse from JSON
-  factory GetURLResponse.fromJson(Map<String, dynamic> json) {
-    return GetURLResponse(
-      object: json['object'] == 'file.urls'
-          ? FileObjectType.fileUrls
-          : FileObjectType.fileUrls,
-      urls: (json['urls'] as List<dynamic>).cast<String>(),
-    );
-  }
-
-  /// Converts the GetURLResponse to JSON
-  Map<String, dynamic> toJson() {
-    return {'object': object.value, 'urls': urls};
-  }
+  factory GetURLResponse.fromJson(String json) => GetURLResponseMapper.fromJson(json);
+  factory GetURLResponse.fromMap(Map<String, dynamic> map) => GetURLResponseMapper.fromMap(map);
 }

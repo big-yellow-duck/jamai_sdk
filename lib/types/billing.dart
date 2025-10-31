@@ -1,6 +1,10 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'common.dart';
 
-class BaseUsageData {
+part "billing.mapper.dart";
+
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class BaseUsageData with BaseUsageDataMappable {
   final String id;
   final String orgId;
   final String projId;
@@ -16,14 +20,15 @@ class BaseUsageData {
     DateTime? timestamp,
     required this.cost,
   })  : id = id ?? uuid7Str(),
-        timestamp = timestamp ?? DateTime.now().toUtc();
+        timestamp = timestamp ?? DateTime.now();
 
   List<dynamic> asList() {
     return [id, orgId, projId, userId, timestamp, cost];
   }
 }
 
-class LlmUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class LlmUsageData extends BaseUsageData with LlmUsageDataMappable {
   final String model;
   final int inputToken;
   final int outputToken;
@@ -50,7 +55,8 @@ class LlmUsageData extends BaseUsageData {
   }
 }
 
-class EmbedUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class EmbedUsageData extends BaseUsageData with EmbedUsageDataMappable {
   final String model;
   final int token;
 
@@ -71,7 +77,8 @@ class EmbedUsageData extends BaseUsageData {
   }
 }
 
-class RerankUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RerankUsageData extends BaseUsageData with RerankUsageDataMappable {
   final String model;
   final int numberOfSearch;
 
@@ -92,7 +99,8 @@ class RerankUsageData extends BaseUsageData {
   }
 }
 
-class EgressUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class EgressUsageData extends BaseUsageData with EgressUsageDataMappable {
   final double amountGib;
 
   EgressUsageData({
@@ -111,7 +119,8 @@ class EgressUsageData extends BaseUsageData {
   }
 }
 
-class FileStorageUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class FileStorageUsageData extends BaseUsageData with FileStorageUsageDataMappable {
   final double amountGib;
   final double snapshotGib;
 
@@ -132,7 +141,8 @@ class FileStorageUsageData extends BaseUsageData {
   }
 }
 
-class DBStorageUsageData extends BaseUsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class DBStorageUsageData extends BaseUsageData with DBStorageUsageDataMappable {
   final double amountGib;
   final double snapshotGib;
 
@@ -153,7 +163,8 @@ class DBStorageUsageData extends BaseUsageData {
   }
 }
 
-class UsageData {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class UsageData with UsageDataMappable {
   final List<LlmUsageData> llmUsage;
   final List<EmbedUsageData> embedUsage;
   final List<RerankUsageData> rerankUsage;
@@ -161,7 +172,7 @@ class UsageData {
   final List<FileStorageUsageData> fileStorageUsage;
   final List<DBStorageUsageData> dbStorageUsage;
 
-  UsageData({
+  const UsageData({
     this.llmUsage = const [],
     this.embedUsage = const [],
     this.rerankUsage = const [],

@@ -1,53 +1,42 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jamai_sdk/types/db.dart';
+part "model.mapper.dart";
 
 /// Response for model info list
-class ModelInfoListResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelInfoListResponse with ModelInfoListResponseMappable {
   final String object;
   final List<ModelInfoRead> data;
 
   ModelInfoListResponse({
     this.object = "models.info",
     required List<ModelInfoRead> data,
-  }) : data = List<ModelInfoRead>.from(data)..sort((a, b) => _sortKey(a).compareTo(_sortKey(b)));
+  }) : data = List<ModelInfoRead>.from(data)
+         ..sort((a, b) => _sortKey(a).compareTo(_sortKey(b)));
 
   static String _sortKey(ModelInfoRead x) {
     final prefix = x.id.startsWith("ellm") ? "0" : "1";
     return "${prefix}_${x.name}";
   }
 
-  factory ModelInfoListResponse.fromJson(Map<String, dynamic> json) {
-    return ModelInfoListResponse(
-      object: json['object'] ?? "models.info",
-      data: (json['data'] as List<dynamic>?)
-          ?.map((item) => ModelInfoRead.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'object': object,
-      'data': data.map((d) => d.toJson()).toList(),
-    };
-  }
+  factory ModelInfoListResponse.fromJson(String json) =>
+      ModelInfoListResponseMapper.fromJson(json);
+  factory ModelInfoListResponse.fromMap(Map<String, dynamic> map) =>
+      ModelInfoListResponseMapper.fromMap(map);
 }
 
 /// Base model price class
-abstract class _ModelPrice {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+abstract class ModelPrice with ModelPriceMappable {
   final String id;
   final String name;
 
-  _ModelPrice({
-    required this.id,
-    required this.name,
-  });
-
-  Map<String, dynamic> toJson();
+  ModelPrice({required this.id, required this.name});
 }
 
 /// LLM model price
-class LLMModelPrice extends _ModelPrice {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class LLMModelPrice extends ModelPrice with LLMModelPriceMappable {
   final double llmInputCostPerMtoken;
   final double llmOutputCostPerMtoken;
 
@@ -57,20 +46,11 @@ class LLMModelPrice extends _ModelPrice {
     required this.llmInputCostPerMtoken,
     required this.llmOutputCostPerMtoken,
   });
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'llm_input_cost_per_mtoken': llmInputCostPerMtoken,
-      'llm_output_cost_per_mtoken': llmOutputCostPerMtoken,
-    };
-  }
 }
 
 /// Embedding model price
-class EmbeddingModelPrice extends _ModelPrice {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class EmbeddingModelPrice extends ModelPrice with EmbeddingModelPriceMappable {
   final double embeddingCostPerMtoken;
 
   EmbeddingModelPrice({
@@ -78,19 +58,11 @@ class EmbeddingModelPrice extends _ModelPrice {
     required super.name,
     required this.embeddingCostPerMtoken,
   });
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'embedding_cost_per_mtoken': embeddingCostPerMtoken,
-    };
-  }
 }
 
 /// Reranking model price
-class RerankingModelPrice extends _ModelPrice {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class RerankingModelPrice extends ModelPrice with RerankingModelPriceMappable {
   final double rerankingCostPerKsearch;
 
   RerankingModelPrice({
@@ -98,25 +70,17 @@ class RerankingModelPrice extends _ModelPrice {
     required super.name,
     required this.rerankingCostPerKsearch,
   });
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'reranking_cost_per_ksearch': rerankingCostPerKsearch,
-    };
-  }
 }
 
 /// Model price response
-class ModelPrice {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ModelPriceResponse with ModelPriceResponseMappable {
   final String object;
   final List<LLMModelPrice> llmModels;
   final List<EmbeddingModelPrice> embedModels;
   final List<RerankingModelPrice> rerankModels;
 
-  ModelPrice({
+  const ModelPriceResponse({
     this.object = "prices.models",
     this.llmModels = const [],
     this.embedModels = const [],
@@ -142,17 +106,15 @@ class ModelPrice {
   dynamic get(String modelId) {
     final model = modelMap[modelId];
     if (model == null) {
-      throw ArgumentError("Invalid model ID: $modelId. Available models: ${modelMap.keys}");
+      throw ArgumentError(
+        "Invalid model ID: $modelId. Available models: ${modelMap.keys}",
+      );
     }
     return model;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'object': object,
-      'llm_models': llmModels.map((m) => m.toJson()).toList(),
-      'embed_models': embedModels.map((m) => m.toJson()).toList(),
-      'rerank_models': rerankModels.map((m) => m.toJson()).toList(),
-    };
-  }
+  factory ModelPriceResponse.fromJson(String json) =>
+      ModelPriceResponseMapper.fromJson(json);
+  factory ModelPriceResponse.fromMap(Map<String, dynamic> map) =>
+      ModelPriceResponseMapper.fromMap(map);
 }

@@ -20,9 +20,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createActionTable(
-    TableSchemaCreate request,
-  ) async {
+  Future<TableMetaResponse> createActionTable(TableSchemaCreate request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/action');
 
     final response = await http.post(
@@ -35,7 +33,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create action table: ${response.statusCode} - ${response.body}',
@@ -50,7 +48,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createKnowledgeTable(
+  Future<TableMetaResponse> createKnowledgeTable(
     KnowledgeTableSchemaCreate request,
   ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/knowledge');
@@ -65,7 +63,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create knowledge table: ${response.statusCode} - ${response.body}',
@@ -80,9 +78,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> createChatTable(
-    ChatTableSchemaCreate request,
-  ) async {
+  Future<TableMetaResponse> createChatTable(TableSchemaCreate request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/chat');
 
     final response = await http.post(
@@ -95,7 +91,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create chat table: ${response.statusCode} - ${response.body}',
@@ -118,7 +114,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the list of tables and pagination info.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> listTables({
+  Future<Page<TableMetaResponse>> listTables({
     TableType? tableType,
     int? offset,
     int? limit,
@@ -160,7 +156,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return Page.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to list tables: ${response.statusCode} - ${response.body}',
@@ -175,7 +171,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> getTable({required String tableId}) async {
+  Future<TableMetaResponse> getTable({required String tableId}) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/gen_tables',
     ).replace(queryParameters: {'table_id': tableId});
@@ -189,7 +185,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to get table: ${response.statusCode} - ${response.body}',
@@ -204,7 +200,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> deleteTable({required String tableId}) async {
+  Future<OkResponse> deleteTable({required String tableId}) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/gen_tables',
     ).replace(queryParameters: {'table_id': tableId});
@@ -218,7 +214,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to delete table: ${response.statusCode} - ${response.body}',
@@ -234,23 +230,39 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> addRows(
-    String tableType,
-    MultiRowAddRequest request,
-  ) async {
+  Future<dynamic> addRows(String tableType, MultiRowAddRequest request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $apiKey',
+    };
+
+    // Add streaming-specific headers if requested
+    if (request.stream) {
+      headers['Accept'] = 'text/event-stream';
+      headers['Cache-Control'] = 'no-cache';
+    }
 
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
+      headers: headers,
       body: json.encode(request.toJson()),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      // Handle streaming response if requested
+      if (request.stream) {
+        // For streaming responses, return the raw response body
+        // The client can then parse the server-sent events
+        return {
+          'stream': true,
+          'data': response.body,
+          'headers': response.headers,
+        };
+      } else {
+        return json.decode(response.body) as Map<String, dynamic>;
+      }
     } else {
       throw Exception(
         'Failed to add rows: ${response.statusCode} - ${response.body}',
@@ -321,7 +333,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> deleteRows(MultiRowDeleteRequest request) async {
+  Future<OkResponse> deleteRows(MultiRowDeleteRequest request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/rows');
 
     final response = await http.delete(
@@ -334,7 +346,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to delete rows: ${response.statusCode} - ${response.body}',

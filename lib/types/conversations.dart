@@ -1,7 +1,10 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jamai_sdk/types/gen_tables.dart';
 
-/// Base meta response class
-class _MetaResponse {
+part "conversations.mapper.dart";
+
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MetaResponse with MetaResponseMappable {
   final Map<String, dynamic>? meta;
   final List<ColumnSchema> cols;
   final String title;
@@ -10,7 +13,7 @@ class _MetaResponse {
   final int numRows;
   final String version;
 
-  _MetaResponse({
+  MetaResponse({
     this.meta,
     required List<ColumnSchema> cols,
     required this.title,
@@ -20,54 +23,32 @@ class _MetaResponse {
     required this.version,
   }) : cols = cols.where((c) => !c.id.endsWith('_')).toList();
 
-  /// Creates a copy with updated fields
-  _MetaResponse copyWith({
-    Map<String, dynamic>? meta,
-    List<ColumnSchema>? cols,
-    String? title,
-    String? createdBy,
-    DateTime? updatedAt,
-    int? numRows,
-    String? version,
-  }) {
-    return _MetaResponse(
-      meta: meta ?? this.meta,
-      cols: cols ?? this.cols,
-      title: title ?? this.title,
-      createdBy: createdBy ?? this.createdBy,
-      updatedAt: updatedAt ?? this.updatedAt,
-      numRows: numRows ?? this.numRows,
-      version: version ?? this.version,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'meta': meta,
-      'cols': cols.map((c) => c.toJson()).toList(),
-      'title': title,
-      'created_by': createdBy,
-      'updated_at': updatedAt.toIso8601String(),
-      'num_rows': numRows,
-      'version': version,
-    };
-  }
+  factory MetaResponse.fromJson(String json) => MetaResponseMapper.fromJson(json);
+  factory MetaResponse.fromMap(Map<String, dynamic> map) => MetaResponseMapper.fromMap(map);
 }
 
 /// Agent meta response
-class AgentMetaResponse extends _MetaResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class AgentMetaResponse with AgentMetaResponseMappable {
   final String agentId;
+  final Map<String, dynamic>? meta;
+  final List<ColumnSchema> cols;
+  final String title;
+  final String? createdBy;
+  final DateTime updatedAt;
+  final int numRows;
+  final String version;
 
   AgentMetaResponse({
     required this.agentId,
-    super.meta,
-    required super.cols,
-    required super.title,
-    required super.createdBy,
-    required super.updatedAt,
-    super.numRows,
-    required super.version,
-  });
+    this.meta,
+    required List<ColumnSchema> cols,
+    required this.title,
+    required this.createdBy,
+    required this.updatedAt,
+    this.numRows = -1,
+    required this.version,
+  }) : cols = cols.where((c) => !c.id.endsWith('_')).toList();
 
   /// Creates an instance from TableMetaResponse
   factory AgentMetaResponse.fromTableMeta(TableMetaResponse meta) {
@@ -83,55 +64,34 @@ class AgentMetaResponse extends _MetaResponse {
     );
   }
 
-  /// Creates a copy with updated fields
-  @override
-  AgentMetaResponse copyWith({
-    String? agentId,
-    Map<String, dynamic>? meta,
-    List<ColumnSchema>? cols,
-    String? title,
-    String? createdBy,
-    DateTime? updatedAt,
-    int? numRows,
-    String? version,
-  }) {
-    return AgentMetaResponse(
-      agentId: agentId ?? this.agentId,
-      meta: meta ?? this.meta,
-      cols: cols ?? this.cols,
-      title: title ?? this.title,
-      createdBy: createdBy ?? this.createdBy,
-      updatedAt: updatedAt ?? this.updatedAt,
-      numRows: numRows ?? this.numRows,
-      version: version ?? this.version,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'agent_id': agentId,
-    };
-  }
+  factory AgentMetaResponse.fromJson(String json) => AgentMetaResponseMapper.fromJson(json);
+  factory AgentMetaResponse.fromMap(Map<String, dynamic> map) => AgentMetaResponseMapper.fromMap(map);
 }
 
 /// Conversation meta response
-class ConversationMetaResponse extends _MetaResponse {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ConversationMetaResponse with ConversationMetaResponseMappable {
   final String conversationId;
   final String? parentId;
+  final Map<String, dynamic>? meta;
+  final List<ColumnSchema> cols;
+  final String title;
+  final String? createdBy;
+  final DateTime updatedAt;
+  final int numRows;
+  final String version;
 
   ConversationMetaResponse({
     required this.conversationId,
     this.parentId,
-    super.meta,
-    required super.cols,
-    required super.title,
-    required super.createdBy,
-    required super.updatedAt,
-    super.numRows,
-    required super.version,
-  });
+    this.meta,
+    required List<ColumnSchema> cols,
+    required this.title,
+    required this.createdBy,
+    required this.updatedAt,
+    this.numRows = -1,
+    required this.version,
+  }) : cols = cols.where((c) => !c.id.endsWith('_')).toList();
 
   /// Creates an instance from TableMetaResponse
   factory ConversationMetaResponse.fromTableMeta(TableMetaResponse meta) {
@@ -148,182 +108,80 @@ class ConversationMetaResponse extends _MetaResponse {
     );
   }
 
-  /// Creates a copy with updated fields
-  @override
-  ConversationMetaResponse copyWith({
-    String? conversationId,
-    String? parentId,
-    Map<String, dynamic>? meta,
-    List<ColumnSchema>? cols,
-    String? title,
-    String? createdBy,
-    DateTime? updatedAt,
-    int? numRows,
-    String? version,
-  }) {
-    return ConversationMetaResponse(
-      conversationId: conversationId ?? this.conversationId,
-      parentId: parentId ?? this.parentId,
-      meta: meta ?? this.meta,
-      cols: cols ?? this.cols,
-      title: title ?? this.title,
-      createdBy: createdBy ?? this.createdBy,
-      updatedAt: updatedAt ?? this.updatedAt,
-      numRows: numRows ?? this.numRows,
-      version: version ?? this.version,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'conversation_id': conversationId,
-      'parent_id': parentId,
-    };
-  }
+  factory ConversationMetaResponse.fromJson(String json) => ConversationMetaResponseMapper.fromJson(json);
+  factory ConversationMetaResponse.fromMap(Map<String, dynamic> map) => ConversationMetaResponseMapper.fromMap(map);
 }
 
 /// Base message class
-class _MessageBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MessageBase with MessageBaseMappable {
   final Map<String, dynamic> data;
 
-  const _MessageBase({required this.data});
+  const MessageBase({required this.data});
 
-  /// Creates a copy with updated fields
-  _MessageBase copyWith({Map<String, dynamic>? data}) {
-    return _MessageBase(data: data ?? this.data);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'data': data};
-  }
+  factory MessageBase.fromJson(String json) => MessageBaseMapper.fromJson(json);
+  factory MessageBase.fromMap(Map<String, dynamic> map) => MessageBaseMapper.fromMap(map);
 }
 
 /// Request to create a new conversation
-class ConversationCreateRequest extends _MessageBase {
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class ConversationCreateRequest with ConversationCreateRequestMappable {
   final String agentId;
   final String? title;
+  final Map<String, dynamic> data;
 
   const ConversationCreateRequest({
     required this.agentId,
     this.title,
-    required super.data,
-  });
-
-  /// Creates a copy with updated fields
-  @override
-  ConversationCreateRequest copyWith({
-    String? agentId,
-    String? title,
-    Map<String, dynamic>? data,
-  }) {
-    return ConversationCreateRequest(
-      agentId: agentId ?? this.agentId,
-      title: title ?? this.title,
-      data: data ?? this.data,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'agent_id': agentId,
-      'title': title,
-    };
-  }
-}
-
-/// Request to add a message
-class MessageAddRequest extends _MessageBase {
-  final String conversationId;
-
-  const MessageAddRequest({
-    required this.conversationId,
-    required super.data,
-  });
-
-  /// Creates a copy with updated fields
-  @override
-  MessageAddRequest copyWith({
-    String? conversationId,
-    Map<String, dynamic>? data,
-  }) {
-    return MessageAddRequest(
-      conversationId: conversationId ?? this.conversationId,
-      data: data ?? this.data,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      ...super.toJson(),
-      'conversation_id': conversationId,
-    };
-  }
-}
-
-/// Request to update a single message in a conversation
-class MessageUpdateRequest {
-  final String conversationId;
-  final String rowId;
-  final Map<String, dynamic> data;
-
-  const MessageUpdateRequest({
-    required this.conversationId,
-    required this.rowId,
     required this.data,
   });
 
-  /// Creates a copy with updated fields
-  MessageUpdateRequest copyWith({
-    String? conversationId,
-    String? rowId,
-    Map<String, dynamic>? data,
-  }) {
-    return MessageUpdateRequest(
-      conversationId: conversationId ?? this.conversationId,
-      rowId: rowId ?? this.rowId,
-      data: data ?? this.data,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'conversation_id': conversationId,
-      'row_id': rowId,
-      'data': data,
-    };
-  }
+  factory ConversationCreateRequest.fromJson(String json) => ConversationCreateRequestMapper.fromJson(json);
+  factory ConversationCreateRequest.fromMap(Map<String, dynamic> map) => ConversationCreateRequestMapper.fromMap(map);
 }
 
-/// Request to regenerate messages in a conversation
-class MessagesRegenRequest {
+/// Request to add a message
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MessageAddRequest with MessageAddRequestMappable {
+  final String conversationId;
+  final Map<String, dynamic> data;
+const MessageAddRequest({
+  required this.conversationId,
+  required this.data,
+});
+
+factory MessageAddRequest.fromJson(String json) => MessageAddRequestMapper.fromJson(json);
+factory MessageAddRequest.fromMap(Map<String, dynamic> map) => MessageAddRequestMapper.fromMap(map);
+}
+
+
+/// Request to update a single message in a conversation
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MessageUpdateRequest with MessageUpdateRequestMappable {
   final String conversationId;
   final String rowId;
+  final Map<String, dynamic> data;
+const MessageUpdateRequest({
+  required this.conversationId,
+  required this.rowId,
+  required this.data,
+});
 
-  const MessagesRegenRequest({
-    required this.conversationId,
-    required this.rowId,
-  });
+factory MessageUpdateRequest.fromJson(String json) => MessageUpdateRequestMapper.fromJson(json);
+factory MessageUpdateRequest.fromMap(Map<String, dynamic> map) => MessageUpdateRequestMapper.fromMap(map);
+}
 
-  /// Creates a copy with updated fields
-  MessagesRegenRequest copyWith({
-    String? conversationId,
-    String? rowId,
-  }) {
-    return MessagesRegenRequest(
-      conversationId: conversationId ?? this.conversationId,
-      rowId: rowId ?? this.rowId,
-    );
-  }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'conversation_id': conversationId,
-      'row_id': rowId,
-    };
-  }
+/// Request to regenerate messages in a conversation
+@MappableClass(caseStyle: CaseStyle.snakeCase)
+class MessagesRegenRequest with MessagesRegenRequestMappable {
+  final String conversationId;
+  final String rowId;
+const MessagesRegenRequest({
+  required this.conversationId,
+  required this.rowId,
+});
+
+factory MessagesRegenRequest.fromJson(String json) => MessagesRegenRequestMapper.fromJson(json);
+factory MessagesRegenRequest.fromMap(Map<String, dynamic> map) => MessagesRegenRequestMapper.fromMap(map);
 }

@@ -64,7 +64,7 @@ class File {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return FileUploadResponse.fromJson(jsonResponse);
+      return FileUploadResponse.fromMap(jsonResponse);
     } else {
       throw Exception(
         'Failed to upload file: ${response.statusCode} - ${response.body}',
@@ -93,7 +93,7 @@ class File {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return GetURLResponse.fromJson(jsonResponse);
+      return GetURLResponse.fromMap(jsonResponse);
     } else {
       throw Exception(
         'Failed to get raw file URLs: ${response.statusCode} - ${response.body}',
@@ -122,7 +122,7 @@ class File {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return GetURLResponse.fromJson(jsonResponse);
+      return GetURLResponse.fromMap(jsonResponse);
     } else {
       throw Exception(
         'Failed to get thumbnail URLs: ${response.statusCode} - ${response.body}',

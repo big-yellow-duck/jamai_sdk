@@ -39,8 +39,7 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ProjectRead.fromJson(jsonResponse);
+      return ProjectRead.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create project: ${response.statusCode} - ${response.body}',
@@ -73,8 +72,7 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ProjectRead.fromJson(jsonResponse);
+      return ProjectRead.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to get project: ${response.statusCode} - ${response.body}',
@@ -113,8 +111,7 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return ProjectRead.fromJson(jsonResponse);
+      return ProjectRead.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to update project: ${response.statusCode} - ${response.body}',
@@ -146,8 +143,7 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return OkResponse.fromJson(jsonResponse);
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to delete project: ${response.statusCode} - ${response.body}',
@@ -196,7 +192,7 @@ class Project {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
       final items = (jsonResponse['items'] as List)
-          .map((item) => ProjectRead.fromJson(item as Map<String, dynamic>))
+          .map((item) => ProjectRead.fromMap(item as Map<String, dynamic>))
           .toList();
       return Page<ProjectRead>(
         items: items,
@@ -418,12 +414,9 @@ class Project {
     required String projectId,
     String format = 'json',
   }) async {
-    final url = Uri.parse('$apiUrl/api/v2/projects/export').replace(
-      queryParameters: {
-        'project_id': projectId,
-        'format': format,
-      },
-    );
+    final url = Uri.parse(
+      '$apiUrl/api/v2/projects/export',
+    ).replace(queryParameters: {'project_id': projectId, 'format': format});
 
     final response = await http.get(
       url,
@@ -600,8 +593,7 @@ class Project {
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      return VerificationCodeRead.fromJson(jsonResponse);
+      return VerificationCodeRead.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create invitation: ${response.statusCode} - ${response.body}',
