@@ -528,18 +528,18 @@ class CallToolResult extends Result with CallToolResultMappable {
 }
 
 /// Helper function to parse content
-Content _parseContent(Map<String, dynamic> json) {
-  final type = json['type'] as String;
-  switch (type) {
-    case 'text':
-      return TextContent.fromMap(json);
-    case 'image':
-      return ImageContent.fromMap(json);
-    case 'audio':
-      return AudioContent.fromMap(json);
-    case 'resource':
-      return EmbeddedResource.fromMap(json);
-    default:
-      throw ArgumentError('Unknown content type: $type');
-  }
-}
+// Content _parseContent(Map<String, dynamic> json) {
+//   final type = json['type'] as String;
+//   switch (type) {
+//     case 'text':
+//       return TextContent.fromMap(json);
+//     case 'image':
+//       return ImageContent.fromMap(json);
+//     case 'audio':
+//       return AudioContent.fromMap(json);
+//     case 'resource':
+//       return EmbeddedResource.fromMap(json);
+//     default:
+//       throw ArgumentError('Unknown content type: $type');
+//   }
+// }

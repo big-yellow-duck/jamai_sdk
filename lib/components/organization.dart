@@ -711,7 +711,7 @@ class Organization {
       'orgId': orgId,
       'windowSize': windowSize,
       if (projIds != null) 'projIds': projIds,
-      if (to != null) 'to': to!.toIso8601String(),
+      if (to != null) 'to': to.toIso8601String(),
       if (groupBy != null) 'groupBy': groupBy,
       'dataSource': dataSource,
     });

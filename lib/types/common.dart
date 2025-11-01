@@ -469,10 +469,10 @@ class StripePaymentInfo with StripePaymentInfoMappable {
     required double amountRemaining,
     required String currency,
   }) {
-    if (subscriptionId != null && !subscriptionId!.startsWith('sub_')) {
+    if (subscriptionId != null && !subscriptionId.startsWith('sub_')) {
       throw ArgumentError('Subscription ID must start with "sub_"');
     }
-    if (paymentIntentId != null && !paymentIntentId!.startsWith('pi_')) {
+    if (paymentIntentId != null && !paymentIntentId.startsWith('pi_')) {
       throw ArgumentError('Payment Intent ID must start with "pi_"');
     }
     return StripePaymentInfo._(
@@ -535,16 +535,16 @@ class StripeEventData with StripeEventDataMappable {
     if (!eventId.startsWith('evt_')) {
       throw ArgumentError('Event ID must start with "evt_"');
     }
-    if (invoiceId != null && !invoiceId!.startsWith('in_')) {
+    if (invoiceId != null && !invoiceId.startsWith('in_')) {
       throw ArgumentError('Invoice ID must start with "in_"');
     }
-    if (subscriptionId != null && !subscriptionId!.startsWith('sub_')) {
+    if (subscriptionId != null && !subscriptionId.startsWith('sub_')) {
       throw ArgumentError('Subscription ID must start with "sub_"');
     }
-    if (priceId != null && !priceId!.startsWith('price_')) {
+    if (priceId != null && !priceId.startsWith('price_')) {
       throw ArgumentError('Price ID must start with "price_"');
     }
-    if (paymentMethod != null && !paymentMethod!.startsWith('pm_')) {
+    if (paymentMethod != null && !paymentMethod.startsWith('pm_')) {
       throw ArgumentError('Payment Method must start with "pm_"');
     }
     if (!customerId.startsWith('cus_')) {
