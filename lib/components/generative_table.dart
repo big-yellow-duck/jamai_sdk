@@ -227,10 +227,16 @@ class GenerativeTable {
   /// [tableType] - The type of the table ('action', 'knowledge', 'chat')
   /// [request] - The multi-row add request
   ///
-  /// Returns a [Map<String, dynamic>] containing the response
+  /// Returns an [AddTableRowsResponse] which can be one of:
+  /// - [MultiRowCompletionResponse] - for non-streaming responses
+  /// - [CellCompletionResponse] - for streaming cell completion events
+  /// - [CellReferencesResponse] - for streaming cell references events
   ///
   /// Throws an [Exception] if the request fails.
-  Future<dynamic> addRows(String tableType, MultiRowAddRequest request) async {
+  Future<AddTableRowsResponse> addRows(
+    String tableType,
+    MultiRowAddRequest request,
+  ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
 
     final headers = {
@@ -251,17 +257,20 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      // Handle streaming response if requested
-      if (request.stream) {
-        // For streaming responses, return the raw response body
-        // The client can then parse the server-sent events
-        return {
-          'stream': true,
-          'data': response.body,
-          'headers': response.headers,
-        };
-      } else {
-        return json.decode(response.body) as Map<String, dynamic>;
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Determine the response type based on the 'object' field (discriminator)
+      final objectType = responseData['object'] as String?;
+
+      switch (objectType) {
+        case 'gen_table.completion.rows':
+          return MultiRowCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_completion':
+          return CellCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_references':
+          return CellReferencesResponse.fromMap(responseData);
+        default:
+          throw Exception('Unknown response type: $objectType');
       }
     } else {
       throw Exception(
@@ -305,7 +314,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateRows(MultiRowUpdateRequest request) async {
+  Future<OkResponse> updateRows(MultiRowUpdateRequest request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/rows');
 
     final response = await http.patch(
@@ -318,7 +327,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to update rows: ${response.statusCode} - ${response.body}',
@@ -354,34 +363,6 @@ class GenerativeTable {
     }
   }
 
-  /// Regenerates a single row in a table.
-  ///
-  /// [request] - The row regeneration request
-  ///
-  /// Returns a [Map<String, dynamic>] containing the response
-  ///
-  /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> regenRow(RowRegen request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/regen');
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: json.encode(request.toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception(
-        'Failed to regen row: ${response.statusCode} - ${response.body}',
-      );
-    }
-  }
-
   /// Regenerates multiple rows in a table.
   ///
   /// [request] - The multi-row regeneration request
@@ -389,7 +370,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> regenRows(MultiRowRegenRequest request) async {
+  Future<AddTableRowsResponse> regenRows(MultiRowRegenRequest request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/regen');
 
     final response = await http.post(
@@ -402,23 +383,43 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Determine the response type based on the 'object' field (discriminator)
+      final objectType = responseData['object'] as String?;
+
+      switch (objectType) {
+        case 'gen_table.completion.rows':
+          return MultiRowCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_completion':
+          return CellCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_references':
+          return CellReferencesResponse.fromMap(responseData);
+        default:
+          throw Exception('Unknown response type: $objectType');
+      }
     } else {
       throw Exception(
-        'Failed to regen rows: ${response.statusCode} - ${response.body}',
+        'Failed to add rows: ${response.statusCode} - ${response.body}',
       );
     }
   }
 
-  /// Searches a table using vector search.
+  /// Searches a table using hybrid search (vector + full-text search).
   ///
-  /// [request] - The search request
+  /// [tableType] - The type of table to search ('action', 'knowledge', 'chat')
+  /// [request] - The search request containing table_id, query, and search parameters
   ///
-  /// Returns a [Map<String, dynamic>] containing the search results
+  /// Returns a [List<Map<String, dynamic>>] containing the search results
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> search(SearchRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/search');
+  Future<List<Map<String, dynamic>>> hybridSearch(
+    TableType tableType,
+    SearchRequest request,
+  ) async {
+    final url = Uri.parse(
+      '$apiUrl/api/v2/gen_tables/${tableType.toString()}/hybrid_search',
+    );
 
     final response = await http.post(
       url,
@@ -430,7 +431,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return json.decode(response.body) as List<Map<String, dynamic>>;
     } else {
       throw Exception(
         'Failed to search: ${response.statusCode} - ${response.body}',
@@ -445,7 +446,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> importData(
+  Future<AddTableRowsResponse> importData(
     TableDataImportRequest request,
   ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/import/data');
@@ -460,10 +461,24 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Determine the response type based on the 'object' field (discriminator)
+      final objectType = responseData['object'] as String?;
+
+      switch (objectType) {
+        case 'gen_table.completion.rows':
+          return MultiRowCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_completion':
+          return CellCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_references':
+          return CellReferencesResponse.fromMap(responseData);
+        default:
+          throw Exception('Unknown response type: $objectType');
+      }
     } else {
       throw Exception(
-        'Failed to import data: ${response.statusCode} - ${response.body}',
+        'Failed to add rows: ${response.statusCode} - ${response.body}',
       );
     }
   }
@@ -472,10 +487,10 @@ class GenerativeTable {
   ///
   /// [request] - The table import request
   ///
-  /// Returns a [Map<String, dynamic>] containing the response
+  /// Returns a TableMetaResponse | OkResponse containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> importTable(TableImportRequest request) async {
+  Future<dynamic> importTable(TableImportRequest request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/import/table');
 
     final response = await http.post(

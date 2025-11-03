@@ -3,7 +3,6 @@ import 'package:jamai_sdk/types/lm.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'gen_tables.mapper.dart';
-
 /// CSV delimiter options
 @MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum CSVDelimiter {
@@ -103,9 +102,44 @@ enum GenConfigTypes {
   String toString() => value;
 }
 
+/// Sealed class for streaming response items
+/// Represents CellReferencesResponse | CellCompletionResponse from Python AsyncGenerator
+sealed class AddTableRowsStreamItem {
+  const AddTableRowsStreamItem();
+}
+
+sealed class AddTableRowsResponse {
+  const AddTableRowsResponse();
+}
+
+/// Stream wrapper for union of CellReferencesResponse and CellCompletionResponse
+/// Represents AsyncGenerator[CellReferencesResponse | CellCompletionResponse, None] from Python
+class AddTableRowsResponseGenerator implements AddTableRowsResponse {
+  final Stream<AddTableRowsStreamItem> stream;
+
+  const AddTableRowsResponseGenerator({required this.stream});
+}
+
+/// Stream wrapper for CellReferencesResponse
+/// Represents AsyncGenerator[CellReferencesResponse, None] from Python
+class CellReferencesResponseGenerator implements AddTableRowsResponse {
+  final Stream<CellReferencesResponse> stream;
+
+  const CellReferencesResponseGenerator({required this.stream});
+}
+
+/// Stream wrapper for CellCompletionResponse
+/// Represents AsyncGenerator[CellCompletionResponse, None] from Python
+class CellCompletionResponseGenerator implements AddTableRowsResponse {
+  final Stream<CellCompletionResponse> stream;
+
+  const CellCompletionResponseGenerator({required this.stream});
+}
+
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class CellCompletionResponse extends ChatCompletionChunkResponse
-    with CellCompletionResponseMappable {
+    with CellCompletionResponseMappable
+    implements AddTableRowsResponse, AddTableRowsStreamItem {
   final String outputColumnName;
   final String rowId;
 
@@ -123,13 +157,16 @@ class CellCompletionResponse extends ChatCompletionChunkResponse
     required this.rowId,
   });
 
-  factory CellCompletionResponse.fromJson(String json) => CellCompletionResponseMapper.fromJson(json);
-  factory CellCompletionResponse.fromMap(Map<String, dynamic> map) => CellCompletionResponseMapper.fromMap(map);
+  factory CellCompletionResponse.fromJson(String json) =>
+      CellCompletionResponseMapper.fromJson(json);
+  factory CellCompletionResponse.fromMap(Map<String, dynamic> map) =>
+      CellCompletionResponseMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class CellReferencesResponse extends References
-    with CellReferencesResponseMappable {
+    with CellReferencesResponseMappable
+    implements AddTableRowsResponse, AddTableRowsStreamItem {
   final String outputColumnName;
   final String rowId;
 
@@ -142,8 +179,10 @@ class CellReferencesResponse extends References
     required this.rowId,
   });
 
-  factory CellReferencesResponse.fromJson(String json) => CellReferencesResponseMapper.fromJson(json);
-  factory CellReferencesResponse.fromMap(Map<String, dynamic> map) => CellReferencesResponseMapper.fromMap(map);
+  factory CellReferencesResponse.fromJson(String json) =>
+      CellReferencesResponseMapper.fromJson(json);
+  factory CellReferencesResponse.fromMap(Map<String, dynamic> map) =>
+      CellReferencesResponseMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -158,19 +197,28 @@ class RowCompletionResponse with RowCompletionResponseMappable {
     required this.rowId,
   });
 
-  factory RowCompletionResponse.fromJson(String json) => RowCompletionResponseMapper.fromJson(json);
-  factory RowCompletionResponse.fromMap(Map<String, dynamic> map) => RowCompletionResponseMapper.fromMap(map);
+  factory RowCompletionResponse.fromJson(String json) =>
+      RowCompletionResponseMapper.fromJson(json);
+  factory RowCompletionResponse.fromMap(Map<String, dynamic> map) =>
+      RowCompletionResponseMapper.fromMap(map);
 }
 
-@MappableClass(caseStyle: CaseStyle.snakeCase)
-class MultiRowCompletionResponse with MultiRowCompletionResponseMappable {
+@MappableClass(
+  caseStyle: CaseStyle.snakeCase,
+  discriminatorValue: 'gen_table.completion.rows',
+)
+class MultiRowCompletionResponse
+    with MultiRowCompletionResponseMappable
+    implements AddTableRowsResponse {
   final String object;
   final List<RowCompletionResponse> rows;
 
   const MultiRowCompletionResponse({required this.object, required this.rows});
 
-  factory MultiRowCompletionResponse.fromJson(String json) => MultiRowCompletionResponseMapper.fromJson(json);
-  factory MultiRowCompletionResponse.fromMap(Map<String, dynamic> map) => MultiRowCompletionResponseMapper.fromMap(map);
+  factory MultiRowCompletionResponse.fromJson(String json) =>
+      MultiRowCompletionResponseMapper.fromJson(json);
+  factory MultiRowCompletionResponse.fromMap(Map<String, dynamic> map) =>
+      MultiRowCompletionResponseMapper.fromMap(map);
 }
 
 /// LLM generation configuration
@@ -213,9 +261,11 @@ class LLMGenConfig extends ChatRequestBase
     this.prompt = '',
     this.multiTurn = false,
   });
-  
-  factory LLMGenConfig.fromJson(String json) => LLMGenConfigMapper.fromJson(json);
-  factory LLMGenConfig.fromMap(Map<String, dynamic> map) => LLMGenConfigMapper.fromMap(map);
+
+  factory LLMGenConfig.fromJson(String json) =>
+      LLMGenConfigMapper.fromJson(json);
+  factory LLMGenConfig.fromMap(Map<String, dynamic> map) =>
+      LLMGenConfigMapper.fromMap(map);
 }
 
 /// Embedding generation configuration
@@ -230,9 +280,11 @@ class EmbedGenConfig extends GenConfig with EmbedGenConfigMappable {
     required this.embeddingModel,
     required this.sourceColumn,
   });
-  
-  factory EmbedGenConfig.fromJson(String json) => EmbedGenConfigMapper.fromJson(json);
-  factory EmbedGenConfig.fromMap(Map<String, dynamic> map) => EmbedGenConfigMapper.fromMap(map);
+
+  factory EmbedGenConfig.fromJson(String json) =>
+      EmbedGenConfigMapper.fromJson(json);
+  factory EmbedGenConfig.fromMap(Map<String, dynamic> map) =>
+      EmbedGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -244,9 +296,11 @@ class CodeGenConfig extends GenConfig with CodeGenConfigMappable {
     this.object = GenConfigTypes.code,
     required this.sourceColumn,
   });
-  
-  factory CodeGenConfig.fromJson(String json) => CodeGenConfigMapper.fromJson(json);
-  factory CodeGenConfig.fromMap(Map<String, dynamic> map) => CodeGenConfigMapper.fromMap(map);
+
+  factory CodeGenConfig.fromJson(String json) =>
+      CodeGenConfigMapper.fromJson(json);
+  factory CodeGenConfig.fromMap(Map<String, dynamic> map) =>
+      CodeGenConfigMapper.fromMap(map);
 }
 
 /// Python generation configuration
@@ -259,9 +313,11 @@ class PythonGenConfig extends GenConfig with PythonGenConfigMappable {
     this.object = GenConfigTypes.python,
     required this.pythonCode,
   });
-  
-  factory PythonGenConfig.fromJson(String json) => PythonGenConfigMapper.fromJson(json);
-  factory PythonGenConfig.fromMap(Map<String, dynamic> map) => PythonGenConfigMapper.fromMap(map);
+
+  factory PythonGenConfig.fromJson(String json) =>
+      PythonGenConfigMapper.fromJson(json);
+  factory PythonGenConfig.fromMap(Map<String, dynamic> map) =>
+      PythonGenConfigMapper.fromMap(map);
 }
 
 sealed class GenConfig {
@@ -333,9 +389,11 @@ class DiscriminatedLLMGenConfig extends LLMGenConfig
     super.prompt = '',
     super.multiTurn = false,
   });
-  
-  factory DiscriminatedLLMGenConfig.fromJson(String json) => DiscriminatedLLMGenConfigMapper.fromJson(json);
-  factory DiscriminatedLLMGenConfig.fromMap(Map<String, dynamic> map) => DiscriminatedLLMGenConfigMapper.fromMap(map);
+
+  factory DiscriminatedLLMGenConfig.fromJson(String json) =>
+      DiscriminatedLLMGenConfigMapper.fromJson(json);
+  factory DiscriminatedLLMGenConfig.fromMap(Map<String, dynamic> map) =>
+      DiscriminatedLLMGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(
@@ -373,9 +431,11 @@ class DiscriminatedChatGenConfig extends LLMGenConfig
     super.prompt = '',
     super.multiTurn = false,
   });
-  
-  factory DiscriminatedChatGenConfig.fromJson(String json) => DiscriminatedChatGenConfigMapper.fromJson(json);
-  factory DiscriminatedChatGenConfig.fromMap(Map<String, dynamic> map) => DiscriminatedChatGenConfigMapper.fromMap(map);
+
+  factory DiscriminatedChatGenConfig.fromJson(String json) =>
+      DiscriminatedChatGenConfigMapper.fromJson(json);
+  factory DiscriminatedChatGenConfig.fromMap(Map<String, dynamic> map) =>
+      DiscriminatedChatGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(
@@ -389,9 +449,11 @@ class DiscriminatedPythonGenConfig extends PythonGenConfig
     super.object = GenConfigTypes.python,
     required super.pythonCode,
   });
-  
-  factory DiscriminatedPythonGenConfig.fromJson(String json) => DiscriminatedPythonGenConfigMapper.fromJson(json);
-  factory DiscriminatedPythonGenConfig.fromMap(Map<String, dynamic> map) => DiscriminatedPythonGenConfigMapper.fromMap(map);
+
+  factory DiscriminatedPythonGenConfig.fromJson(String json) =>
+      DiscriminatedPythonGenConfigMapper.fromJson(json);
+  factory DiscriminatedPythonGenConfig.fromMap(Map<String, dynamic> map) =>
+      DiscriminatedPythonGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(
@@ -406,9 +468,11 @@ class DiscriminatedEmbedGenConfig extends EmbedGenConfig
     required super.embeddingModel,
     required super.sourceColumn,
   });
-  
-  factory DiscriminatedEmbedGenConfig.fromJson(String json) => DiscriminatedEmbedGenConfigMapper.fromJson(json);
-  factory DiscriminatedEmbedGenConfig.fromMap(Map<String, dynamic> map) => DiscriminatedEmbedGenConfigMapper.fromMap(map);
+
+  factory DiscriminatedEmbedGenConfig.fromJson(String json) =>
+      DiscriminatedEmbedGenConfigMapper.fromJson(json);
+  factory DiscriminatedEmbedGenConfig.fromMap(Map<String, dynamic> map) =>
+      DiscriminatedEmbedGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(
@@ -422,9 +486,11 @@ class DiscriminatedCodeGenConfig extends CodeGenConfig
     super.object = GenConfigTypes.code,
     required super.sourceColumn,
   });
-  
-  factory DiscriminatedCodeGenConfig.fromJson(String json) => DiscriminatedCodeGenConfigMapper.fromJson(json);
-  factory DiscriminatedCodeGenConfig.fromMap(Map<String, dynamic> map) => DiscriminatedCodeGenConfigMapper.fromMap(map);
+
+  factory DiscriminatedCodeGenConfig.fromJson(String json) =>
+      DiscriminatedCodeGenConfigMapper.fromJson(json);
+  factory DiscriminatedCodeGenConfig.fromMap(Map<String, dynamic> map) =>
+      DiscriminatedCodeGenConfigMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -470,9 +536,11 @@ class ColumnSchemaCreate extends ColumnSchema with ColumnSchemaCreateMappable {
     super.index = true,
     super.genConfig,
   });
-  
-  factory ColumnSchemaCreate.fromJson(String json) => ColumnSchemaCreateMapper.fromJson(json);
-  factory ColumnSchemaCreate.fromMap(Map<String, dynamic> map) => ColumnSchemaCreateMapper.fromMap(map);
+
+  factory ColumnSchemaCreate.fromJson(String json) =>
+      ColumnSchemaCreateMapper.fromJson(json);
+  factory ColumnSchemaCreate.fromMap(Map<String, dynamic> map) =>
+      ColumnSchemaCreateMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -494,9 +562,11 @@ class KnowledgeTableSchemaCreate extends TableSchemaCreate
     required super.cols,
     required this.embeddingModel,
   });
-  
-  factory KnowledgeTableSchemaCreate.fromJson(String json) => KnowledgeTableSchemaCreateMapper.fromJson(json);
-  factory KnowledgeTableSchemaCreate.fromMap(Map<String, dynamic> map) => KnowledgeTableSchemaCreateMapper.fromMap(map);
+
+  factory KnowledgeTableSchemaCreate.fromJson(String json) =>
+      KnowledgeTableSchemaCreateMapper.fromJson(json);
+  factory KnowledgeTableSchemaCreate.fromMap(Map<String, dynamic> map) =>
+      KnowledgeTableSchemaCreateMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -526,14 +596,16 @@ class TableMeta with TableMetaMappable {
   Map<String, ColumnSchema> get colMap => {for (var c in cols) c.id: c};
 
   Map<String, dynamic> get cfgMap => {for (var c in cols) c.id: c.genConfig};
-  
+
   factory TableMeta.fromJson(String json) => TableMetaMapper.fromJson(json);
-  factory TableMeta.fromMap(Map<String, dynamic> map) => TableMetaMapper.fromMap(map);
+  factory TableMeta.fromMap(Map<String, dynamic> map) =>
+      TableMetaMapper.fromMap(map);
 }
 
-/// Table metadata response
 @MappableClass(caseStyle: CaseStyle.snakeCase)
-class TableMetaResponse extends TableMeta with TableMetaResponseMappable {
+class TableMetaResponse extends TableMeta
+    with TableMetaResponseMappable
+    implements TableImportResponse {
   final String? indexedAtFts;
   final String? indexedAtVec;
   final String? indexedAtSca;
@@ -582,9 +654,11 @@ class GenConfigUpdateRequest with GenConfigUpdateRequestMappable {
     required this.tableId,
     required this.columnMap,
   });
-  
-  factory GenConfigUpdateRequest.fromJson(String json) => GenConfigUpdateRequestMapper.fromJson(json);
-  factory GenConfigUpdateRequest.fromMap(Map<String, dynamic> map) => GenConfigUpdateRequestMapper.fromMap(map);
+
+  factory GenConfigUpdateRequest.fromJson(String json) =>
+      GenConfigUpdateRequestMapper.fromJson(json);
+  factory GenConfigUpdateRequest.fromMap(Map<String, dynamic> map) =>
+      GenConfigUpdateRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -615,9 +689,11 @@ class ColumnRenameRequest with ColumnRenameRequestMappable {
     // If validation passes, return a new instance using the private constructor
     return ColumnRenameRequest._(tableId: tableId, columnMap: columnMap);
   }
-  
-  factory ColumnRenameRequest.fromJson(String json) => ColumnRenameRequestMapper.fromJson(json);
-  factory ColumnRenameRequest.fromMap(Map<String, dynamic> map) => ColumnRenameRequestMapper.fromMap(map);
+
+  factory ColumnRenameRequest.fromJson(String json) =>
+      ColumnRenameRequestMapper.fromJson(json);
+  factory ColumnRenameRequest.fromMap(Map<String, dynamic> map) =>
+      ColumnRenameRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -658,9 +734,11 @@ class ColumnReorderRequest with ColumnReorderRequestMappable {
     required this.tableId,
     required this.columnNames,
   });
-  
-  factory ColumnReorderRequest.fromJson(String json) => ColumnReorderRequestMapper.fromJson(json);
-  factory ColumnReorderRequest.fromMap(Map<String, dynamic> map) => ColumnReorderRequestMapper.fromMap(map);
+
+  factory ColumnReorderRequest.fromJson(String json) =>
+      ColumnReorderRequestMapper.fromJson(json);
+  factory ColumnReorderRequest.fromMap(Map<String, dynamic> map) =>
+      ColumnReorderRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -684,9 +762,11 @@ class ColumnDropRequest with ColumnDropRequestMappable {
   }
 
   const ColumnDropRequest._({required this.tableId, required this.columnNames});
-  
-  factory ColumnDropRequest.fromJson(String json) => ColumnDropRequestMapper.fromJson(json);
-  factory ColumnDropRequest.fromMap(Map<String, dynamic> map) => ColumnDropRequestMapper.fromMap(map);
+
+  factory ColumnDropRequest.fromJson(String json) =>
+      ColumnDropRequestMapper.fromJson(json);
+  factory ColumnDropRequest.fromMap(Map<String, dynamic> map) =>
+      ColumnDropRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -702,9 +782,11 @@ class MultiRowAddRequest with MultiRowAddRequestMappable {
     this.stream = true,
     this.concurrent = true,
   });
-  
-  factory MultiRowAddRequest.fromJson(String json) => MultiRowAddRequestMapper.fromJson(json);
-  factory MultiRowAddRequest.fromMap(Map<String, dynamic> map) => MultiRowAddRequestMapper.fromMap(map);
+
+  factory MultiRowAddRequest.fromJson(String json) =>
+      MultiRowAddRequestMapper.fromJson(json);
+  factory MultiRowAddRequest.fromMap(Map<String, dynamic> map) =>
+      MultiRowAddRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -718,9 +800,11 @@ class RowUpdateRequest with RowUpdateRequestMappable {
     required this.rowId,
     required this.data,
   });
-  
-  factory RowUpdateRequest.fromJson(String json) => RowUpdateRequestMapper.fromJson(json);
-  factory RowUpdateRequest.fromMap(Map<String, dynamic> map) => RowUpdateRequestMapper.fromMap(map);
+
+  factory RowUpdateRequest.fromJson(String json) =>
+      RowUpdateRequestMapper.fromJson(json);
+  factory RowUpdateRequest.fromMap(Map<String, dynamic> map) =>
+      RowUpdateRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -729,9 +813,11 @@ class MultiRowUpdateRequest with MultiRowUpdateRequestMappable {
   final Map<String, Map<String, dynamic>> data;
 
   const MultiRowUpdateRequest({required this.tableId, required this.data});
-  
-  factory MultiRowUpdateRequest.fromJson(String json) => MultiRowUpdateRequestMapper.fromJson(json);
-  factory MultiRowUpdateRequest.fromMap(Map<String, dynamic> map) => MultiRowUpdateRequestMapper.fromMap(map);
+
+  factory MultiRowUpdateRequest.fromJson(String json) =>
+      MultiRowUpdateRequestMapper.fromJson(json);
+  factory MultiRowUpdateRequest.fromMap(Map<String, dynamic> map) =>
+      MultiRowUpdateRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -741,32 +827,34 @@ class MultiRowUpdateRequestWithLimit extends MultiRowUpdateRequest
     required super.tableId,
     required super.data,
   });
-  
-  factory MultiRowUpdateRequestWithLimit.fromJson(String json) => MultiRowUpdateRequestWithLimitMapper.fromJson(json);
-  factory MultiRowUpdateRequestWithLimit.fromMap(Map<String, dynamic> map) => MultiRowUpdateRequestWithLimitMapper.fromMap(map);
+
+  factory MultiRowUpdateRequestWithLimit.fromJson(String json) =>
+      MultiRowUpdateRequestWithLimitMapper.fromJson(json);
+  factory MultiRowUpdateRequestWithLimit.fromMap(Map<String, dynamic> map) =>
+      MultiRowUpdateRequestWithLimitMapper.fromMap(map);
 }
 
-@MappableClass(caseStyle: CaseStyle.snakeCase)
-class RowRegen with RowRegenMappable {
-  final String tableId;
-  final String rowId;
-  final RegenStrategy regenStrategy;
-  final String? outputColumnId;
-  final bool stream;
-  final bool concurrent;
+// @MappableClass(caseStyle: CaseStyle.snakeCase)
+// class RowRegen with RowRegenMappable {
+//   final String tableId;
+//   final String rowId;
+//   final RegenStrategy regenStrategy;
+//   final String? outputColumnId;
+//   final bool stream;
+//   final bool concurrent;
 
-  const RowRegen({
-    required this.tableId,
-    required this.rowId,
-    this.regenStrategy = RegenStrategy.runAll,
-    this.outputColumnId,
-    this.stream = true,
-    this.concurrent = true,
-  });
-  
-  factory RowRegen.fromJson(String json) => RowRegenMapper.fromJson(json);
-  factory RowRegen.fromMap(Map<String, dynamic> map) => RowRegenMapper.fromMap(map);
-}
+//   const RowRegen({
+//     required this.tableId,
+//     required this.rowId,
+//     this.regenStrategy = RegenStrategy.runAll,
+//     this.outputColumnId,
+//     this.stream = true,
+//     this.concurrent = true,
+//   });
+
+//   factory RowRegen.fromJson(String json) => RowRegenMapper.fromJson(json);
+//   factory RowRegen.fromMap(Map<String, dynamic> map) => RowRegenMapper.fromMap(map);
+// }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class MultiRowRegenRequest with MultiRowRegenRequestMappable {
@@ -785,9 +873,11 @@ class MultiRowRegenRequest with MultiRowRegenRequestMappable {
     this.stream = true,
     this.concurrent = true,
   });
-  
-  factory MultiRowRegenRequest.fromJson(String json) => MultiRowRegenRequestMapper.fromJson(json);
-  factory MultiRowRegenRequest.fromMap(Map<String, dynamic> map) => MultiRowRegenRequestMapper.fromMap(map);
+
+  factory MultiRowRegenRequest.fromJson(String json) =>
+      MultiRowRegenRequestMapper.fromJson(json);
+  factory MultiRowRegenRequest.fromMap(Map<String, dynamic> map) =>
+      MultiRowRegenRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -801,9 +891,11 @@ class MultiRowDeleteRequest with MultiRowDeleteRequestMappable {
     this.rowIds,
     this.where = '',
   });
-  
-  factory MultiRowDeleteRequest.fromJson(String json) => MultiRowDeleteRequestMapper.fromJson(json);
-  factory MultiRowDeleteRequest.fromMap(Map<String, dynamic> map) => MultiRowDeleteRequestMapper.fromMap(map);
+
+  factory MultiRowDeleteRequest.fromJson(String json) =>
+      MultiRowDeleteRequestMapper.fromJson(json);
+  factory MultiRowDeleteRequest.fromMap(Map<String, dynamic> map) =>
+      MultiRowDeleteRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -825,9 +917,11 @@ class SearchRequest with SearchRequestMappable {
     this.vecDecimals = 0,
     this.rerankingModel,
   });
-  
-  factory SearchRequest.fromJson(String json) => SearchRequestMapper.fromJson(json);
-  factory SearchRequest.fromMap(Map<String, dynamic> map) => SearchRequestMapper.fromMap(map);
+
+  factory SearchRequest.fromJson(String json) =>
+      SearchRequestMapper.fromJson(json);
+  factory SearchRequest.fromMap(Map<String, dynamic> map) =>
+      SearchRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -843,9 +937,11 @@ class TableDataImportRequest with TableDataImportRequestMappable {
     this.stream = true,
     this.delimiter = CSVDelimiter.comma,
   });
-  
-  factory TableDataImportRequest.fromJson(String json) => TableDataImportRequestMapper.fromJson(json);
-  factory TableDataImportRequest.fromMap(Map<String, dynamic> map) => TableDataImportRequestMapper.fromMap(map);
+
+  factory TableDataImportRequest.fromJson(String json) =>
+      TableDataImportRequestMapper.fromJson(json);
+  factory TableDataImportRequest.fromMap(Map<String, dynamic> map) =>
+      TableDataImportRequestMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -859,7 +955,14 @@ class TableImportRequest with TableImportRequestMappable {
     this.tableIdDst,
     this.blocking = true,
   });
-  
-  factory TableImportRequest.fromJson(String json) => TableImportRequestMapper.fromJson(json);
-  factory TableImportRequest.fromMap(Map<String, dynamic> map) => TableImportRequestMapper.fromMap(map);
+
+  factory TableImportRequest.fromJson(String json) =>
+      TableImportRequestMapper.fromJson(json);
+  factory TableImportRequest.fromMap(Map<String, dynamic> map) =>
+      TableImportRequestMapper.fromMap(map);
+}
+
+// type for import table reponse
+sealed class TableImportResponse {
+  const TableImportResponse();
 }
