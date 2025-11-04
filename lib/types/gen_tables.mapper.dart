@@ -53,56 +53,6 @@ extension CSVDelimiterMapperExtension on CSVDelimiter {
   }
 }
 
-class TableTypeMapper extends EnumMapper<TableType> {
-  TableTypeMapper._();
-
-  static TableTypeMapper? _instance;
-  static TableTypeMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = TableTypeMapper._());
-    }
-    return _instance!;
-  }
-
-  static TableType fromValue(dynamic value) {
-    ensureInitialized();
-    return MapperContainer.globals.fromValue(value);
-  }
-
-  @override
-  TableType decode(dynamic value) {
-    switch (value) {
-      case r'action':
-        return TableType.action;
-      case r'knowledge':
-        return TableType.knowledge;
-      case r'chat':
-        return TableType.chat;
-      default:
-        throw MapperException.unknownEnumValue(value);
-    }
-  }
-
-  @override
-  dynamic encode(TableType self) {
-    switch (self) {
-      case TableType.action:
-        return r'action';
-      case TableType.knowledge:
-        return r'knowledge';
-      case TableType.chat:
-        return r'chat';
-    }
-  }
-}
-
-extension TableTypeMapperExtension on TableType {
-  String toValue() {
-    TableTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<TableType>(this) as String;
-  }
-}
-
 class ColumnSchemaDtypeMapper extends EnumMapper<ColumnSchemaDtype> {
   ColumnSchemaDtypeMapper._();
 
@@ -136,6 +86,8 @@ class ColumnSchemaDtypeMapper extends EnumMapper<ColumnSchemaDtype> {
         return ColumnSchemaDtype.image;
       case r'audio':
         return ColumnSchemaDtype.audio;
+      case 'date-time':
+        return ColumnSchemaDtype.dateTime;
       case r'document':
         return ColumnSchemaDtype.document;
       default:
@@ -160,6 +112,8 @@ class ColumnSchemaDtypeMapper extends EnumMapper<ColumnSchemaDtype> {
         return r'image';
       case ColumnSchemaDtype.audio:
         return r'audio';
+      case ColumnSchemaDtype.dateTime:
+        return 'date-time';
       case ColumnSchemaDtype.document:
         return r'document';
     }
@@ -167,9 +121,9 @@ class ColumnSchemaDtypeMapper extends EnumMapper<ColumnSchemaDtype> {
 }
 
 extension ColumnSchemaDtypeMapperExtension on ColumnSchemaDtype {
-  String toValue() {
+  dynamic toValue() {
     ColumnSchemaDtypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<ColumnSchemaDtype>(this) as String;
+    return MapperContainer.globals.toValue<ColumnSchemaDtype>(this);
   }
 }
 
@@ -2002,6 +1956,8 @@ class DiscriminatedGenConfigMapper
   @override
   final MappableFields<DiscriminatedGenConfig> fields = const {};
 
+  @override
+  final MappingHook hook = const DiscriminatedGenConfigHook();
   static DiscriminatedGenConfig _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
       'DiscriminatedGenConfig',
@@ -2240,7 +2196,7 @@ class DiscriminatedLLMGenConfigMapper
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = GenConfigTypes.llm;
+  final dynamic discriminatorValue = 'gen_config.llm';
   @override
   late final ClassMapperBase superMapper =
       LLMGenConfigMapper.ensureInitialized();
@@ -2473,7 +2429,7 @@ class DiscriminatedChatGenConfigMapper
   );
   static GenConfigTypes _$object(DiscriminatedChatGenConfig v) => v.object;
   static const Field<DiscriminatedChatGenConfig, GenConfigTypes> _f$object =
-      Field('object', _$object, opt: true, def: GenConfigTypes.llm);
+      Field('object', _$object, opt: true, def: GenConfigTypes.chat);
   static String _$systemPrompt(DiscriminatedChatGenConfig v) => v.systemPrompt;
   static const Field<DiscriminatedChatGenConfig, String> _f$systemPrompt =
       Field(
@@ -2531,7 +2487,7 @@ class DiscriminatedChatGenConfigMapper
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = GenConfigTypes.chat;
+  final dynamic discriminatorValue = 'gen_config.chat';
   @override
   late final ClassMapperBase superMapper =
       LLMGenConfigMapper.ensureInitialized();
@@ -2646,7 +2602,7 @@ class DiscriminatedPythonGenConfigMapper
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = GenConfigTypes.python;
+  final dynamic discriminatorValue = 'gen_config.python';
   @override
   late final ClassMapperBase superMapper =
       PythonGenConfigMapper.ensureInitialized();
@@ -2815,7 +2771,7 @@ class DiscriminatedEmbedGenConfigMapper
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = GenConfigTypes.embed;
+  final dynamic discriminatorValue = 'gen_config.embed';
   @override
   late final ClassMapperBase superMapper =
       EmbedGenConfigMapper.ensureInitialized();
@@ -2991,7 +2947,7 @@ class DiscriminatedCodeGenConfigMapper
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = GenConfigTypes.code;
+  final dynamic discriminatorValue = 'gen_config.code';
   @override
   late final ClassMapperBase superMapper =
       CodeGenConfigMapper.ensureInitialized();
@@ -3175,7 +3131,13 @@ class ColumnSchemaMapper extends ClassMapperBase<ColumnSchema> {
   };
 
   static ColumnSchema _instantiate(DecodingData data) {
-    throw MapperException.missingConstructor('ColumnSchema');
+    return ColumnSchema(
+      id: data.dec(_f$id),
+      dtype: data.dec(_f$dtype),
+      vlen: data.dec(_f$vlen),
+      index: data.dec(_f$index),
+      genConfig: data.dec(_f$genConfig),
+    );
   }
 
   @override
@@ -3191,9 +3153,51 @@ class ColumnSchemaMapper extends ClassMapperBase<ColumnSchema> {
 }
 
 mixin ColumnSchemaMappable {
-  String toJson();
-  Map<String, dynamic> toMap();
-  ColumnSchemaCopyWith<ColumnSchema, ColumnSchema, ColumnSchema> get copyWith;
+  String toJson() {
+    return ColumnSchemaMapper.ensureInitialized().encodeJson<ColumnSchema>(
+      this as ColumnSchema,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return ColumnSchemaMapper.ensureInitialized().encodeMap<ColumnSchema>(
+      this as ColumnSchema,
+    );
+  }
+
+  ColumnSchemaCopyWith<ColumnSchema, ColumnSchema, ColumnSchema> get copyWith =>
+      _ColumnSchemaCopyWithImpl<ColumnSchema, ColumnSchema>(
+        this as ColumnSchema,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return ColumnSchemaMapper.ensureInitialized().stringifyValue(
+      this as ColumnSchema,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return ColumnSchemaMapper.ensureInitialized().equalsValue(
+      this as ColumnSchema,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return ColumnSchemaMapper.ensureInitialized().hashValue(
+      this as ColumnSchema,
+    );
+  }
+}
+
+extension ColumnSchemaValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ColumnSchema, $Out> {
+  ColumnSchemaCopyWith<$R, ColumnSchema, $Out> get $asColumnSchema =>
+      $base.as((v, t, t2) => _ColumnSchemaCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class ColumnSchemaCopyWith<$R, $In extends ColumnSchema, $Out>
@@ -3206,6 +3210,45 @@ abstract class ColumnSchemaCopyWith<$R, $In extends ColumnSchema, $Out>
     DiscriminatedGenConfig? genConfig,
   });
   ColumnSchemaCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _ColumnSchemaCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ColumnSchema, $Out>
+    implements ColumnSchemaCopyWith<$R, ColumnSchema, $Out> {
+  _ColumnSchemaCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<ColumnSchema> $mapper =
+      ColumnSchemaMapper.ensureInitialized();
+  @override
+  $R call({
+    String? id,
+    ColumnSchemaDtype? dtype,
+    int? vlen,
+    bool? index,
+    Object? genConfig = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (dtype != null) #dtype: dtype,
+      if (vlen != null) #vlen: vlen,
+      if (index != null) #index: index,
+      if (genConfig != $none) #genConfig: genConfig,
+    }),
+  );
+  @override
+  ColumnSchema $make(CopyWithData data) => ColumnSchema(
+    id: data.get(#id, or: $value.id),
+    dtype: data.get(#dtype, or: $value.dtype),
+    vlen: data.get(#vlen, or: $value.vlen),
+    index: data.get(#index, or: $value.index),
+    genConfig: data.get(#genConfig, or: $value.genConfig),
+  );
+
+  @override
+  ColumnSchemaCopyWith<$R2, ColumnSchema, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _ColumnSchemaCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class ColumnSchemaCreateMapper extends ClassMapperBase<ColumnSchemaCreate> {
@@ -3424,7 +3467,7 @@ class TableSchemaCreateMapper extends ClassMapperBase<TableSchemaCreate> {
   };
 
   static TableSchemaCreate _instantiate(DecodingData data) {
-    throw MapperException.missingConstructor('TableSchemaCreate');
+    return TableSchemaCreate(id: data.dec(_f$id), cols: data.dec(_f$cols));
   }
 
   @override
@@ -3440,14 +3483,56 @@ class TableSchemaCreateMapper extends ClassMapperBase<TableSchemaCreate> {
 }
 
 mixin TableSchemaCreateMappable {
-  String toJson();
-  Map<String, dynamic> toMap();
+  String toJson() {
+    return TableSchemaCreateMapper.ensureInitialized()
+        .encodeJson<TableSchemaCreate>(this as TableSchemaCreate);
+  }
+
+  Map<String, dynamic> toMap() {
+    return TableSchemaCreateMapper.ensureInitialized()
+        .encodeMap<TableSchemaCreate>(this as TableSchemaCreate);
+  }
+
   TableSchemaCreateCopyWith<
     TableSchemaCreate,
     TableSchemaCreate,
     TableSchemaCreate
   >
-  get copyWith;
+  get copyWith =>
+      _TableSchemaCreateCopyWithImpl<TableSchemaCreate, TableSchemaCreate>(
+        this as TableSchemaCreate,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return TableSchemaCreateMapper.ensureInitialized().stringifyValue(
+      this as TableSchemaCreate,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return TableSchemaCreateMapper.ensureInitialized().equalsValue(
+      this as TableSchemaCreate,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return TableSchemaCreateMapper.ensureInitialized().hashValue(
+      this as TableSchemaCreate,
+    );
+  }
+}
+
+extension TableSchemaCreateValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, TableSchemaCreate, $Out> {
+  TableSchemaCreateCopyWith<$R, TableSchemaCreate, $Out>
+  get $asTableSchemaCreate => $base.as(
+    (v, t, t2) => _TableSchemaCreateCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
 abstract class TableSchemaCreateCopyWith<
@@ -3466,6 +3551,41 @@ abstract class TableSchemaCreateCopyWith<
   TableSchemaCreateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
+}
+
+class _TableSchemaCreateCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, TableSchemaCreate, $Out>
+    implements TableSchemaCreateCopyWith<$R, TableSchemaCreate, $Out> {
+  _TableSchemaCreateCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<TableSchemaCreate> $mapper =
+      TableSchemaCreateMapper.ensureInitialized();
+  @override
+  ListCopyWith<
+    $R,
+    ColumnSchemaCreate,
+    ColumnSchemaCreateCopyWith<$R, ColumnSchemaCreate, ColumnSchemaCreate>
+  >
+  get cols => ListCopyWith(
+    $value.cols,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(cols: v),
+  );
+  @override
+  $R call({String? id, List<ColumnSchemaCreate>? cols}) => $apply(
+    FieldCopyWithData({if (id != null) #id: id, if (cols != null) #cols: cols}),
+  );
+  @override
+  TableSchemaCreate $make(CopyWithData data) => TableSchemaCreate(
+    id: data.get(#id, or: $value.id),
+    cols: data.get(#cols, or: $value.cols),
+  );
+
+  @override
+  TableSchemaCreateCopyWith<$R2, TableSchemaCreate, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _TableSchemaCreateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class KnowledgeTableSchemaCreateMapper

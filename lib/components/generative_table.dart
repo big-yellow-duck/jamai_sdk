@@ -6,11 +6,13 @@ import 'package:jamai_sdk/types/common.dart';
 class GenerativeTable {
   final String apiUrl;
   final String apiKey;
-  final String projectId;
+  final String? projectId;
+  final String? userId;
   GenerativeTable({
     required this.apiUrl,
     required this.apiKey,
-    required this.projectId,
+    this.projectId,
+    this.userId,
   });
 
   /// Creates a new action table.
@@ -23,16 +25,21 @@ class GenerativeTable {
   Future<TableMetaResponse> createActionTable(TableSchemaCreate request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/action');
 
+    print('Create Action Table Request:');
+    print(request);
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
+      print('Create Action Table Response: ${response.body}');
       return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
@@ -58,8 +65,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -86,8 +95,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -152,6 +163,8 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
     );
 
@@ -181,6 +194,8 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
     );
 
@@ -210,6 +225,8 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
     );
 
@@ -242,6 +259,8 @@ class GenerativeTable {
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $apiKey',
+      if (userId != null) 'X-USER-ID': userId!,
+      if (projectId != null) 'X-PROJECT-ID': projectId!,
     };
 
     // Add streaming-specific headers if requested
@@ -253,7 +272,7 @@ class GenerativeTable {
     final response = await http.post(
       url,
       headers: headers,
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -294,8 +313,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -322,8 +343,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -350,8 +373,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -378,8 +403,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -426,8 +453,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -456,8 +485,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -498,8 +529,10 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
@@ -518,7 +551,7 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateGenConfig(
+  Future<TableMetaResponse> updateGenConfig(
     GenConfigUpdateRequest request,
   ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/gen_config');
@@ -528,12 +561,14 @@ class GenerativeTable {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to update gen config: ${response.statusCode} - ${response.body}',
@@ -548,20 +583,27 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> renameColumn(ColumnRenameRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/columns/rename');
+  Future<TableMetaResponse> renameColumns(
+    TableType tableType,
+    ColumnRenameRequest request,
+  ) async {
+    final url = Uri.parse(
+      '$apiUrl/api/v2/gen_tables/$tableType/columns/rename',
+    );
 
     final response = await http.patch(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to rename column: ${response.statusCode} - ${response.body}',
@@ -576,22 +618,27 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> reorderColumns(
+  Future<TableMetaResponse> reorderColumns(
+    TableType tableType,
     ColumnReorderRequest request,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/columns/reorder');
+    final url = Uri.parse(
+      '$apiUrl/api/v2/gen_tables/$tableType/columns/reorder',
+    );
 
     final response = await http.patch(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to reorder columns: ${response.statusCode} - ${response.body}',
@@ -606,20 +653,25 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> dropColumns(ColumnDropRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/columns');
+  Future<TableMetaResponse> dropColumns(
+    TableType tableType,
+    ColumnDropRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/columns');
 
     final response = await http.delete(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode(request.toJson()),
+      body: request.toJson(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to drop columns: ${response.statusCode} - ${response.body}',
@@ -631,27 +683,38 @@ class GenerativeTable {
   ///
   /// [filePath] - The path to the file to embed
   /// [tableId] - The ID of the knowledge table
+  /// [chunkSize] - The size of chunks to split the file into
+  /// [chunkOverlap] - The overlap between chunks
   ///
-  /// Returns a [Map<String, dynamic>] containing the response
+  /// Returns an [OkResponse] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> embedFile(
+  Future<OkResponse> embedFile(
     String filePath,
     String tableId,
+    int chunkSize,
+    int chunkOverlap,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/embed');
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/knowledge/embed_file');
 
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
       },
-      body: json.encode({'file_path': filePath, 'table_id': tableId}),
+      body: json.encode({
+        'file_path': filePath,
+        'table_id': tableId,
+        'chunk_size': chunkSize,
+        'chunk_overlap': chunkOverlap,
+      }),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to embed file: ${response.statusCode} - ${response.body}',

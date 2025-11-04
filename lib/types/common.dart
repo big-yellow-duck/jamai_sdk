@@ -1,7 +1,6 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:sealed_countries/sealed_countries.dart';
 import 'package:uuid/uuid.dart';
-import 'package:dart_mappable/dart_mappable.dart';
-import 'package:meta/meta.dart';
 
 part 'common.mapper.dart';
 
@@ -35,12 +34,12 @@ enum TableType {
 }
 
 /// String of length less than 255
-class ShortString {
+@MappableClass()
+class ShortString with ShortStringMappable {
   static const int maxLength = 255;
 
-  final String _value;
-
-  const ShortString._internal(this._value);
+  @MappableField(hook: ShortStringHook())
+  final String value;
 
   factory ShortString(String input) {
     if (input.length > maxLength) {
@@ -48,33 +47,50 @@ class ShortString {
         'String length (${input.length}) must be less than $maxLength characters.',
       );
     }
-    return ShortString._internal(input);
+    return ShortString._(input);
   }
+  const ShortString._(this.value);
 
-  String get value => _value;
+  // String get value => _value;
 
-  /// Delegates to the underlying String's length.
-  int get length => _value.length;
+  // /// Delegates to the underlying String's length.
+  // int get length => _value.length;
 
-  /// Allows indexed access to characters, just like a standard String.
-  /// Example: myShortString[0]
-  String operator [](int index) {
-    return _value[index];
+  // /// Allows indexed access to characters, just like a standard String.
+  // /// Example: myShortString[0]
+  // String operator [](int index) {
+  //   return _value[index];
+  // }
+
+  // @override
+  // bool operator ==(Object other) {
+  //   if (identical(this, other)) return true;
+  //   return other is ShortString && other._value == _value;
+  // }
+
+  // /// Delegates the hashCode to the underlying String value.
+  // @override
+  // int get hashCode => _value.hashCode;
+
+  // /// Overrides the toString method to easily print the value.
+  // @override
+  // String toString() => _value;
+}
+
+class ShortStringHook extends MappingHook {
+  const ShortStringHook();
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    return ShortString(value);
   }
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ShortString && other._value == _value;
+  dynamic beforeEncode(dynamic value) {
+    return (value as ShortString).value;
   }
-
-  /// Delegates the hashCode to the underlying String value.
-  @override
-  int get hashCode => _value.hashCode;
-
-  /// Overrides the toString method to easily print the value.
-  @override
-  String toString() => _value;
 }
 
 /// Example model IDs used throughout the SDK
@@ -595,6 +611,7 @@ sealed class StringOrListString {
 }
 
 class StringOrListStringString extends StringOrListString {
+  @MappableField(hook: ShortStringHook())
   final String value;
   const StringOrListStringString(this.value);
 }
@@ -623,6 +640,7 @@ class StringOrListDoubleListDouble extends StringOrListDouble {
 }
 
 class StringOrListDoubleString extends StringOrListDouble {
+  @MappableField(hook: ShortStringHook())
   final String value;
   StringOrListDoubleString(this.value);
 }
@@ -711,8 +729,10 @@ class StringValidator {
   }
 }
 
-@immutable
-class SanitizedNonEmptyString {
+@MappableClass()
+class SanitizedNonEmptyString with SanitizedNonEmptyStringMappable {
+  @MappableField(hook: ShortStringHook())
+  final String value;
   factory SanitizedNonEmptyString(String value) {
     if (!StringValidator.isValidString(
       value,
@@ -727,8 +747,6 @@ class SanitizedNonEmptyString {
   }
 
   const SanitizedNonEmptyString._(this.value);
-
-  final String value;
 
   /// Acts like a string when printed
   @override
@@ -755,8 +773,24 @@ class SanitizedNonEmptyString {
   String asString() => value;
 }
 
-@immutable
-class SanitizedString {
+class SanitizedNonEmptyStringHook extends MappingHook {
+  const SanitizedNonEmptyStringHook();
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    return SanitizedNonEmptyString(value);
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return (value as SanitizedNonEmptyString).get;
+  }
+}
+
+@MappableClass()
+class SanitizedString with SanitizedStringMappable {
   factory SanitizedString(String value) {
     if (!StringValidator.isValidString(
       value,
@@ -771,6 +805,7 @@ class SanitizedString {
   }
   const SanitizedString._(this.value);
 
+  @MappableField(hook: ShortStringHook())
   final String value;
 
   /// Acts like a string when printed
@@ -798,8 +833,24 @@ class SanitizedString {
   String asString() => value;
 }
 
-@immutable
-class SanitizedMultilineString {
+class SanitizedStringHook extends MappingHook {
+  const SanitizedStringHook();
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    return SanitizedString(value);
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return (value as SanitizedString).get;
+  }
+}
+
+@MappableClass()
+class SanitizedMultilineString with SanitizedMultilineStringMappable {
   factory SanitizedMultilineString(String value) {
     if (!StringValidator.isValidString(
       value,
@@ -815,6 +866,7 @@ class SanitizedMultilineString {
 
   const SanitizedMultilineString._(this.value);
 
+  @MappableField(hook: ShortStringHook())
   final String value;
 
   /// Acts like a string when printed
@@ -842,8 +894,25 @@ class SanitizedMultilineString {
   String asString() => value;
 }
 
-@immutable
-class SanitizedNonEmptyMultilineString {
+class SanitizedMultilineStringHook extends MappingHook {
+  const SanitizedMultilineStringHook();
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    return SanitizedMultilineString(value);
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return (value as SanitizedMultilineString).get;
+  }
+}
+
+@MappableClass()
+class SanitizedNonEmptyMultilineString
+    with SanitizedNonEmptyMultilineStringMappable {
   factory SanitizedNonEmptyMultilineString(String value) {
     if (!StringValidator.isValidString(
       value,
@@ -859,6 +928,7 @@ class SanitizedNonEmptyMultilineString {
 
   const SanitizedNonEmptyMultilineString._(this.value);
 
+  @MappableField(hook: ShortStringHook())
   final String value;
 
   /// Acts like a string when printed
@@ -884,4 +954,38 @@ class SanitizedNonEmptyMultilineString {
 
   /// Optional: convenience to convert back to `String`
   String asString() => value;
+}
+
+class SaniztiedNonEmptyMultilineStringHook extends MappingHook {
+  const SaniztiedNonEmptyMultilineStringHook();
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    return SanitizedNonEmptyMultilineString(value);
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return (value as SanitizedNonEmptyMultilineString).get;
+  }
+}
+
+class FiatCurrencyHook extends MappingHook {
+  const FiatCurrencyHook();
+
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value is! String) {
+      throw ArgumentError('Value must be a String');
+    }
+    final currency = FiatCurrency.fromCode(value);
+    return currency;
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    return (value as FiatCurrency).code;
+  }
 }

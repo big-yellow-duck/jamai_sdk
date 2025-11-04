@@ -11,7 +11,7 @@ void main() {
   late String? jamaiUrl;
   late JamaiApiClient jamai;
   late String? testOrganizationId;
-  late String? testProjectName;
+  late SanitizedNonEmptyString? testProjectName;
   late String? testUserId;
 
   // create newproject to use for later tests
@@ -22,7 +22,11 @@ void main() {
     jamaiApiKey = env['JAMAI_API_KEY'];
     jamaiUrl = env['JAMAI_API_URL'];
     testOrganizationId = env['TEST_ORGANIZATION_ID'];
-    testProjectName = env['TEST_PROJECT_NAME'];
+    String? loadedTestProjectName = env['TEST_PROJECT_NAME'];
+    if(loadedTestProjectName == null) {
+      throw Exception('TEST_PROJECT_NAME environment variable is not set');
+    }
+    testProjectName = SanitizedNonEmptyString(loadedTestProjectName);
     testUserId = env['TEST_USER_ID'];
 
     expect(jamaiApiKey, isNotNull);
@@ -37,7 +41,7 @@ void main() {
       userId: testUserId,
     );
     final projectCreateResult = await jamai.project.create(
-      projectId: testProjectName!,
+      projectId: testProjectName.toString()!,
       body: db_types.ProjectCreate(
         organizationId: testOrganizationId!,
         name: testProjectName!,

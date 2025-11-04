@@ -161,6 +161,126 @@ extension ProgressStateMapperExtension on ProgressState {
   }
 }
 
+class ShortStringMapper extends ClassMapperBase<ShortString> {
+  ShortStringMapper._();
+
+  static ShortStringMapper? _instance;
+  static ShortStringMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ShortStringMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'ShortString';
+
+  static const Field<ShortString, String> _f$input = Field(
+    'input',
+    null,
+    mode: FieldMode.param,
+  );
+  static String _$value(ShortString v) => v.value;
+  static const Field<ShortString, String> _f$value = Field(
+    'value',
+    _$value,
+    hook: ShortStringHook(),
+  );
+
+  @override
+  final MappableFields<ShortString> fields = const {
+    #input: _f$input,
+    #value: _f$value,
+  };
+
+  static ShortString _instantiate(DecodingData data) {
+    return ShortString(data.dec(_f$input));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static ShortString fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<ShortString>(map);
+  }
+
+  static ShortString fromJson(String json) {
+    return ensureInitialized().decodeJson<ShortString>(json);
+  }
+}
+
+mixin ShortStringMappable {
+  String toJson() {
+    return ShortStringMapper.ensureInitialized().encodeJson<ShortString>(
+      this as ShortString,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return ShortStringMapper.ensureInitialized().encodeMap<ShortString>(
+      this as ShortString,
+    );
+  }
+
+  ShortStringCopyWith<ShortString, ShortString, ShortString> get copyWith =>
+      _ShortStringCopyWithImpl<ShortString, ShortString>(
+        this as ShortString,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return ShortStringMapper.ensureInitialized().stringifyValue(
+      this as ShortString,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return ShortStringMapper.ensureInitialized().equalsValue(
+      this as ShortString,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return ShortStringMapper.ensureInitialized().hashValue(this as ShortString);
+  }
+}
+
+extension ShortStringValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ShortString, $Out> {
+  ShortStringCopyWith<$R, ShortString, $Out> get $asShortString =>
+      $base.as((v, t, t2) => _ShortStringCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class ShortStringCopyWith<$R, $In extends ShortString, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({required String input});
+  ShortStringCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _ShortStringCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ShortString, $Out>
+    implements ShortStringCopyWith<$R, ShortString, $Out> {
+  _ShortStringCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<ShortString> $mapper =
+      ShortStringMapper.ensureInitialized();
+  @override
+  $R call({required String input}) =>
+      $apply(FieldCopyWithData({#input: input}));
+  @override
+  ShortString $make(CopyWithData data) => ShortString(data.get(#input));
+
+  @override
+  ShortStringCopyWith<$R2, ShortString, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _ShortStringCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
 class ProgressMapper extends ClassMapperBase<Progress> {
   ProgressMapper._();
 
@@ -2062,5 +2182,597 @@ class _StripeEventDataCopyWithImpl<$R, $Out>
   StripeEventDataCopyWith<$R2, StripeEventData, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _StripeEventDataCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class SanitizedNonEmptyStringMapper
+    extends ClassMapperBase<SanitizedNonEmptyString> {
+  SanitizedNonEmptyStringMapper._();
+
+  static SanitizedNonEmptyStringMapper? _instance;
+  static SanitizedNonEmptyStringMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = SanitizedNonEmptyStringMapper._(),
+      );
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'SanitizedNonEmptyString';
+
+  static String _$value(SanitizedNonEmptyString v) => v.value;
+  static const Field<SanitizedNonEmptyString, String> _f$value = Field(
+    'value',
+    _$value,
+    hook: ShortStringHook(),
+  );
+  static String _$get(SanitizedNonEmptyString v) => v.get;
+  static const Field<SanitizedNonEmptyString, String> _f$get = Field(
+    'get',
+    _$get,
+    mode: FieldMode.member,
+  );
+  static int _$hashCode(SanitizedNonEmptyString v) => v.hashCode;
+  static const Field<SanitizedNonEmptyString, int> _f$hashCode = Field(
+    'hashCode',
+    _$hashCode,
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<SanitizedNonEmptyString> fields = const {
+    #value: _f$value,
+    #get: _f$get,
+    #hashCode: _f$hashCode,
+  };
+
+  static SanitizedNonEmptyString _instantiate(DecodingData data) {
+    return SanitizedNonEmptyString(data.dec(_f$value));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static SanitizedNonEmptyString fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<SanitizedNonEmptyString>(map);
+  }
+
+  static SanitizedNonEmptyString fromJson(String json) {
+    return ensureInitialized().decodeJson<SanitizedNonEmptyString>(json);
+  }
+}
+
+mixin SanitizedNonEmptyStringMappable {
+  String toJson() {
+    return SanitizedNonEmptyStringMapper.ensureInitialized()
+        .encodeJson<SanitizedNonEmptyString>(this as SanitizedNonEmptyString);
+  }
+
+  Map<String, dynamic> toMap() {
+    return SanitizedNonEmptyStringMapper.ensureInitialized()
+        .encodeMap<SanitizedNonEmptyString>(this as SanitizedNonEmptyString);
+  }
+
+  SanitizedNonEmptyStringCopyWith<
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get copyWith =>
+      _SanitizedNonEmptyStringCopyWithImpl<
+        SanitizedNonEmptyString,
+        SanitizedNonEmptyString
+      >(this as SanitizedNonEmptyString, $identity, $identity);
+  @override
+  String toString() {
+    return SanitizedNonEmptyStringMapper.ensureInitialized().stringifyValue(
+      this as SanitizedNonEmptyString,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return SanitizedNonEmptyStringMapper.ensureInitialized().equalsValue(
+      this as SanitizedNonEmptyString,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return SanitizedNonEmptyStringMapper.ensureInitialized().hashValue(
+      this as SanitizedNonEmptyString,
+    );
+  }
+}
+
+extension SanitizedNonEmptyStringValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, SanitizedNonEmptyString, $Out> {
+  SanitizedNonEmptyStringCopyWith<$R, SanitizedNonEmptyString, $Out>
+  get $asSanitizedNonEmptyString => $base.as(
+    (v, t, t2) => _SanitizedNonEmptyStringCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class SanitizedNonEmptyStringCopyWith<
+  $R,
+  $In extends SanitizedNonEmptyString,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? value});
+  SanitizedNonEmptyStringCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _SanitizedNonEmptyStringCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, SanitizedNonEmptyString, $Out>
+    implements
+        SanitizedNonEmptyStringCopyWith<$R, SanitizedNonEmptyString, $Out> {
+  _SanitizedNonEmptyStringCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<SanitizedNonEmptyString> $mapper =
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+  @override
+  $R call({String? value}) =>
+      $apply(FieldCopyWithData({if (value != null) #value: value}));
+  @override
+  SanitizedNonEmptyString $make(CopyWithData data) =>
+      SanitizedNonEmptyString(data.get(#value, or: $value.value));
+
+  @override
+  SanitizedNonEmptyStringCopyWith<$R2, SanitizedNonEmptyString, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _SanitizedNonEmptyStringCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class SanitizedStringMapper extends ClassMapperBase<SanitizedString> {
+  SanitizedStringMapper._();
+
+  static SanitizedStringMapper? _instance;
+  static SanitizedStringMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = SanitizedStringMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'SanitizedString';
+
+  static String _$value(SanitizedString v) => v.value;
+  static const Field<SanitizedString, String> _f$value = Field(
+    'value',
+    _$value,
+    hook: ShortStringHook(),
+  );
+  static String _$get(SanitizedString v) => v.get;
+  static const Field<SanitizedString, String> _f$get = Field(
+    'get',
+    _$get,
+    mode: FieldMode.member,
+  );
+  static int _$hashCode(SanitizedString v) => v.hashCode;
+  static const Field<SanitizedString, int> _f$hashCode = Field(
+    'hashCode',
+    _$hashCode,
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<SanitizedString> fields = const {
+    #value: _f$value,
+    #get: _f$get,
+    #hashCode: _f$hashCode,
+  };
+
+  static SanitizedString _instantiate(DecodingData data) {
+    return SanitizedString(data.dec(_f$value));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static SanitizedString fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<SanitizedString>(map);
+  }
+
+  static SanitizedString fromJson(String json) {
+    return ensureInitialized().decodeJson<SanitizedString>(json);
+  }
+}
+
+mixin SanitizedStringMappable {
+  String toJson() {
+    return SanitizedStringMapper.ensureInitialized()
+        .encodeJson<SanitizedString>(this as SanitizedString);
+  }
+
+  Map<String, dynamic> toMap() {
+    return SanitizedStringMapper.ensureInitialized().encodeMap<SanitizedString>(
+      this as SanitizedString,
+    );
+  }
+
+  SanitizedStringCopyWith<SanitizedString, SanitizedString, SanitizedString>
+  get copyWith =>
+      _SanitizedStringCopyWithImpl<SanitizedString, SanitizedString>(
+        this as SanitizedString,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return SanitizedStringMapper.ensureInitialized().stringifyValue(
+      this as SanitizedString,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return SanitizedStringMapper.ensureInitialized().equalsValue(
+      this as SanitizedString,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return SanitizedStringMapper.ensureInitialized().hashValue(
+      this as SanitizedString,
+    );
+  }
+}
+
+extension SanitizedStringValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, SanitizedString, $Out> {
+  SanitizedStringCopyWith<$R, SanitizedString, $Out> get $asSanitizedString =>
+      $base.as((v, t, t2) => _SanitizedStringCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class SanitizedStringCopyWith<$R, $In extends SanitizedString, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? value});
+  SanitizedStringCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _SanitizedStringCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, SanitizedString, $Out>
+    implements SanitizedStringCopyWith<$R, SanitizedString, $Out> {
+  _SanitizedStringCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<SanitizedString> $mapper =
+      SanitizedStringMapper.ensureInitialized();
+  @override
+  $R call({String? value}) =>
+      $apply(FieldCopyWithData({if (value != null) #value: value}));
+  @override
+  SanitizedString $make(CopyWithData data) =>
+      SanitizedString(data.get(#value, or: $value.value));
+
+  @override
+  SanitizedStringCopyWith<$R2, SanitizedString, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _SanitizedStringCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class SanitizedMultilineStringMapper
+    extends ClassMapperBase<SanitizedMultilineString> {
+  SanitizedMultilineStringMapper._();
+
+  static SanitizedMultilineStringMapper? _instance;
+  static SanitizedMultilineStringMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = SanitizedMultilineStringMapper._(),
+      );
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'SanitizedMultilineString';
+
+  static String _$value(SanitizedMultilineString v) => v.value;
+  static const Field<SanitizedMultilineString, String> _f$value = Field(
+    'value',
+    _$value,
+    hook: ShortStringHook(),
+  );
+  static String _$get(SanitizedMultilineString v) => v.get;
+  static const Field<SanitizedMultilineString, String> _f$get = Field(
+    'get',
+    _$get,
+    mode: FieldMode.member,
+  );
+  static int _$hashCode(SanitizedMultilineString v) => v.hashCode;
+  static const Field<SanitizedMultilineString, int> _f$hashCode = Field(
+    'hashCode',
+    _$hashCode,
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<SanitizedMultilineString> fields = const {
+    #value: _f$value,
+    #get: _f$get,
+    #hashCode: _f$hashCode,
+  };
+
+  static SanitizedMultilineString _instantiate(DecodingData data) {
+    return SanitizedMultilineString(data.dec(_f$value));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static SanitizedMultilineString fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<SanitizedMultilineString>(map);
+  }
+
+  static SanitizedMultilineString fromJson(String json) {
+    return ensureInitialized().decodeJson<SanitizedMultilineString>(json);
+  }
+}
+
+mixin SanitizedMultilineStringMappable {
+  String toJson() {
+    return SanitizedMultilineStringMapper.ensureInitialized()
+        .encodeJson<SanitizedMultilineString>(this as SanitizedMultilineString);
+  }
+
+  Map<String, dynamic> toMap() {
+    return SanitizedMultilineStringMapper.ensureInitialized()
+        .encodeMap<SanitizedMultilineString>(this as SanitizedMultilineString);
+  }
+
+  SanitizedMultilineStringCopyWith<
+    SanitizedMultilineString,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get copyWith =>
+      _SanitizedMultilineStringCopyWithImpl<
+        SanitizedMultilineString,
+        SanitizedMultilineString
+      >(this as SanitizedMultilineString, $identity, $identity);
+  @override
+  String toString() {
+    return SanitizedMultilineStringMapper.ensureInitialized().stringifyValue(
+      this as SanitizedMultilineString,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return SanitizedMultilineStringMapper.ensureInitialized().equalsValue(
+      this as SanitizedMultilineString,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return SanitizedMultilineStringMapper.ensureInitialized().hashValue(
+      this as SanitizedMultilineString,
+    );
+  }
+}
+
+extension SanitizedMultilineStringValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, SanitizedMultilineString, $Out> {
+  SanitizedMultilineStringCopyWith<$R, SanitizedMultilineString, $Out>
+  get $asSanitizedMultilineString => $base.as(
+    (v, t, t2) => _SanitizedMultilineStringCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class SanitizedMultilineStringCopyWith<
+  $R,
+  $In extends SanitizedMultilineString,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? value});
+  SanitizedMultilineStringCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _SanitizedMultilineStringCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, SanitizedMultilineString, $Out>
+    implements
+        SanitizedMultilineStringCopyWith<$R, SanitizedMultilineString, $Out> {
+  _SanitizedMultilineStringCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<SanitizedMultilineString> $mapper =
+      SanitizedMultilineStringMapper.ensureInitialized();
+  @override
+  $R call({String? value}) =>
+      $apply(FieldCopyWithData({if (value != null) #value: value}));
+  @override
+  SanitizedMultilineString $make(CopyWithData data) =>
+      SanitizedMultilineString(data.get(#value, or: $value.value));
+
+  @override
+  SanitizedMultilineStringCopyWith<$R2, SanitizedMultilineString, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _SanitizedMultilineStringCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class SanitizedNonEmptyMultilineStringMapper
+    extends ClassMapperBase<SanitizedNonEmptyMultilineString> {
+  SanitizedNonEmptyMultilineStringMapper._();
+
+  static SanitizedNonEmptyMultilineStringMapper? _instance;
+  static SanitizedNonEmptyMultilineStringMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = SanitizedNonEmptyMultilineStringMapper._(),
+      );
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'SanitizedNonEmptyMultilineString';
+
+  static String _$value(SanitizedNonEmptyMultilineString v) => v.value;
+  static const Field<SanitizedNonEmptyMultilineString, String> _f$value = Field(
+    'value',
+    _$value,
+    hook: ShortStringHook(),
+  );
+  static String _$get(SanitizedNonEmptyMultilineString v) => v.get;
+  static const Field<SanitizedNonEmptyMultilineString, String> _f$get = Field(
+    'get',
+    _$get,
+    mode: FieldMode.member,
+  );
+  static int _$hashCode(SanitizedNonEmptyMultilineString v) => v.hashCode;
+  static const Field<SanitizedNonEmptyMultilineString, int> _f$hashCode = Field(
+    'hashCode',
+    _$hashCode,
+    mode: FieldMode.member,
+  );
+
+  @override
+  final MappableFields<SanitizedNonEmptyMultilineString> fields = const {
+    #value: _f$value,
+    #get: _f$get,
+    #hashCode: _f$hashCode,
+  };
+
+  static SanitizedNonEmptyMultilineString _instantiate(DecodingData data) {
+    return SanitizedNonEmptyMultilineString(data.dec(_f$value));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static SanitizedNonEmptyMultilineString fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<SanitizedNonEmptyMultilineString>(map);
+  }
+
+  static SanitizedNonEmptyMultilineString fromJson(String json) {
+    return ensureInitialized().decodeJson<SanitizedNonEmptyMultilineString>(
+      json,
+    );
+  }
+}
+
+mixin SanitizedNonEmptyMultilineStringMappable {
+  String toJson() {
+    return SanitizedNonEmptyMultilineStringMapper.ensureInitialized()
+        .encodeJson<SanitizedNonEmptyMultilineString>(
+          this as SanitizedNonEmptyMultilineString,
+        );
+  }
+
+  Map<String, dynamic> toMap() {
+    return SanitizedNonEmptyMultilineStringMapper.ensureInitialized()
+        .encodeMap<SanitizedNonEmptyMultilineString>(
+          this as SanitizedNonEmptyMultilineString,
+        );
+  }
+
+  SanitizedNonEmptyMultilineStringCopyWith<
+    SanitizedNonEmptyMultilineString,
+    SanitizedNonEmptyMultilineString,
+    SanitizedNonEmptyMultilineString
+  >
+  get copyWith =>
+      _SanitizedNonEmptyMultilineStringCopyWithImpl<
+        SanitizedNonEmptyMultilineString,
+        SanitizedNonEmptyMultilineString
+      >(this as SanitizedNonEmptyMultilineString, $identity, $identity);
+  @override
+  String toString() {
+    return SanitizedNonEmptyMultilineStringMapper.ensureInitialized()
+        .stringifyValue(this as SanitizedNonEmptyMultilineString);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return SanitizedNonEmptyMultilineStringMapper.ensureInitialized()
+        .equalsValue(this as SanitizedNonEmptyMultilineString, other);
+  }
+
+  @override
+  int get hashCode {
+    return SanitizedNonEmptyMultilineStringMapper.ensureInitialized().hashValue(
+      this as SanitizedNonEmptyMultilineString,
+    );
+  }
+}
+
+extension SanitizedNonEmptyMultilineStringValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, SanitizedNonEmptyMultilineString, $Out> {
+  SanitizedNonEmptyMultilineStringCopyWith<
+    $R,
+    SanitizedNonEmptyMultilineString,
+    $Out
+  >
+  get $asSanitizedNonEmptyMultilineString => $base.as(
+    (v, t, t2) =>
+        _SanitizedNonEmptyMultilineStringCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class SanitizedNonEmptyMultilineStringCopyWith<
+  $R,
+  $In extends SanitizedNonEmptyMultilineString,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? value});
+  SanitizedNonEmptyMultilineStringCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _SanitizedNonEmptyMultilineStringCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, SanitizedNonEmptyMultilineString, $Out>
+    implements
+        SanitizedNonEmptyMultilineStringCopyWith<
+          $R,
+          SanitizedNonEmptyMultilineString,
+          $Out
+        > {
+  _SanitizedNonEmptyMultilineStringCopyWithImpl(
+    super.value,
+    super.then,
+    super.then2,
+  );
+
+  @override
+  late final ClassMapperBase<SanitizedNonEmptyMultilineString> $mapper =
+      SanitizedNonEmptyMultilineStringMapper.ensureInitialized();
+  @override
+  $R call({String? value}) =>
+      $apply(FieldCopyWithData({if (value != null) #value: value}));
+  @override
+  SanitizedNonEmptyMultilineString $make(CopyWithData data) =>
+      SanitizedNonEmptyMultilineString(data.get(#value, or: $value.value));
+
+  @override
+  SanitizedNonEmptyMultilineStringCopyWith<
+    $R2,
+    SanitizedNonEmptyMultilineString,
+    $Out2
+  >
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _SanitizedNonEmptyMultilineStringCopyWithImpl<$R2, $Out2>(
+        $value,
+        $cast,
+        t,
+      );
 }
 

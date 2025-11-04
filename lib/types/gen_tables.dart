@@ -3,6 +3,7 @@ import 'package:jamai_sdk/types/lm.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'gen_tables.mapper.dart';
+
 /// CSV delimiter options
 @MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum CSVDelimiter {
@@ -17,18 +18,18 @@ enum CSVDelimiter {
 }
 
 /// Table type enumeration
-@MappableEnum(caseStyle: CaseStyle.snakeCase)
-enum TableType {
-  action('action'),
-  knowledge('knowledge'),
-  chat('chat');
+// @MappableEnum(caseStyle: CaseStyle.snakeCase)
+// enum TableType {
+//   action('action'),
+//   knowledge('knowledge'),
+//   chat('chat');
 
-  final String apiString;
-  const TableType(this.apiString);
+//   final String apiString;
+//   const TableType(this.apiString);
 
-  @override
-  String toString() => apiString;
-}
+//   @override
+//   String toString() => apiString;
+// }
 
 @MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ColumnSchemaDtype {
@@ -39,6 +40,8 @@ enum ColumnSchemaDtype {
   file('file'),
   image('image'),
   audio('audio'),
+  @MappableValue('date-time')
+  dateTime('date-time'),
   document('document');
 
   final String value;
@@ -77,7 +80,7 @@ enum VectorMetric {
   String toString() => value;
 }
 
-@MappableEnum()
+@MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum GenConfigTypes {
   @MappableValue('gen_config.llm')
   llm,
@@ -90,16 +93,16 @@ enum GenConfigTypes {
   @MappableValue('gen_config.code')
   code;
 
-  String get value => switch (this) {
-    GenConfigTypes.llm => 'gen_config.llm',
-    GenConfigTypes.python => 'gen_config.python',
-    GenConfigTypes.chat => 'gen_config.chat',
-    GenConfigTypes.embed => 'gen_config.embed',
-    GenConfigTypes.code => 'gen_config.code',
-  };
+  // String get value => switch (this) {
+  //   GenConfigTypes.llm => 'gen_config.llm',
+  //   GenConfigTypes.python => 'gen_config.python',
+  //   GenConfigTypes.chat => 'gen_config.chat',
+  //   GenConfigTypes.embed => 'gen_config.embed',
+  //   GenConfigTypes.code => 'gen_config.code',
+  // };
 
-  @override
-  String toString() => value;
+  // @override
+  // String toString() => value;
 }
 
 /// Sealed class for streaming response items
@@ -341,6 +344,42 @@ sealed class GenConfig {
   }
 }
 
+class DiscriminatedGenConfigHook extends MappingHook {
+  const DiscriminatedGenConfigHook();
+
+  @override
+  dynamic beforeDecode(dynamic value) {
+    if (value == null) return null;
+    if (value is Map<String, dynamic>) {
+      final obj = value['object'];
+      switch (obj) {
+        case 'gen_config.llm':
+          return DiscriminatedLLMGenConfig.fromMap(value);
+        case 'gen_config.chat':
+          return DiscriminatedChatGenConfig.fromMap(value);
+        case 'gen_config.python':
+          return DiscriminatedPythonGenConfig.fromMap(value);
+        case 'gen_config.embed':
+          return DiscriminatedEmbedGenConfig.fromMap(value);
+        case 'gen_config.code':
+          return DiscriminatedCodeGenConfig.fromMap(value);
+      }
+    }
+    return value;
+  }
+
+  @override
+  dynamic beforeEncode(dynamic value) {
+    if (value == null) return null;
+    if (value is DiscriminatedLLMGenConfig) return value.toMap();
+    if (value is DiscriminatedChatGenConfig) return value.toMap();
+    if (value is DiscriminatedPythonGenConfig) return value.toMap();
+    if (value is DiscriminatedEmbedGenConfig) return value.toMap();
+    if (value is DiscriminatedCodeGenConfig) return value.toMap();
+    return value;
+  }
+}
+
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
   discriminatorKey: 'object',
@@ -349,13 +388,15 @@ sealed class GenConfig {
       GenerateMethods.encode |
       GenerateMethods.equals |
       GenerateMethods.stringify,
+  hook: DiscriminatedGenConfigHook(),
 )
 sealed class DiscriminatedGenConfig with DiscriminatedGenConfigMappable {}
 
 // discriminated gen configs
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
-  discriminatorValue: GenConfigTypes.llm,
+  discriminatorKey: 'object',
+  discriminatorValue: 'gen_config.llm',
   generateMethods:
       GenerateMethods.decode |
       GenerateMethods.encode |
@@ -398,7 +439,8 @@ class DiscriminatedLLMGenConfig extends LLMGenConfig
 
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
-  discriminatorValue: GenConfigTypes.chat,
+  discriminatorKey: 'object',
+  discriminatorValue: 'gen_config.chat',
   generateMethods:
       GenerateMethods.decode |
       GenerateMethods.encode |
@@ -426,7 +468,7 @@ class DiscriminatedChatGenConfig extends LLMGenConfig
     super.reasoningBudget,
     super.reasoningSummary = ReasoningSummary.auto,
     // Subclass fields
-    super.object = GenConfigTypes.llm,
+    super.object = GenConfigTypes.chat,
     super.systemPrompt = '',
     super.prompt = '',
     super.multiTurn = false,
@@ -440,7 +482,8 @@ class DiscriminatedChatGenConfig extends LLMGenConfig
 
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
-  discriminatorValue: GenConfigTypes.python,
+  discriminatorKey: 'object',
+  discriminatorValue: 'gen_config.python',
 )
 class DiscriminatedPythonGenConfig extends PythonGenConfig
     with DiscriminatedPythonGenConfigMappable
@@ -458,7 +501,8 @@ class DiscriminatedPythonGenConfig extends PythonGenConfig
 
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
-  discriminatorValue: GenConfigTypes.embed,
+  discriminatorKey: 'object',
+  discriminatorValue: 'gen_config.embed',
 )
 class DiscriminatedEmbedGenConfig extends EmbedGenConfig
     with DiscriminatedEmbedGenConfigMappable
@@ -477,7 +521,8 @@ class DiscriminatedEmbedGenConfig extends EmbedGenConfig
 
 @MappableClass(
   caseStyle: CaseStyle.snakeCase,
-  discriminatorValue: GenConfigTypes.code,
+  discriminatorKey: 'object',
+  discriminatorValue: 'gen_config.code',
 )
 class DiscriminatedCodeGenConfig extends CodeGenConfig
     with DiscriminatedCodeGenConfigMappable
@@ -494,7 +539,7 @@ class DiscriminatedCodeGenConfig extends CodeGenConfig
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
-abstract class ColumnSchema with ColumnSchemaMappable {
+class ColumnSchema with ColumnSchemaMappable {
   final String id;
   final ColumnSchemaDtype dtype;
   final int vlen;
@@ -531,9 +576,9 @@ class ColumnSchemaCreate extends ColumnSchema with ColumnSchemaCreateMappable {
   }
   const ColumnSchemaCreate._({
     required super.id,
-    super.dtype = ColumnSchemaDtype.str,
-    super.vlen = 0,
-    super.index = true,
+    super.dtype,
+    super.vlen,
+    super.index,
     super.genConfig,
   });
 
@@ -544,7 +589,7 @@ class ColumnSchemaCreate extends ColumnSchema with ColumnSchemaCreateMappable {
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
-abstract class TableSchemaCreate with TableSchemaCreateMappable {
+class TableSchemaCreate with TableSchemaCreateMappable {
   final String id;
   final List<ColumnSchemaCreate> cols;
 

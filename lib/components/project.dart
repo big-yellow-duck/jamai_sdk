@@ -26,7 +26,7 @@ class Project {
   }) async {
     final url = Uri.parse('$apiUrl/api/v2/projects');
 
-    final requestBody = json.encode(body.toJson());
+    final requestBody = body.toJson();
 
     final response = await http.post(
       url,

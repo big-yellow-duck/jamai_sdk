@@ -600,13 +600,13 @@ class PaymentStateMapper extends EnumMapper<PaymentState> {
   @override
   PaymentState decode(dynamic value) {
     switch (value) {
-      case r'none':
+      case r'NONE':
         return PaymentState.none;
-      case r'success':
+      case r'SUCCESS':
         return PaymentState.success;
-      case r'processing':
+      case r'PROCESSING':
         return PaymentState.processing;
-      case r'failed':
+      case r'FAILED':
         return PaymentState.failed;
       default:
         throw MapperException.unknownEnumValue(value);
@@ -617,13 +617,13 @@ class PaymentStateMapper extends EnumMapper<PaymentState> {
   dynamic encode(PaymentState self) {
     switch (self) {
       case PaymentState.none:
-        return r'none';
+        return r'NONE';
       case PaymentState.success:
-        return r'success';
+        return r'SUCCESS';
       case PaymentState.processing:
-        return r'processing';
+        return r'PROCESSING';
       case PaymentState.failed:
-        return r'failed';
+        return r'FAILED';
     }
   }
 }
@@ -1135,6 +1135,7 @@ class PricePlanUpdateMapper extends ClassMapperBase<PricePlanUpdate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = PricePlanUpdateMapper._());
       PricePlanCreateMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
       ProductsMapper.ensureInitialized();
     }
     return _instance!;
@@ -1150,6 +1151,7 @@ class PricePlanUpdateMapper extends ClassMapperBase<PricePlanUpdate> {
     'stripePriceIdLive',
     _$stripePriceIdLive,
     key: r'stripe_price_id_live',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdTest(PricePlanUpdate v) =>
       v.stripePriceIdTest;
@@ -1158,11 +1160,13 @@ class PricePlanUpdateMapper extends ClassMapperBase<PricePlanUpdate> {
     'stripePriceIdTest',
     _$stripePriceIdTest,
     key: r'stripe_price_id_test',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$name(PricePlanUpdate v) => v.name;
   static const Field<PricePlanUpdate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static double _$flatCost(PricePlanUpdate v) => v.flatCost;
   static const Field<PricePlanUpdate, double> _f$flatCost = Field(
@@ -1289,6 +1293,24 @@ extension PricePlanUpdateValueCopy<$R, $Out>
 
 abstract class PricePlanUpdateCopyWith<$R, $In extends PricePlanUpdate, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
   ProductsCopyWith<$R, Products, Products> get products;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get allowedOrgs;
   $R call({
@@ -1314,6 +1336,31 @@ class _PricePlanUpdateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<PricePlanUpdate> $mapper =
       PricePlanUpdateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive => $value.stripePriceIdLive.copyWith.$chain(
+    (v) => call(stripePriceIdLive: v),
+  );
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest => $value.stripePriceIdTest.copyWith.$chain(
+    (v) => call(stripePriceIdTest: v),
+  );
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
   @override
   ProductsCopyWith<$R, Products, Products> get products =>
       ($value.products as Products).copyWith.$chain((v) => call(products: v));
@@ -1379,6 +1426,7 @@ class PricePlanCreateMapper extends ClassMapperBase<PricePlanCreate> {
       MapperContainer.globals.use(_instance = PricePlanCreateMapper._());
       PricePlanUpdateMapper.ensureInitialized();
       PricePlanMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
       ProductsMapper.ensureInitialized();
     }
     return _instance!;
@@ -1393,6 +1441,7 @@ class PricePlanCreateMapper extends ClassMapperBase<PricePlanCreate> {
   static const Field<PricePlanCreate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdLive(PricePlanCreate v) =>
       v.stripePriceIdLive;
@@ -1401,6 +1450,7 @@ class PricePlanCreateMapper extends ClassMapperBase<PricePlanCreate> {
     'stripePriceIdLive',
     _$stripePriceIdLive,
     key: r'stripe_price_id_live',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdTest(PricePlanCreate v) =>
       v.stripePriceIdTest;
@@ -1409,6 +1459,7 @@ class PricePlanCreateMapper extends ClassMapperBase<PricePlanCreate> {
     'stripePriceIdTest',
     _$stripePriceIdTest,
     key: r'stripe_price_id_test',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static double _$flatCost(PricePlanCreate v) => v.flatCost;
   static const Field<PricePlanCreate, double> _f$flatCost = Field(
@@ -1532,6 +1583,27 @@ extension PricePlanCreateValueCopy<$R, $Out>
 abstract class PricePlanCreateCopyWith<$R, $In extends PricePlanCreate, $Out>
     implements PricePlanUpdateCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest;
+  @override
   ProductsCopyWith<$R, Products, Products> get products;
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get allowedOrgs;
@@ -1560,6 +1632,31 @@ class _PricePlanCreateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<PricePlanCreate> $mapper =
       PricePlanCreateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive => $value.stripePriceIdLive.copyWith.$chain(
+    (v) => call(stripePriceIdLive: v),
+  );
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest => $value.stripePriceIdTest.copyWith.$chain(
+    (v) => call(stripePriceIdTest: v),
+  );
   @override
   ProductsCopyWith<$R, Products, Products> get products =>
       $value.products.copyWith.$chain((v) => call(products: v));
@@ -1628,6 +1725,7 @@ class PricePlanMapper extends ClassMapperBase<PricePlan> {
       MapperContainer.globals.use(_instance = PricePlanMapper._());
       PricePlanCreateMapper.ensureInitialized();
       PricePlanReadMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
       ProductsMapper.ensureInitialized();
     }
     return _instance!;
@@ -1642,6 +1740,7 @@ class PricePlanMapper extends ClassMapperBase<PricePlan> {
   static const Field<PricePlan, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdLive(PricePlan v) =>
       v.stripePriceIdLive;
@@ -1650,6 +1749,7 @@ class PricePlanMapper extends ClassMapperBase<PricePlan> {
         'stripePriceIdLive',
         _$stripePriceIdLive,
         key: r'stripe_price_id_live',
+        hook: SanitizedNonEmptyStringHook(),
       );
   static SanitizedNonEmptyString _$stripePriceIdTest(PricePlan v) =>
       v.stripePriceIdTest;
@@ -1658,6 +1758,7 @@ class PricePlanMapper extends ClassMapperBase<PricePlan> {
         'stripePriceIdTest',
         _$stripePriceIdTest,
         key: r'stripe_price_id_test',
+        hook: SanitizedNonEmptyStringHook(),
       );
   static double _$flatCost(PricePlan v) => v.flatCost;
   static const Field<PricePlan, double> _f$flatCost = Field(
@@ -1794,6 +1895,27 @@ extension PricePlanValueCopy<$R, $Out> on ObjectCopyWith<$R, PricePlan, $Out> {
 abstract class PricePlanCopyWith<$R, $In extends PricePlan, $Out>
     implements PricePlanCreateCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest;
+  @override
   ProductsCopyWith<$R, Products, Products> get products;
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get allowedOrgs;
@@ -1822,6 +1944,31 @@ class _PricePlanCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<PricePlan> $mapper =
       PricePlanMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive => $value.stripePriceIdLive.copyWith.$chain(
+    (v) => call(stripePriceIdLive: v),
+  );
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest => $value.stripePriceIdTest.copyWith.$chain(
+    (v) => call(stripePriceIdTest: v),
+  );
   @override
   ProductsCopyWith<$R, Products, Products> get products =>
       $value.products.copyWith.$chain((v) => call(products: v));
@@ -1895,6 +2042,7 @@ class PricePlanReadMapper extends ClassMapperBase<PricePlanRead> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = PricePlanReadMapper._());
       PricePlanMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
       ProductsMapper.ensureInitialized();
     }
     return _instance!;
@@ -1909,6 +2057,7 @@ class PricePlanReadMapper extends ClassMapperBase<PricePlanRead> {
   static const Field<PricePlanRead, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdLive(PricePlanRead v) =>
       v.stripePriceIdLive;
@@ -1917,6 +2066,7 @@ class PricePlanReadMapper extends ClassMapperBase<PricePlanRead> {
     'stripePriceIdLive',
     _$stripePriceIdLive,
     key: r'stripe_price_id_live',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString _$stripePriceIdTest(PricePlanRead v) =>
       v.stripePriceIdTest;
@@ -1925,6 +2075,7 @@ class PricePlanReadMapper extends ClassMapperBase<PricePlanRead> {
     'stripePriceIdTest',
     _$stripePriceIdTest,
     key: r'stripe_price_id_test',
+    hook: SanitizedNonEmptyStringHook(),
   );
   static double _$flatCost(PricePlanRead v) => v.flatCost;
   static const Field<PricePlanRead, double> _f$flatCost = Field(
@@ -2064,6 +2215,27 @@ extension PricePlanReadValueCopy<$R, $Out>
 abstract class PricePlanReadCopyWith<$R, $In extends PricePlanRead, $Out>
     implements PricePlanCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest;
+  @override
   ProductsCopyWith<$R, Products, Products> get products;
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get allowedOrgs;
@@ -2092,6 +2264,31 @@ class _PricePlanReadCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<PricePlanRead> $mapper =
       PricePlanReadMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdLive => $value.stripePriceIdLive.copyWith.$chain(
+    (v) => call(stripePriceIdLive: v),
+  );
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get stripePriceIdTest => $value.stripePriceIdTest.copyWith.$chain(
+    (v) => call(stripePriceIdTest: v),
+  );
   @override
   ProductsCopyWith<$R, Products, Products> get products =>
       $value.products.copyWith.$chain((v) => call(products: v));
@@ -6893,6 +7090,7 @@ class OrganizationMapper extends ClassMapperBase<Organization> {
   static const Field<Organization, FiatCurrency> _f$currency = Field(
     'currency',
     _$currency,
+    hook: FiatCurrencyHook(),
   );
   static String? _$timezone(Organization v) => v.timezone;
   static const Field<Organization, String> _f$timezone = Field(
@@ -7450,6 +7648,7 @@ class OrganizationCreateMapper extends ClassMapperBase<OrganizationCreate> {
   static const Field<OrganizationCreate, FiatCurrency> _f$currency = Field(
     'currency',
     _$currency,
+    hook: FiatCurrencyHook(),
   );
   static String? _$timezone(OrganizationCreate v) => v.timezone;
   static const Field<OrganizationCreate, String> _f$timezone = Field(
@@ -7640,6 +7839,7 @@ class OrganizationUpdateMapper extends ClassMapperBase<OrganizationUpdate> {
   static const Field<OrganizationUpdate, FiatCurrency> _f$currency = Field(
     'currency',
     _$currency,
+    hook: FiatCurrencyHook(),
   );
   static String? _$timezone(OrganizationUpdate v) => v.timezone;
   static const Field<OrganizationUpdate, String> _f$timezone = Field(
@@ -8476,6 +8676,8 @@ class ProjectMapper extends ClassMapperBase<Project> {
       MapperContainer.globals.use(_instance = ProjectMapper._());
       ProjectCreateMapper.ensureInitialized();
       ProjectReadMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedMultilineStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -8495,12 +8697,14 @@ class ProjectMapper extends ClassMapperBase<Project> {
   static const Field<Project, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedMultilineString _$description(Project v) => v.description;
   static const Field<Project, SanitizedMultilineString> _f$description = Field(
     'description',
     _$description,
     opt: true,
+    hook: SanitizedMultilineStringHook(),
   );
   static List<String> _$tags(Project v) => v.tags;
   static const Field<Project, List<String>> _f$tags = Field(
@@ -8631,6 +8835,18 @@ extension ProjectValueCopy<$R, $Out> on ObjectCopyWith<$R, Project, $Out> {
 
 abstract class ProjectCopyWith<$R, $In extends Project, $Out>
     implements ProjectCreateCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags;
   @override
   $R call({
@@ -8657,6 +8873,21 @@ class _ProjectCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<Project> $mapper =
       ProjectMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description => ($value.description as SanitizedMultilineString).copyWith
+      .$chain((v) => call(description: v));
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags =>
       ListCopyWith(
@@ -8724,6 +8955,8 @@ class ProjectCreateMapper extends ClassMapperBase<ProjectCreate> {
       MapperContainer.globals.use(_instance = ProjectCreateMapper._());
       ProjectUpdateMapper.ensureInitialized();
       ProjectMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedMultilineStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -8741,11 +8974,17 @@ class ProjectCreateMapper extends ClassMapperBase<ProjectCreate> {
   static const Field<ProjectCreate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedMultilineString _$description(ProjectCreate v) =>
       v.description;
   static const Field<ProjectCreate, SanitizedMultilineString> _f$description =
-      Field('description', _$description, opt: true);
+      Field(
+        'description',
+        _$description,
+        opt: true,
+        hook: SanitizedMultilineStringHook(),
+      );
   static List<String> _$tags(ProjectCreate v) => v.tags;
   static const Field<ProjectCreate, List<String>> _f$tags = Field(
     'tags',
@@ -8850,6 +9089,18 @@ extension ProjectCreateValueCopy<$R, $Out>
 
 abstract class ProjectCreateCopyWith<$R, $In extends ProjectCreate, $Out>
     implements ProjectUpdateCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags;
   @override
   $R call({
@@ -8871,6 +9122,21 @@ class _ProjectCreateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectCreate> $mapper =
       ProjectCreateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description => ($value.description as SanitizedMultilineString).copyWith
+      .$chain((v) => call(description: v));
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags =>
       ListCopyWith(
@@ -8923,6 +9189,8 @@ class ProjectUpdateMapper extends ClassMapperBase<ProjectUpdate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProjectUpdateMapper._());
       ProjectCreateMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedMultilineStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -8934,11 +9202,17 @@ class ProjectUpdateMapper extends ClassMapperBase<ProjectUpdate> {
   static const Field<ProjectUpdate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedMultilineString _$description(ProjectUpdate v) =>
       v.description;
   static const Field<ProjectUpdate, SanitizedMultilineString> _f$description =
-      Field('description', _$description, opt: true);
+      Field(
+        'description',
+        _$description,
+        opt: true,
+        hook: SanitizedMultilineStringHook(),
+      );
   static List<String> _$tags(ProjectUpdate v) => v.tags;
   static const Field<ProjectUpdate, List<String>> _f$tags = Field(
     'tags',
@@ -9041,6 +9315,18 @@ extension ProjectUpdateValueCopy<$R, $Out>
 
 abstract class ProjectUpdateCopyWith<$R, $In extends ProjectUpdate, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags;
   $R call({
     SanitizedNonEmptyString? name,
@@ -9060,6 +9346,21 @@ class _ProjectUpdateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectUpdate> $mapper =
       ProjectUpdateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description => ($value.description as SanitizedMultilineString).copyWith
+      .$chain((v) => call(description: v));
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>?> get tags =>
       ListCopyWith(
@@ -11332,6 +11633,7 @@ class OrganizationReadMapper extends ClassMapperBase<OrganizationRead> {
   static const Field<OrganizationRead, FiatCurrency> _f$currency = Field(
     'currency',
     _$currency,
+    hook: FiatCurrencyHook(),
   );
   static String? _$timezone(OrganizationRead v) => v.timezone;
   static const Field<OrganizationRead, String> _f$timezone = Field(
@@ -11906,6 +12208,8 @@ class ProjectReadMapper extends ClassMapperBase<ProjectRead> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProjectReadMapper._());
       ProjectMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedMultilineStringMapper.ensureInitialized();
       OrganizationMapper.ensureInitialized();
       TableMetaResponseMapper.ensureInitialized();
     }
@@ -11927,10 +12231,16 @@ class ProjectReadMapper extends ClassMapperBase<ProjectRead> {
   static const Field<ProjectRead, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedMultilineString _$description(ProjectRead v) => v.description;
   static const Field<ProjectRead, SanitizedMultilineString> _f$description =
-      Field('description', _$description, opt: true);
+      Field(
+        'description',
+        _$description,
+        opt: true,
+        hook: SanitizedMultilineStringHook(),
+      );
   static List<String> _$tags(ProjectRead v) => v.tags;
   static const Field<ProjectRead, List<String>> _f$tags = Field(
     'tags',
@@ -12076,6 +12386,18 @@ extension ProjectReadValueCopy<$R, $Out>
 
 abstract class ProjectReadCopyWith<$R, $In extends ProjectRead, $Out>
     implements ProjectCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags;
   OrganizationCopyWith<$R, Organization, Organization>? get organization;
   ListCopyWith<
@@ -12111,6 +12433,21 @@ class _ProjectReadCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectRead> $mapper =
       ProjectReadMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedMultilineStringCopyWith<
+    $R,
+    SanitizedMultilineString,
+    SanitizedMultilineString
+  >
+  get description => ($value.description as SanitizedMultilineString).copyWith
+      .$chain((v) => call(description: v));
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get tags =>
       ListCopyWith(
@@ -12201,6 +12538,8 @@ class VerificationCodeUpdateMapper
     if (_instance == null) {
       MapperContainer.globals.use(_instance = VerificationCodeUpdateMapper._());
       VerificationCodeCreateMapper.ensureInitialized();
+      SanitizedStringMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -12213,10 +12552,11 @@ class VerificationCodeUpdateMapper
     'name',
     _$name,
     opt: true,
+    hook: SanitizedStringHook(),
   );
   static SanitizedNonEmptyString? _$role(VerificationCodeUpdate v) => v.role;
   static const Field<VerificationCodeUpdate, SanitizedNonEmptyString> _f$role =
-      Field('role', _$role, opt: true);
+      Field('role', _$role, opt: true, hook: SanitizedNonEmptyStringHook());
 
   @override
   final MappableFields<VerificationCodeUpdate> fields = const {
@@ -12301,6 +12641,13 @@ abstract class VerificationCodeUpdateCopyWith<
   $Out
 >
     implements ClassCopyWith<$R, $In, $Out> {
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role;
   $R call({SanitizedString? name, SanitizedNonEmptyString? role});
   VerificationCodeUpdateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -12316,6 +12663,16 @@ class _VerificationCodeUpdateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<VerificationCodeUpdate> $mapper =
       VerificationCodeUpdateMapper.ensureInitialized();
+  @override
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name =>
+      ($value.name as SanitizedString).copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role => $value.role?.copyWith.$chain((v) => call(role: v));
   @override
   $R call({Object? name = $none, Object? role = $none}) => $apply(
     FieldCopyWithData({
@@ -12345,6 +12702,8 @@ class VerificationCodeCreateMapper
       MapperContainer.globals.use(_instance = VerificationCodeCreateMapper._());
       VerificationCodeUpdateMapper.ensureInitialized();
       VerificationCodeMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -12355,7 +12714,12 @@ class VerificationCodeCreateMapper
   static SanitizedNonEmptyString _$userEmail(VerificationCodeCreate v) =>
       v.userEmail;
   static const Field<VerificationCodeCreate, SanitizedNonEmptyString>
-  _f$userEmail = Field('userEmail', _$userEmail, key: r'user_email');
+  _f$userEmail = Field(
+    'userEmail',
+    _$userEmail,
+    key: r'user_email',
+    hook: SanitizedNonEmptyStringHook(),
+  );
   static DateTime _$expiry(VerificationCodeCreate v) => v.expiry;
   static const Field<VerificationCodeCreate, DateTime> _f$expiry = Field(
     'expiry',
@@ -12369,20 +12733,28 @@ class VerificationCodeCreateMapper
     _$organizationId,
     key: r'organization_id',
     opt: true,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString? _$projectId(VerificationCodeCreate v) =>
       v.projectId;
   static const Field<VerificationCodeCreate, SanitizedNonEmptyString>
-  _f$projectId = Field('projectId', _$projectId, key: r'project_id', opt: true);
+  _f$projectId = Field(
+    'projectId',
+    _$projectId,
+    key: r'project_id',
+    opt: true,
+    hook: SanitizedNonEmptyStringHook(),
+  );
   static SanitizedString _$name(VerificationCodeCreate v) => v.name;
   static const Field<VerificationCodeCreate, SanitizedString> _f$name = Field(
     'name',
     _$name,
     opt: true,
+    hook: SanitizedStringHook(),
   );
   static SanitizedNonEmptyString? _$role(VerificationCodeCreate v) => v.role;
   static const Field<VerificationCodeCreate, SanitizedNonEmptyString> _f$role =
-      Field('role', _$role, opt: true);
+      Field('role', _$role, opt: true, hook: SanitizedNonEmptyStringHook());
 
   @override
   final MappableFields<VerificationCodeCreate> fields = const {
@@ -12475,6 +12847,31 @@ abstract class VerificationCodeCreateCopyWith<
   $Out
 >
     implements VerificationCodeUpdateCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role;
   @override
   $R call({
     SanitizedNonEmptyString? userEmail,
@@ -12498,6 +12895,38 @@ class _VerificationCodeCreateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<VerificationCodeCreate> $mapper =
       VerificationCodeCreateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail => $value.userEmail.copyWith.$chain((v) => call(userEmail: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId =>
+      $value.organizationId?.copyWith.$chain((v) => call(organizationId: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
+  @override
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name =>
+      ($value.name as SanitizedString).copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role => $value.role?.copyWith.$chain((v) => call(role: v));
   @override
   $R call({
     SanitizedNonEmptyString? userEmail,
@@ -12541,6 +12970,8 @@ class VerificationCodeMapper extends ClassMapperBase<VerificationCode> {
       MapperContainer.globals.use(_instance = VerificationCodeMapper._());
       VerificationCodeCreateMapper.ensureInitialized();
       VerificationCodeReadMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -12552,7 +12983,12 @@ class VerificationCodeMapper extends ClassMapperBase<VerificationCode> {
   static const Field<VerificationCode, String> _f$id = Field('id', _$id);
   static SanitizedNonEmptyString _$userEmail(VerificationCode v) => v.userEmail;
   static const Field<VerificationCode, SanitizedNonEmptyString> _f$userEmail =
-      Field('userEmail', _$userEmail, key: r'user_email');
+      Field(
+        'userEmail',
+        _$userEmail,
+        key: r'user_email',
+        hook: SanitizedNonEmptyStringHook(),
+      );
   static DateTime _$expiry(VerificationCode v) => v.expiry;
   static const Field<VerificationCode, DateTime> _f$expiry = Field(
     'expiry',
@@ -12566,22 +13002,31 @@ class VerificationCodeMapper extends ClassMapperBase<VerificationCode> {
     _$organizationId,
     key: r'organization_id',
     opt: true,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString? _$projectId(VerificationCode v) =>
       v.projectId;
   static const Field<VerificationCode, SanitizedNonEmptyString> _f$projectId =
-      Field('projectId', _$projectId, key: r'project_id', opt: true);
+      Field(
+        'projectId',
+        _$projectId,
+        key: r'project_id',
+        opt: true,
+        hook: SanitizedNonEmptyStringHook(),
+      );
   static SanitizedString _$name(VerificationCode v) => v.name;
   static const Field<VerificationCode, SanitizedString> _f$name = Field(
     'name',
     _$name,
     opt: true,
+    hook: SanitizedStringHook(),
   );
   static SanitizedNonEmptyString? _$role(VerificationCode v) => v.role;
   static const Field<VerificationCode, SanitizedNonEmptyString> _f$role = Field(
     'role',
     _$role,
     opt: true,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static DateTime _$createdAt(VerificationCode v) => v.createdAt;
   static const Field<VerificationCode, DateTime> _f$createdAt = Field(
@@ -12685,6 +13130,31 @@ extension VerificationCodeValueCopy<$R, $Out>
 
 abstract class VerificationCodeCopyWith<$R, $In extends VerificationCode, $Out>
     implements VerificationCodeCreateCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role;
   @override
   $R call({
     String? id,
@@ -12710,6 +13180,38 @@ class _VerificationCodeCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<VerificationCode> $mapper =
       VerificationCodeMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail => $value.userEmail.copyWith.$chain((v) => call(userEmail: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId =>
+      $value.organizationId?.copyWith.$chain((v) => call(organizationId: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
+  @override
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name =>
+      ($value.name as SanitizedString).copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role => $value.role?.copyWith.$chain((v) => call(role: v));
   @override
   $R call({
     String? id,
@@ -12761,6 +13263,8 @@ class VerificationCodeReadMapper extends ClassMapperBase<VerificationCodeRead> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = VerificationCodeReadMapper._());
       VerificationCodeMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
+      SanitizedStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -12773,7 +13277,12 @@ class VerificationCodeReadMapper extends ClassMapperBase<VerificationCodeRead> {
   static SanitizedNonEmptyString _$userEmail(VerificationCodeRead v) =>
       v.userEmail;
   static const Field<VerificationCodeRead, SanitizedNonEmptyString>
-  _f$userEmail = Field('userEmail', _$userEmail, key: r'user_email');
+  _f$userEmail = Field(
+    'userEmail',
+    _$userEmail,
+    key: r'user_email',
+    hook: SanitizedNonEmptyStringHook(),
+  );
   static DateTime _$expiry(VerificationCodeRead v) => v.expiry;
   static const Field<VerificationCodeRead, DateTime> _f$expiry = Field(
     'expiry',
@@ -12787,20 +13296,28 @@ class VerificationCodeReadMapper extends ClassMapperBase<VerificationCodeRead> {
     _$organizationId,
     key: r'organization_id',
     opt: true,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static SanitizedNonEmptyString? _$projectId(VerificationCodeRead v) =>
       v.projectId;
   static const Field<VerificationCodeRead, SanitizedNonEmptyString>
-  _f$projectId = Field('projectId', _$projectId, key: r'project_id', opt: true);
+  _f$projectId = Field(
+    'projectId',
+    _$projectId,
+    key: r'project_id',
+    opt: true,
+    hook: SanitizedNonEmptyStringHook(),
+  );
   static SanitizedString _$name(VerificationCodeRead v) => v.name;
   static const Field<VerificationCodeRead, SanitizedString> _f$name = Field(
     'name',
     _$name,
     opt: true,
+    hook: SanitizedStringHook(),
   );
   static SanitizedNonEmptyString? _$role(VerificationCodeRead v) => v.role;
   static const Field<VerificationCodeRead, SanitizedNonEmptyString> _f$role =
-      Field('role', _$role, opt: true);
+      Field('role', _$role, opt: true, hook: SanitizedNonEmptyStringHook());
   static DateTime _$createdAt(VerificationCodeRead v) => v.createdAt;
   static const Field<VerificationCodeRead, DateTime> _f$createdAt = Field(
     'createdAt',
@@ -12911,6 +13428,31 @@ abstract class VerificationCodeReadCopyWith<
   $Out
 >
     implements VerificationCodeCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role;
   @override
   $R call({
     String? id,
@@ -12936,6 +13478,38 @@ class _VerificationCodeReadCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<VerificationCodeRead> $mapper =
       VerificationCodeReadMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get userEmail => $value.userEmail.copyWith.$chain((v) => call(userEmail: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get organizationId =>
+      $value.organizationId?.copyWith.$chain((v) => call(organizationId: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
+  @override
+  SanitizedStringCopyWith<$R, SanitizedString, SanitizedString> get name =>
+      ($value.name as SanitizedString).copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get role => $value.role?.copyWith.$chain((v) => call(role: v));
   @override
   $R call({
     String? id,
@@ -12987,6 +13561,7 @@ class ProjectKeyUpdateMapper extends ClassMapperBase<ProjectKeyUpdate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProjectKeyUpdateMapper._());
       ProjectKeyCreateMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -12998,6 +13573,7 @@ class ProjectKeyUpdateMapper extends ClassMapperBase<ProjectKeyUpdate> {
   static const Field<ProjectKeyUpdate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static DateTime? _$expiry(ProjectKeyUpdate v) => v.expiry;
   static const Field<ProjectKeyUpdate, DateTime> _f$expiry = Field(
@@ -13081,6 +13657,12 @@ extension ProjectKeyUpdateValueCopy<$R, $Out>
 
 abstract class ProjectKeyUpdateCopyWith<$R, $In extends ProjectKeyUpdate, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
   $R call({SanitizedNonEmptyString? name, DateTime? expiry});
   ProjectKeyUpdateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -13095,6 +13677,13 @@ class _ProjectKeyUpdateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectKeyUpdate> $mapper =
       ProjectKeyUpdateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
   @override
   $R call({SanitizedNonEmptyString? name, Object? expiry = $none}) => $apply(
     FieldCopyWithData({
@@ -13123,6 +13712,7 @@ class ProjectKeyCreateMapper extends ClassMapperBase<ProjectKeyCreate> {
       MapperContainer.globals.use(_instance = ProjectKeyCreateMapper._());
       ProjectKeyUpdateMapper.ensureInitialized();
       ProjectKeyMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -13134,6 +13724,7 @@ class ProjectKeyCreateMapper extends ClassMapperBase<ProjectKeyCreate> {
   static const Field<ProjectKeyCreate, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static DateTime? _$expiry(ProjectKeyCreate v) => v.expiry;
   static const Field<ProjectKeyCreate, DateTime> _f$expiry = Field(
@@ -13144,7 +13735,13 @@ class ProjectKeyCreateMapper extends ClassMapperBase<ProjectKeyCreate> {
   static SanitizedNonEmptyString? _$projectId(ProjectKeyCreate v) =>
       v.projectId;
   static const Field<ProjectKeyCreate, SanitizedNonEmptyString> _f$projectId =
-      Field('projectId', _$projectId, key: r'project_id', opt: true);
+      Field(
+        'projectId',
+        _$projectId,
+        key: r'project_id',
+        opt: true,
+        hook: SanitizedNonEmptyStringHook(),
+      );
 
   @override
   final MappableFields<ProjectKeyCreate> fields = const {
@@ -13224,6 +13821,19 @@ extension ProjectKeyCreateValueCopy<$R, $Out>
 abstract class ProjectKeyCreateCopyWith<$R, $In extends ProjectKeyCreate, $Out>
     implements ProjectKeyUpdateCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  @override
   $R call({
     SanitizedNonEmptyString? name,
     DateTime? expiry,
@@ -13242,6 +13852,20 @@ class _ProjectKeyCreateCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectKeyCreate> $mapper =
       ProjectKeyCreateMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
   @override
   $R call({
     SanitizedNonEmptyString? name,
@@ -13276,6 +13900,7 @@ class ProjectKeyMapper extends ClassMapperBase<ProjectKey> {
       MapperContainer.globals.use(_instance = ProjectKeyMapper._());
       ProjectKeyCreateMapper.ensureInitialized();
       ProjectKeyReadMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -13287,6 +13912,7 @@ class ProjectKeyMapper extends ClassMapperBase<ProjectKey> {
   static const Field<ProjectKey, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static DateTime? _$expiry(ProjectKey v) => v.expiry;
   static const Field<ProjectKey, DateTime> _f$expiry = Field(
@@ -13300,6 +13926,7 @@ class ProjectKeyMapper extends ClassMapperBase<ProjectKey> {
     _$projectId,
     key: r'project_id',
     opt: true,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static String _$id(ProjectKey v) => v.id;
   static const Field<ProjectKey, String> _f$id = Field('id', _$id);
@@ -13406,6 +14033,20 @@ extension ProjectKeyValueCopy<$R, $Out>
 abstract class ProjectKeyCopyWith<$R, $In extends ProjectKey, $Out>
     implements ProjectKeyCreateCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  @override
   $R call({
     SanitizedNonEmptyString? name,
     DateTime? expiry,
@@ -13426,6 +14067,20 @@ class _ProjectKeyCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectKey> $mapper =
       ProjectKeyMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
   @override
   $R call({
     SanitizedNonEmptyString? name,
@@ -13471,6 +14126,7 @@ class ProjectKeyReadMapper extends ClassMapperBase<ProjectKeyRead> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ProjectKeyReadMapper._());
       ProjectKeyMapper.ensureInitialized();
+      SanitizedNonEmptyStringMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -13482,6 +14138,7 @@ class ProjectKeyReadMapper extends ClassMapperBase<ProjectKeyRead> {
   static const Field<ProjectKeyRead, SanitizedNonEmptyString> _f$name = Field(
     'name',
     _$name,
+    hook: SanitizedNonEmptyStringHook(),
   );
   static DateTime? _$expiry(ProjectKeyRead v) => v.expiry;
   static const Field<ProjectKeyRead, DateTime> _f$expiry = Field(
@@ -13491,7 +14148,13 @@ class ProjectKeyReadMapper extends ClassMapperBase<ProjectKeyRead> {
   );
   static SanitizedNonEmptyString? _$projectId(ProjectKeyRead v) => v.projectId;
   static const Field<ProjectKeyRead, SanitizedNonEmptyString> _f$projectId =
-      Field('projectId', _$projectId, key: r'project_id', opt: true);
+      Field(
+        'projectId',
+        _$projectId,
+        key: r'project_id',
+        opt: true,
+        hook: SanitizedNonEmptyStringHook(),
+      );
   static String _$id(ProjectKeyRead v) => v.id;
   static const Field<ProjectKeyRead, String> _f$id = Field('id', _$id);
   static String _$userId(ProjectKeyRead v) => v.userId;
@@ -13599,6 +14262,20 @@ extension ProjectKeyReadValueCopy<$R, $Out>
 abstract class ProjectKeyReadCopyWith<$R, $In extends ProjectKeyRead, $Out>
     implements ProjectKeyCopyWith<$R, $In, $Out> {
   @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name;
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId;
+  @override
   $R call({
     SanitizedNonEmptyString? name,
     DateTime? expiry,
@@ -13621,6 +14298,20 @@ class _ProjectKeyReadCopyWithImpl<$R, $Out>
   @override
   late final ClassMapperBase<ProjectKeyRead> $mapper =
       ProjectKeyReadMapper.ensureInitialized();
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >
+  get name => $value.name.copyWith.$chain((v) => call(name: v));
+  @override
+  SanitizedNonEmptyStringCopyWith<
+    $R,
+    SanitizedNonEmptyString,
+    SanitizedNonEmptyString
+  >?
+  get projectId => $value.projectId?.copyWith.$chain((v) => call(projectId: v));
   @override
   $R call({
     SanitizedNonEmptyString? name,

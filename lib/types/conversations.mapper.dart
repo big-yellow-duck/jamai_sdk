@@ -148,7 +148,11 @@ abstract class MetaResponseCopyWith<$R, $In extends MetaResponse, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>?
   get meta;
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols;
   $R call({
     Map<String, dynamic>? meta,
@@ -180,10 +184,14 @@ class _MetaResponseCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols => ListCopyWith(
     $value.cols,
-    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v, t) => v.copyWith.$chain(t),
     (v) => call(cols: v),
   );
   @override
@@ -384,7 +392,11 @@ abstract class AgentMetaResponseCopyWith<
     implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>?
   get meta;
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols;
   $R call({
     String? agentId,
@@ -419,10 +431,14 @@ class _AgentMetaResponseCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols => ListCopyWith(
     $value.cols,
-    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v, t) => v.copyWith.$chain(t),
     (v) => call(cols: v),
   );
   @override
@@ -630,7 +646,11 @@ abstract class ConversationMetaResponseCopyWith<
     implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>?
   get meta;
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols;
   $R call({
     String? conversationId,
@@ -667,10 +687,14 @@ class _ConversationMetaResponseCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  ListCopyWith<$R, ColumnSchema, ObjectCopyWith<$R, ColumnSchema, ColumnSchema>>
+  ListCopyWith<
+    $R,
+    ColumnSchema,
+    ColumnSchemaCopyWith<$R, ColumnSchema, ColumnSchema>
+  >
   get cols => ListCopyWith(
     $value.cols,
-    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v, t) => v.copyWith.$chain(t),
     (v) => call(cols: v),
   );
   @override

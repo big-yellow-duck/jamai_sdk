@@ -59,7 +59,8 @@ class PriceTier with PriceTierMappable {
   }
 
   factory PriceTier.fromJson(String json) => PriceTierMapper.fromJson(json);
-  factory PriceTier.fromMap(Map<String, dynamic> map) => PriceTierMapper.fromMap(map);
+  factory PriceTier.fromMap(Map<String, dynamic> map) =>
+      PriceTierMapper.fromMap(map);
 }
 
 /// Product model
@@ -96,7 +97,8 @@ class Product with ProductMappable {
   }
 
   factory Product.fromJson(String json) => ProductMapper.fromJson(json);
-  factory Product.fromMap(Map<String, dynamic> map) => ProductMapper.fromMap(map);
+  factory Product.fromMap(Map<String, dynamic> map) =>
+      ProductMapper.fromMap(map);
 }
 
 /// Products collection
@@ -164,7 +166,8 @@ class Products with ProductsMappable {
   }
 
   factory Products.fromJson(String json) => ProductsMapper.fromJson(json);
-  factory Products.fromMap(Map<String, dynamic> map) => ProductsMapper.fromMap(map);
+  factory Products.fromMap(Map<String, dynamic> map) =>
+      ProductsMapper.fromMap(map);
 }
 
 /// Product type enum
@@ -234,8 +237,11 @@ enum ProductType {
 /// Price plan update model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class PricePlanUpdate with PricePlanUpdateMappable {
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString stripePriceIdLive;
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString stripePriceIdTest;
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString name;
   final double flatCost;
   final double creditGrant;
@@ -327,8 +333,10 @@ class PricePlanUpdate with PricePlanUpdateMappable {
     );
   }
 
-  factory PricePlanUpdate.fromJson(String json) => PricePlanUpdateMapper.fromJson(json);
-  factory PricePlanUpdate.fromMap(Map<String, dynamic> map) => PricePlanUpdateMapper.fromMap(map);
+  factory PricePlanUpdate.fromJson(String json) =>
+      PricePlanUpdateMapper.fromJson(json);
+  factory PricePlanUpdate.fromMap(Map<String, dynamic> map) =>
+      PricePlanUpdateMapper.fromMap(map);
 }
 
 /// Price plan create model
@@ -348,8 +356,10 @@ class PricePlanCreate extends PricePlanUpdate with PricePlanCreateMappable {
     super.allowedOrgs = const [],
   }) : super._();
 
-  factory PricePlanCreate.fromJson(String json) => PricePlanCreateMapper.fromJson(json);
-  factory PricePlanCreate.fromMap(Map<String, dynamic> map) => PricePlanCreateMapper.fromMap(map);
+  factory PricePlanCreate.fromJson(String json) =>
+      PricePlanCreateMapper.fromJson(json);
+  factory PricePlanCreate.fromMap(Map<String, dynamic> map) =>
+      PricePlanCreateMapper.fromMap(map);
 }
 
 /// Price plan model
@@ -373,7 +383,8 @@ class PricePlan extends PricePlanCreate with PricePlanMappable {
   });
 
   factory PricePlan.fromJson(String json) => PricePlanMapper.fromJson(json);
-  factory PricePlan.fromMap(Map<String, dynamic> map) => PricePlanMapper.fromMap(map);
+  factory PricePlan.fromMap(Map<String, dynamic> map) =>
+      PricePlanMapper.fromMap(map);
 }
 
 /// Price plan read model
@@ -393,8 +404,10 @@ class PricePlanRead extends PricePlan with PricePlanReadMappable {
     required super.stripePriceId,
   });
 
-  factory PricePlanRead.fromJson(String json) => PricePlanReadMapper.fromJson(json);
-  factory PricePlanRead.fromMap(Map<String, dynamic> map) => PricePlanReadMapper.fromMap(map);
+  factory PricePlanRead.fromJson(String json) =>
+      PricePlanReadMapper.fromJson(json);
+  factory PricePlanRead.fromMap(Map<String, dynamic> map) =>
+      PricePlanReadMapper.fromMap(map);
 }
 
 /// On-prem provider enum
@@ -489,8 +502,10 @@ class DeploymentUpdate with DeploymentUpdateMappable {
     required this.cooldownUntil,
   });
 
-  factory DeploymentUpdate.fromJson(String json) => DeploymentUpdateMapper.fromJson(json);
-  factory DeploymentUpdate.fromMap(Map<String, dynamic> map) => DeploymentUpdateMapper.fromMap(map);
+  factory DeploymentUpdate.fromJson(String json) =>
+      DeploymentUpdateMapper.fromJson(json);
+  factory DeploymentUpdate.fromMap(Map<String, dynamic> map) =>
+      DeploymentUpdateMapper.fromMap(map);
 }
 
 /// Deployment create model
@@ -508,8 +523,10 @@ class DeploymentCreate extends DeploymentUpdate with DeploymentCreateMappable {
     required super.cooldownUntil,
   });
 
-  factory DeploymentCreate.fromJson(String json) => DeploymentCreateMapper.fromJson(json);
-  factory DeploymentCreate.fromMap(Map<String, dynamic> map) => DeploymentCreateMapper.fromMap(map);
+  factory DeploymentCreate.fromJson(String json) =>
+      DeploymentCreateMapper.fromJson(json);
+  factory DeploymentCreate.fromMap(Map<String, dynamic> map) =>
+      DeploymentCreateMapper.fromMap(map);
 }
 
 /// Deployment model
@@ -536,7 +553,8 @@ class Deployment extends DeploymentCreate
   });
 
   factory Deployment.fromJson(String json) => DeploymentMapper.fromJson(json);
-  factory Deployment.fromMap(Map<String, dynamic> map) => DeploymentMapper.fromMap(map);
+  factory Deployment.fromMap(Map<String, dynamic> map) =>
+      DeploymentMapper.fromMap(map);
 }
 
 /// Deployment read model
@@ -561,8 +579,10 @@ class DeploymentRead extends Deployment with DeploymentReadMappable {
   /// Status of the deployment. Will always be "ACTIVE".
   String get status => DeploymentStatus.active.value;
 
-  factory DeploymentRead.fromJson(String json) => DeploymentReadMapper.fromJson(json);
-  factory DeploymentRead.fromMap(Map<String, dynamic> map) => DeploymentReadMapper.fromMap(map);
+  factory DeploymentRead.fromJson(String json) =>
+      DeploymentReadMapper.fromJson(json);
+  factory DeploymentRead.fromMap(Map<String, dynamic> map) =>
+      DeploymentReadMapper.fromMap(map);
 }
 
 /// Model type enum
@@ -627,7 +647,8 @@ class ModelInfo with ModelInfoMappable {
   }
 
   factory ModelInfo.fromJson(String json) => ModelInfoMapper.fromJson(json);
-  factory ModelInfo.fromMap(Map<String, dynamic> map) => ModelInfoMapper.fromMap(map);
+  factory ModelInfo.fromMap(Map<String, dynamic> map) =>
+      ModelInfoMapper.fromMap(map);
 }
 
 /// Model info read model
@@ -652,8 +673,10 @@ class ModelInfoRead extends ModelInfo
     required this.updatedAt,
   });
 
-  factory ModelInfoRead.fromJson(String json) => ModelInfoReadMapper.fromJson(json);
-  factory ModelInfoRead.fromMap(Map<String, dynamic> map) => ModelInfoReadMapper.fromMap(map);
+  factory ModelInfoRead.fromJson(String json) =>
+      ModelInfoReadMapper.fromJson(json);
+  factory ModelInfoRead.fromMap(Map<String, dynamic> map) =>
+      ModelInfoReadMapper.fromMap(map);
 }
 
 /// Model config update model
@@ -703,8 +726,10 @@ class ModelConfigUpdate extends ModelInfo with ModelConfigUpdateMappable {
     return embedSize;
   }
 
-  factory ModelConfigUpdate.fromJson(String json) => ModelConfigUpdateMapper.fromJson(json);
-  factory ModelConfigUpdate.fromMap(Map<String, dynamic> map) => ModelConfigUpdateMapper.fromMap(map);
+  factory ModelConfigUpdate.fromJson(String json) =>
+      ModelConfigUpdateMapper.fromJson(json);
+  factory ModelConfigUpdate.fromMap(Map<String, dynamic> map) =>
+      ModelConfigUpdateMapper.fromMap(map);
 }
 
 /// Model config create model
@@ -733,8 +758,10 @@ class ModelConfigCreate extends ModelConfigUpdate
     super.rerankingCostPerKsearch,
   });
 
-  factory ModelConfigCreate.fromJson(String json) => ModelConfigCreateMapper.fromJson(json);
-  factory ModelConfigCreate.fromMap(Map<String, dynamic> map) => ModelConfigCreateMapper.fromMap(map);
+  factory ModelConfigCreate.fromJson(String json) =>
+      ModelConfigCreateMapper.fromJson(json);
+  factory ModelConfigCreate.fromMap(Map<String, dynamic> map) =>
+      ModelConfigCreateMapper.fromMap(map);
 }
 
 /// Model config model
@@ -773,7 +800,8 @@ class ModelConfig extends ModelConfigCreate
   });
 
   factory ModelConfig.fromJson(String json) => ModelConfigMapper.fromJson(json);
-  factory ModelConfig.fromMap(Map<String, dynamic> map) => ModelConfigMapper.fromMap(map);
+  factory ModelConfig.fromMap(Map<String, dynamic> map) =>
+      ModelConfigMapper.fromMap(map);
 }
 
 /// Model config read model
@@ -809,8 +837,10 @@ class ModelConfigRead extends ModelConfig with ModelConfigReadMappable {
     required this.isActive,
   });
 
-  factory ModelConfigRead.fromJson(String json) => ModelConfigReadMapper.fromJson(json);
-  factory ModelConfigRead.fromMap(Map<String, dynamic> map) => ModelConfigReadMapper.fromMap(map);
+  factory ModelConfigRead.fromJson(String json) =>
+      ModelConfigReadMapper.fromJson(json);
+  factory ModelConfigRead.fromMap(Map<String, dynamic> map) =>
+      ModelConfigReadMapper.fromMap(map);
 }
 
 /// Role enum
@@ -852,8 +882,10 @@ class OrgMemberUpdate with OrgMemberUpdateMappable {
 
   const OrgMemberUpdate({required this.role});
 
-  factory OrgMemberUpdate.fromJson(String json) => OrgMemberUpdateMapper.fromJson(json);
-  factory OrgMemberUpdate.fromMap(Map<String, dynamic> map) => OrgMemberUpdateMapper.fromMap(map);
+  factory OrgMemberUpdate.fromJson(String json) =>
+      OrgMemberUpdateMapper.fromJson(json);
+  factory OrgMemberUpdate.fromMap(Map<String, dynamic> map) =>
+      OrgMemberUpdateMapper.fromMap(map);
 }
 
 /// Org member create model
@@ -868,8 +900,10 @@ class OrgMemberCreate extends OrgMemberUpdate with OrgMemberCreateMappable {
     required super.role,
   });
 
-  factory OrgMemberCreate.fromJson(String json) => OrgMemberCreateMapper.fromJson(json);
-  factory OrgMemberCreate.fromMap(Map<String, dynamic> map) => OrgMemberCreateMapper.fromMap(map);
+  factory OrgMemberCreate.fromJson(String json) =>
+      OrgMemberCreateMapper.fromJson(json);
+  factory OrgMemberCreate.fromMap(Map<String, dynamic> map) =>
+      OrgMemberCreateMapper.fromMap(map);
 }
 
 /// Org member model
@@ -889,7 +923,8 @@ class OrgMember extends OrgMemberCreate with TableBaseMixin, OrgMemberMappable {
   });
 
   factory OrgMember.fromJson(String json) => OrgMemberMapper.fromJson(json);
-  factory OrgMember.fromMap(Map<String, dynamic> map) => OrgMemberMapper.fromMap(map);
+  factory OrgMember.fromMap(Map<String, dynamic> map) =>
+      OrgMemberMapper.fromMap(map);
 }
 
 /// Org member read model
@@ -908,8 +943,10 @@ class OrgMemberRead extends OrgMember with OrgMemberReadMappable {
     required this.organization,
   });
 
-  factory OrgMemberRead.fromJson(String json) => OrgMemberReadMapper.fromJson(json);
-  factory OrgMemberRead.fromMap(Map<String, dynamic> map) => OrgMemberReadMapper.fromMap(map);
+  factory OrgMemberRead.fromJson(String json) =>
+      OrgMemberReadMapper.fromJson(json);
+  factory OrgMemberRead.fromMap(Map<String, dynamic> map) =>
+      OrgMemberReadMapper.fromMap(map);
 }
 
 /// Project member update model
@@ -919,8 +956,10 @@ class ProjectMemberUpdate with ProjectMemberUpdateMappable {
 
   const ProjectMemberUpdate({required this.role});
 
-  factory ProjectMemberUpdate.fromJson(String json) => ProjectMemberUpdateMapper.fromJson(json);
-  factory ProjectMemberUpdate.fromMap(Map<String, dynamic> map) => ProjectMemberUpdateMapper.fromMap(map);
+  factory ProjectMemberUpdate.fromJson(String json) =>
+      ProjectMemberUpdateMapper.fromJson(json);
+  factory ProjectMemberUpdate.fromMap(Map<String, dynamic> map) =>
+      ProjectMemberUpdateMapper.fromMap(map);
 }
 
 /// Project member create model
@@ -936,8 +975,10 @@ class ProjectMemberCreate extends ProjectMemberUpdate
     required super.role,
   });
 
-  factory ProjectMemberCreate.fromJson(String json) => ProjectMemberCreateMapper.fromJson(json);
-  factory ProjectMemberCreate.fromMap(Map<String, dynamic> map) => ProjectMemberCreateMapper.fromMap(map);
+  factory ProjectMemberCreate.fromJson(String json) =>
+      ProjectMemberCreateMapper.fromJson(json);
+  factory ProjectMemberCreate.fromMap(Map<String, dynamic> map) =>
+      ProjectMemberCreateMapper.fromMap(map);
 }
 
 /// Project member model
@@ -957,8 +998,10 @@ class ProjectMember extends ProjectMemberCreate
     required this.updatedAt,
   });
 
-  factory ProjectMember.fromJson(String json) => ProjectMemberMapper.fromJson(json);
-  factory ProjectMember.fromMap(Map<String, dynamic> map) => ProjectMemberMapper.fromMap(map);
+  factory ProjectMember.fromJson(String json) =>
+      ProjectMemberMapper.fromJson(json);
+  factory ProjectMember.fromMap(Map<String, dynamic> map) =>
+      ProjectMemberMapper.fromMap(map);
 }
 
 /// Project member read model
@@ -977,8 +1020,10 @@ class ProjectMemberRead extends ProjectMember with ProjectMemberReadMappable {
     required this.project,
   });
 
-  factory ProjectMemberRead.fromJson(String json) => ProjectMemberReadMapper.fromJson(json);
-  factory ProjectMemberRead.fromMap(Map<String, dynamic> map) => ProjectMemberReadMapper.fromMap(map);
+  factory ProjectMemberRead.fromJson(String json) =>
+      ProjectMemberReadMapper.fromJson(json);
+  factory ProjectMemberRead.fromMap(Map<String, dynamic> map) =>
+      ProjectMemberReadMapper.fromMap(map);
 }
 
 /// User base model
@@ -1019,7 +1064,8 @@ class UserBase with UserBaseMappable {
   });
 
   factory UserBase.fromJson(String json) => UserBaseMapper.fromJson(json);
-  factory UserBase.fromMap(Map<String, dynamic> map) => UserBaseMapper.fromMap(map);
+  factory UserBase.fromMap(Map<String, dynamic> map) =>
+      UserBaseMapper.fromMap(map);
 }
 
 /// User update model
@@ -1047,7 +1093,8 @@ class UserUpdate extends UserBase with UserUpdateMappable {
   });
 
   factory UserUpdate.fromJson(String json) => UserUpdateMapper.fromJson(json);
-  factory UserUpdate.fromMap(Map<String, dynamic> map) => UserUpdateMapper.fromMap(map);
+  factory UserUpdate.fromMap(Map<String, dynamic> map) =>
+      UserUpdateMapper.fromMap(map);
 }
 
 /// User create model
@@ -1076,7 +1123,8 @@ class UserCreate extends UserUpdate with UserCreateMappable {
   });
 
   factory UserCreate.fromJson(String json) => UserCreateMapper.fromJson(json);
-  factory UserCreate.fromMap(Map<String, dynamic> map) => UserCreateMapper.fromMap(map);
+  factory UserCreate.fromMap(Map<String, dynamic> map) =>
+      UserCreateMapper.fromMap(map);
 }
 
 /// User model
@@ -1164,7 +1212,8 @@ class UserAuth extends User with UserAuthMappable {
   });
 
   factory UserAuth.fromJson(String json) => UserAuthMapper.fromJson(json);
-  factory UserAuth.fromMap(Map<String, dynamic> map) => UserAuthMapper.fromMap(map);
+  factory UserAuth.fromMap(Map<String, dynamic> map) =>
+      UserAuthMapper.fromMap(map);
 }
 
 /// User read model
@@ -1206,7 +1255,8 @@ class UserRead extends UserAuth with UserReadMappable {
   });
 
   factory UserRead.fromJson(String json) => UserReadMapper.fromJson(json);
-  factory UserRead.fromMap(Map<String, dynamic> map) => UserReadMapper.fromMap(map);
+  factory UserRead.fromMap(Map<String, dynamic> map) =>
+      UserReadMapper.fromMap(map);
 }
 
 /// User read obscured model
@@ -1248,12 +1298,14 @@ class UserReadObscured extends UserRead with UserReadObscuredMappable {
     return value != null ? "***" : null;
   }
 
-  factory UserReadObscured.fromJson(String json) => UserReadObscuredMapper.fromJson(json);
-  factory UserReadObscured.fromMap(Map<String, dynamic> map) => UserReadObscuredMapper.fromMap(map);
+  factory UserReadObscured.fromJson(String json) =>
+      UserReadObscuredMapper.fromJson(json);
+  factory UserReadObscured.fromMap(Map<String, dynamic> map) =>
+      UserReadObscuredMapper.fromMap(map);
 }
 
 /// Payment state enum
-@MappableEnum(caseStyle: CaseStyle.snakeCase)
+@MappableEnum(caseStyle: CaseStyle.upperCase)
 enum PaymentState {
   none("NONE"),
   success("SUCCESS"),
@@ -1268,10 +1320,12 @@ enum PaymentState {
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class OrganizationUpdate with OrganizationUpdateMappable {
   final String name;
+  @MappableField(hook: FiatCurrencyHook())
   final FiatCurrency currency;
   final String? timezone;
   final Map<String, String> externalKeys;
-
+  
+  
   const OrganizationUpdate({
     this.name = "",
     required this.currency,
@@ -1285,8 +1339,10 @@ class OrganizationUpdate with OrganizationUpdateMappable {
     }
   }
 
-  factory OrganizationUpdate.fromJson(String json) => OrganizationUpdateMapper.fromJson(json);
-  factory OrganizationUpdate.fromMap(Map<String, dynamic> map) => OrganizationUpdateMapper.fromMap(map);
+  factory OrganizationUpdate.fromJson(String json) =>
+      OrganizationUpdateMapper.fromJson(json);
+  factory OrganizationUpdate.fromMap(Map<String, dynamic> map) =>
+      OrganizationUpdateMapper.fromMap(map);
 }
 
 /// Organization create model
@@ -1300,8 +1356,10 @@ class OrganizationCreate extends OrganizationUpdate
     super.externalKeys,
   });
 
-  factory OrganizationCreate.fromJson(String json) => OrganizationCreateMapper.fromJson(json);
-  factory OrganizationCreate.fromMap(Map<String, dynamic> map) => OrganizationCreateMapper.fromMap(map);
+  factory OrganizationCreate.fromJson(String json) =>
+      OrganizationCreateMapper.fromJson(json);
+  factory OrganizationCreate.fromMap(Map<String, dynamic> map) =>
+      OrganizationCreateMapper.fromMap(map);
 }
 
 /// Organization model
@@ -1374,8 +1432,10 @@ class Organization extends OrganizationCreate
     required this.updatedAt,
   });
 
-  factory Organization.fromJson(String json) => OrganizationMapper.fromJson(json);
-  factory Organization.fromMap(Map<String, dynamic> map) => OrganizationMapper.fromMap(map);
+  factory Organization.fromJson(String json) =>
+      OrganizationMapper.fromJson(json);
+  factory Organization.fromMap(Map<String, dynamic> map) =>
+      OrganizationMapper.fromMap(map);
 }
 
 /// Organization read model
@@ -1419,14 +1479,18 @@ class OrganizationRead extends Organization with OrganizationReadMappable {
     this.pricePlan,
   });
 
-  factory OrganizationRead.fromJson(String json) => OrganizationReadMapper.fromJson(json);
-  factory OrganizationRead.fromMap(Map<String, dynamic> map) => OrganizationReadMapper.fromMap(map);
+  factory OrganizationRead.fromJson(String json) =>
+      OrganizationReadMapper.fromJson(json);
+  factory OrganizationRead.fromMap(Map<String, dynamic> map) =>
+      OrganizationReadMapper.fromMap(map);
 }
 
 /// Project update model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class ProjectUpdate with ProjectUpdateMappable {
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString name;
+  @MappableField(hook: SanitizedMultilineStringHook())
   final SanitizedMultilineString description;
   final List<String> tags;
   final String? profilePictureUrl;
@@ -1457,8 +1521,10 @@ class ProjectUpdate with ProjectUpdateMappable {
     this.coverPictureUrl,
   });
 
-  factory ProjectUpdate.fromJson(String json) => ProjectUpdateMapper.fromJson(json);
-  factory ProjectUpdate.fromMap(Map<String, dynamic> map) => ProjectUpdateMapper.fromMap(map);
+  factory ProjectUpdate.fromJson(String json) =>
+      ProjectUpdateMapper.fromJson(json);
+  factory ProjectUpdate.fromMap(Map<String, dynamic> map) =>
+      ProjectUpdateMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -1500,8 +1566,10 @@ class ProjectCreate extends ProjectUpdate with ProjectCreateMappable {
     );
   }
 
-  factory ProjectCreate.fromJson(String json) => ProjectCreateMapper.fromJson(json);
-  factory ProjectCreate.fromMap(Map<String, dynamic> map) => ProjectCreateMapper.fromMap(map);
+  factory ProjectCreate.fromJson(String json) =>
+      ProjectCreateMapper.fromJson(json);
+  factory ProjectCreate.fromMap(Map<String, dynamic> map) =>
+      ProjectCreateMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -1572,7 +1640,8 @@ class Project extends ProjectCreate with TableBaseMixin, ProjectMappable {
   }
 
   factory Project.fromJson(String json) => ProjectMapper.fromJson(json);
-  factory Project.fromMap(Map<String, dynamic> map) => ProjectMapper.fromMap(map);
+  factory Project.fromMap(Map<String, dynamic> map) =>
+      ProjectMapper.fromMap(map);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
@@ -1649,13 +1718,16 @@ class ProjectRead extends Project with ProjectReadMappable {
   }
 
   factory ProjectRead.fromJson(String json) => ProjectReadMapper.fromJson(json);
-  factory ProjectRead.fromMap(Map<String, dynamic> map) => ProjectReadMapper.fromMap(map);
+  factory ProjectRead.fromMap(Map<String, dynamic> map) =>
+      ProjectReadMapper.fromMap(map);
 }
 
 /// Verification code update model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class VerificationCodeUpdate with VerificationCodeUpdateMappable {
+  @MappableField(hook: SanitizedStringHook())
   final SanitizedString name;
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString? role;
 
   factory VerificationCodeUpdate({
@@ -1669,17 +1741,22 @@ class VerificationCodeUpdate with VerificationCodeUpdateMappable {
   }
   const VerificationCodeUpdate._({required this.name, this.role});
 
-  factory VerificationCodeUpdate.fromJson(String json) => VerificationCodeUpdateMapper.fromJson(json);
-  factory VerificationCodeUpdate.fromMap(Map<String, dynamic> map) => VerificationCodeUpdateMapper.fromMap(map);
+  factory VerificationCodeUpdate.fromJson(String json) =>
+      VerificationCodeUpdateMapper.fromJson(json);
+  factory VerificationCodeUpdate.fromMap(Map<String, dynamic> map) =>
+      VerificationCodeUpdateMapper.fromMap(map);
 }
 
 /// Verification code create model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class VerificationCodeCreate extends VerificationCodeUpdate
     with VerificationCodeCreateMappable {
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString userEmail;
   final DatetimeUTC expiry;
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString? organizationId;
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString? projectId;
 
   factory VerificationCodeCreate({
@@ -1710,8 +1787,10 @@ class VerificationCodeCreate extends VerificationCodeUpdate
     this.projectId,
   }) : super._();
 
-  factory VerificationCodeCreate.fromJson(String json) => VerificationCodeCreateMapper.fromJson(json);
-  factory VerificationCodeCreate.fromMap(Map<String, dynamic> map) => VerificationCodeCreateMapper.fromMap(map);
+  factory VerificationCodeCreate.fromJson(String json) =>
+      VerificationCodeCreateMapper.fromJson(json);
+  factory VerificationCodeCreate.fromMap(Map<String, dynamic> map) =>
+      VerificationCodeCreateMapper.fromMap(map);
 }
 
 /// Verification code model
@@ -1768,8 +1847,10 @@ class VerificationCode extends VerificationCodeCreate
     required this.updatedAt,
   }) : super._();
 
-  factory VerificationCode.fromJson(String json) => VerificationCodeMapper.fromJson(json);
-  factory VerificationCode.fromMap(Map<String, dynamic> map) => VerificationCodeMapper.fromMap(map);
+  factory VerificationCode.fromJson(String json) =>
+      VerificationCodeMapper.fromJson(json);
+  factory VerificationCode.fromMap(Map<String, dynamic> map) =>
+      VerificationCodeMapper.fromMap(map);
 }
 
 /// Verification code read model
@@ -1820,31 +1901,39 @@ class VerificationCodeRead extends VerificationCode
     required super.updatedAt,
   }) : super._();
 
-  factory VerificationCodeRead.fromJson(String json) => VerificationCodeReadMapper.fromJson(json);
-  factory VerificationCodeRead.fromMap(Map<String, dynamic> map) => VerificationCodeReadMapper.fromMap(map);
+  factory VerificationCodeRead.fromJson(String json) =>
+      VerificationCodeReadMapper.fromJson(json);
+  factory VerificationCodeRead.fromMap(Map<String, dynamic> map) =>
+      VerificationCodeReadMapper.fromMap(map);
 }
 
 /// Project key update model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class ProjectKeyUpdate with ProjectKeyUpdateMappable {
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString name;
   final DatetimeUTC? expiry;
 
   const ProjectKeyUpdate({required this.name, this.expiry});
 
-  factory ProjectKeyUpdate.fromJson(String json) => ProjectKeyUpdateMapper.fromJson(json);
-  factory ProjectKeyUpdate.fromMap(Map<String, dynamic> map) => ProjectKeyUpdateMapper.fromMap(map);
+  factory ProjectKeyUpdate.fromJson(String json) =>
+      ProjectKeyUpdateMapper.fromJson(json);
+  factory ProjectKeyUpdate.fromMap(Map<String, dynamic> map) =>
+      ProjectKeyUpdateMapper.fromMap(map);
 }
 
 /// Project key create model
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class ProjectKeyCreate extends ProjectKeyUpdate with ProjectKeyCreateMappable {
+  @MappableField(hook: SanitizedNonEmptyStringHook())
   final SanitizedNonEmptyString? projectId;
 
   const ProjectKeyCreate({required super.name, super.expiry, this.projectId});
 
-  factory ProjectKeyCreate.fromJson(String json) => ProjectKeyCreateMapper.fromJson(json);
-  factory ProjectKeyCreate.fromMap(Map<String, dynamic> map) => ProjectKeyCreateMapper.fromMap(map);
+  factory ProjectKeyCreate.fromJson(String json) =>
+      ProjectKeyCreateMapper.fromJson(json);
+  factory ProjectKeyCreate.fromMap(Map<String, dynamic> map) =>
+      ProjectKeyCreateMapper.fromMap(map);
 }
 
 /// Project key model
@@ -1869,7 +1958,8 @@ class ProjectKey extends ProjectKeyCreate
   });
 
   factory ProjectKey.fromJson(String json) => ProjectKeyMapper.fromJson(json);
-  factory ProjectKey.fromMap(Map<String, dynamic> map) => ProjectKeyMapper.fromMap(map);
+  factory ProjectKey.fromMap(Map<String, dynamic> map) =>
+      ProjectKeyMapper.fromMap(map);
 }
 
 /// Project key read model
@@ -1885,6 +1975,8 @@ class ProjectKeyRead extends ProjectKey with ProjectKeyReadMappable {
     required super.updatedAt,
   });
 
-  factory ProjectKeyRead.fromJson(String json) => ProjectKeyReadMapper.fromJson(json);
-  factory ProjectKeyRead.fromMap(Map<String, dynamic> map) => ProjectKeyReadMapper.fromMap(map);
+  factory ProjectKeyRead.fromJson(String json) =>
+      ProjectKeyReadMapper.fromJson(json);
+  factory ProjectKeyRead.fromMap(Map<String, dynamic> map) =>
+      ProjectKeyReadMapper.fromMap(map);
 }
