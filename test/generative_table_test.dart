@@ -2,7 +2,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:jamai_sdk/client.dart';
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/db.dart';
-import 'package:jamai_sdk/types/gen_tables.dart' ;
+import 'package:jamai_sdk/types/gen_tables.dart';
 import 'package:jamai_sdk/types/lm.dart';
 import 'package:test/test.dart';
 
@@ -96,8 +96,9 @@ void main() {
   group('Generative Table Tests', () {
     group('Table Creation', () {
       test('create action table', () async {
-        final String testTableId = 'test_action_table_${DateTime.now().millisecondsSinceEpoch}';
-        
+        final String testTableId =
+            'test_action_table_${DateTime.now().millisecondsSinceEpoch}';
+
         final response = await jamai.generativeTable.createActionTable(
           TableSchemaCreate(
             id: testTableId,
@@ -107,27 +108,32 @@ void main() {
                 id: 'output',
                 dtype: ColumnSchemaDtype.str,
                 genConfig: DiscriminatedLLMGenConfig(
-                  model: 'openai/gpt-4o-mini',
+                  model: 'openai/gpt-4.1-nano',
                   maxTokens: 256,
-                  prompt: 'You are a helpful assistant that processes the input: "\${input}"',
+                  prompt:
+                      'You are a helpful assistant that processes the input: "\${input}"',
                 ),
               ),
             ],
           ),
         );
-        
+
         expect(response.id, equals(testTableId));
-        expect(response.cols.length, equals(2));
-        expect(response.cols[0].id, equals('input'));
-        expect(response.cols[1].id, equals('output'));
-        expect(response.cols[1].genConfig, isNotNull);
-        
+        expect(
+          response.cols.length,
+          equals(4),
+        ); // includes ID and Updated at columns
+        expect(response.cols[2].id, equals('input'));
+        expect(response.cols[3].id, equals('output'));
+        expect(response.cols[3].genConfig, isNotNull);
+
         testActionTableId = testTableId;
       });
 
       test('create knowledge table', () async {
-        final String testTableId = 'test_knowledge_table_${DateTime.now().millisecondsSinceEpoch}';
-        
+        final String testTableId =
+            'test_knowledge_table_${DateTime.now().millisecondsSinceEpoch}';
+
         final response = await jamai.generativeTable.createKnowledgeTable(
           KnowledgeTableSchemaCreate(
             id: testTableId,
@@ -145,45 +151,53 @@ void main() {
             embeddingModel: 'openai/text-embedding-3-small',
           ),
         );
-        
+
         expect(response.id, equals(testTableId));
         expect(response.cols.length, equals(2));
         expect(response.cols[0].id, equals('content'));
         expect(response.cols[1].id, equals('embedding'));
         expect(response.cols[1].genConfig, isNotNull);
-        
+
         testKnowledgeTableId = testTableId;
       });
 
       test('create chat table', () async {
-        final String testTableId = 'test_chat_table_${DateTime.now().millisecondsSinceEpoch}';
-        
+        final String testTableId =
+            'test_chat_table_${DateTime.now().millisecondsSinceEpoch}';
+
         final response = await jamai.generativeTable.createChatTable(
           TableSchemaCreate(
             id: testTableId,
             cols: [
-              ColumnSchemaCreate(id: 'user_message', dtype: ColumnSchemaDtype.str),
-              ColumnSchemaCreate(id: 'assistant_message', dtype: ColumnSchemaDtype.str),
+              ColumnSchemaCreate(
+                id: 'user_message',
+                dtype: ColumnSchemaDtype.str,
+              ),
+              ColumnSchemaCreate(
+                id: 'assistant_message',
+                dtype: ColumnSchemaDtype.str,
+              ),
               ColumnSchemaCreate(
                 id: 'response',
                 dtype: ColumnSchemaDtype.str,
                 genConfig: DiscriminatedChatGenConfig(
-                  model: 'openai/gpt-4o-mini',
+                  model: 'openai/gpt-4.1-mini-4o-mini',
                   maxTokens: 256,
-                  prompt: 'You are a helpful assistant. Respond to the user message: "\${user_message}"',
+                  prompt:
+                      'You are a helpful assistant. Respond to the user message: "\${user_message}"',
                 ),
               ),
             ],
           ),
         );
-        
+
         expect(response.id, equals(testTableId));
         expect(response.cols.length, equals(3));
         expect(response.cols[0].id, equals('user_message'));
         expect(response.cols[1].id, equals('assistant_message'));
         expect(response.cols[2].id, equals('response'));
         expect(response.cols[2].genConfig, isNotNull);
-        
+
         testChatTableId = testTableId;
       });
     });
@@ -191,15 +205,17 @@ void main() {
     group('Table Listing and Retrieval', () {
       test('list all tables', () async {
         final response = await jamai.generativeTable.listTables();
-        
+
         expect(response.items, isA<List<TableMetaResponse>>());
         expect(response.items.length, greaterThan(0));
         expect(response.total, greaterThan(0));
       });
 
       test('list tables with type filter', () async {
-        final response = await jamai.generativeTable.listTables(tableType: common.TableType.action);
-        
+        final response = await jamai.generativeTable.listTables(
+          tableType: TableType.action,
+        );
+
         expect(response.items, isA<List<TableMetaResponse>>());
         // All returned tables should be action tables
         for (final table in response.items) {
@@ -209,8 +225,11 @@ void main() {
       });
 
       test('list tables with pagination', () async {
-        final response = await jamai.generativeTable.listTables(limit: 5, offset: 0);
-        
+        final response = await jamai.generativeTable.listTables(
+          limit: 5,
+          offset: 0,
+        );
+
         expect(response.items.length, lessThanOrEqualTo(5));
         expect(response.offset, equals(0));
         expect(response.limit, equals(5));
@@ -221,9 +240,11 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
-        final response = await jamai.generativeTable.getTable(tableId: testActionTableId!);
-        
+
+        final response = await jamai.generativeTable.getTable(
+          tableId: testActionTableId!,
+        );
+
         expect(response.id, equals(testActionTableId));
         expect(response.cols, isA<List<ColumnSchema>>());
         expect(response.cols.length, greaterThan(0));
@@ -236,7 +257,7 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
+
         final request = MultiRowAddRequest(
           tableId: testActionTableId!,
           data: [
@@ -245,13 +266,13 @@ void main() {
           ],
           stream: false, // Disable streaming for easier testing
         );
-        
+
         final response = await jamai.generativeTable.addRows('action', request);
-        
+
         expect(response, isA<MultiRowCompletionResponse>());
         final multiRowResponse = response as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(2));
-        
+
         // Store row ID for later tests
         if (multiRowResponse.rows.isNotEmpty) {
           testActionTableRowId = multiRowResponse.rows[0].rowId;
@@ -263,22 +284,31 @@ void main() {
           // Skip if no knowledge table was created
           return;
         }
-        
+
         final request = MultiRowAddRequest(
           tableId: testKnowledgeTableId!,
           data: [
-            {'content': 'This is a test document about artificial intelligence.'},
-            {'content': 'This is another test document about machine learning.'},
+            {
+              'content':
+                  'This is a test document about artificial intelligence.',
+            },
+            {
+              'content':
+                  'This is another test document about machine learning.',
+            },
           ],
           stream: false, // Disable streaming for easier testing
         );
-        
-        final response = await jamai.generativeTable.addRows('knowledge', request);
-        
+
+        final response = await jamai.generativeTable.addRows(
+          'knowledge',
+          request,
+        );
+
         expect(response, isA<MultiRowCompletionResponse>());
         final multiRowResponse = response as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(2));
-        
+
         // Store row ID for later tests
         if (multiRowResponse.rows.isNotEmpty) {
           testKnowledgeTableRowId = multiRowResponse.rows[0].rowId;
@@ -290,7 +320,7 @@ void main() {
           // Skip if no chat table was created
           return;
         }
-        
+
         final request = MultiRowAddRequest(
           tableId: testChatTableId!,
           data: [
@@ -299,13 +329,13 @@ void main() {
           ],
           stream: false, // Disable streaming for easier testing
         );
-        
+
         final response = await jamai.generativeTable.addRows('chat', request);
-        
+
         expect(response, isA<MultiRowCompletionResponse>());
         final multiRowResponse = response as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(2));
-        
+
         // Store row ID for later tests
         if (multiRowResponse.rows.isNotEmpty) {
           testChatTableRowId = multiRowResponse.rows[0].rowId;
@@ -317,15 +347,15 @@ void main() {
           // Skip if no action table or row was created
           return;
         }
-        
+
         final request = RowUpdateRequest(
           tableId: testActionTableId!,
           rowId: testActionTableRowId!,
           data: {'input': 'Updated test input'},
         );
-        
+
         final response = await jamai.generativeTable.updateRow(request);
-        
+
         expect(response, isA<Map<String, dynamic>>());
       });
 
@@ -334,16 +364,16 @@ void main() {
           // Skip if no action table or row was created
           return;
         }
-        
+
         final request = MultiRowUpdateRequest(
           tableId: testActionTableId!,
           data: {
             testActionTableRowId!: {'input': 'Updated test input again'},
           },
         );
-        
+
         final response = await jamai.generativeTable.updateRows(request);
-        
+
         expect(response.ok, isTrue);
       });
 
@@ -352,16 +382,16 @@ void main() {
           // Skip if no action table or row was created
           return;
         }
-        
+
         final request = MultiRowRegenRequest(
           tableId: testActionTableId!,
           rowIds: [testActionTableRowId!],
           regenStrategy: RegenStrategy.runAll,
           stream: false, // Disable streaming for easier testing
         );
-        
+
         final response = await jamai.generativeTable.regenRows(request);
-        
+
         expect(response, isA<MultiRowCompletionResponse>());
         final multiRowResponse = response as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(1));
@@ -372,14 +402,14 @@ void main() {
           // Skip if no action table or row was created
           return;
         }
-        
+
         final request = MultiRowDeleteRequest(
           tableId: testActionTableId!,
           rowIds: [testActionTableRowId!],
         );
-        
+
         final response = await jamai.generativeTable.deleteRows(request);
-        
+
         expect(response.ok, isTrue);
       });
     });
@@ -390,15 +420,18 @@ void main() {
           // Skip if no knowledge table was created
           return;
         }
-        
+
         final request = SearchRequest(
           tableId: testKnowledgeTableId!,
           query: 'artificial intelligence',
           limit: 10,
         );
-        
-        final response = await jamai.generativeTable.hybridSearch(TableType.knowledge, request);
-        
+
+        final response = await jamai.generativeTable.hybridSearch(
+          TableType.knowledge,
+          request,
+        );
+
         expect(response, isA<List<Map<String, dynamic>>>());
       });
     });
@@ -409,20 +442,20 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
+
         final request = GenConfigUpdateRequest(
           tableId: testActionTableId!,
           columnMap: {
             'output': DiscriminatedLLMGenConfig(
-              model: 'openai/gpt-4o-mini',
+              model: 'openai/gpt-4.1-mini-4o-mini',
               maxTokens: 512,
               prompt: 'Updated prompt: Process this input: "\${input}"',
             ),
           },
         );
-        
+
         final response = await jamai.generativeTable.updateGenConfig(request);
-        
+
         expect(response.id, equals(testActionTableId));
         expect(response.cols, isA<List<ColumnSchema>>());
       });
@@ -432,14 +465,17 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
+
         final request = ColumnRenameRequest(
           tableId: testActionTableId!,
           columnMap: {'input': 'renamed_input'},
         );
-        
-        final response = await jamai.generativeTable.renameColumns(TableType.action, request);
-        
+
+        final response = await jamai.generativeTable.renameColumns(
+          TableType.action,
+          request,
+        );
+
         expect(response.id, equals(testActionTableId));
         expect(response.cols, isA<List<ColumnSchema>>());
       });
@@ -449,14 +485,17 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
+
         final request = ColumnReorderRequest(
           tableId: testActionTableId!,
           columnNames: ['ID', 'Updated at', 'renamed_input', 'output'],
         );
-        
-        final response = await jamai.generativeTable.reorderColumns(TableType.action, request);
-        
+
+        final response = await jamai.generativeTable.reorderColumns(
+          TableType.action,
+          request,
+        );
+
         expect(response.id, equals(testActionTableId));
         expect(response.cols, isA<List<ColumnSchema>>());
       });
@@ -466,14 +505,17 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
+
         final request = ColumnDropRequest(
           tableId: testActionTableId!,
           columnNames: ['output'],
         );
-        
-        final response = await jamai.generativeTable.dropColumns(TableType.action, request);
-        
+
+        final response = await jamai.generativeTable.dropColumns(
+          TableType.action,
+          request,
+        );
+
         expect(response.id, equals(testActionTableId));
         expect(response.cols, isA<List<ColumnSchema>>());
       });
@@ -485,7 +527,7 @@ void main() {
           // Skip if no knowledge table was created
           return;
         }
-        
+
         // Note: This test assumes a test CSV file exists
         // In a real test environment, you would need to create this file
         final request = TableDataImportRequest(
@@ -493,7 +535,7 @@ void main() {
           tableId: testKnowledgeTableId!,
           stream: false, // Disable streaming for easier testing
         );
-        
+
         try {
           final response = await jamai.generativeTable.importData(request);
           expect(response, isA<MultiRowCompletionResponse>());
@@ -510,11 +552,11 @@ void main() {
           filePath: 'test_table.json', // This file would need to exist
           blocking: true,
         );
-        
+
         try {
           final response = await jamai.generativeTable.importTable(request);
           expect(response, isA<TableMetaResponse>());
-          
+
           // Clean up the imported table
           if (response is TableMetaResponse) {
             await jamai.generativeTable.deleteTable(tableId: response.id);
@@ -532,7 +574,7 @@ void main() {
           // Skip if no knowledge table was created
           return;
         }
-        
+
         // Note: This test assumes a test file exists
         // In a real test environment, you would need to create this file
         try {
@@ -540,9 +582,9 @@ void main() {
             'test_document.txt', // This file would need to exist
             testKnowledgeTableId!,
             1000, // chunkSize
-            200,  // chunkOverlap
+            200, // chunkOverlap
           );
-          
+
           expect(response.ok, isTrue);
         } catch (e) {
           // File might not exist, which is expected in a test environment
@@ -557,11 +599,13 @@ void main() {
           // Skip if no action table was created
           return;
         }
-        
-        final response = await jamai.generativeTable.deleteTable(tableId: testActionTableId!);
-        
+
+        final response = await jamai.generativeTable.deleteTable(
+          tableId: testActionTableId!,
+        );
+
         expect(response.ok, isTrue);
-        
+
         // Verify table is deleted
         try {
           await jamai.generativeTable.getTable(tableId: testActionTableId!);
@@ -570,7 +614,7 @@ void main() {
           // Expected to fail
           expect(e, isA<Exception>());
         }
-        
+
         testActionTableId = null;
       });
 
@@ -579,11 +623,13 @@ void main() {
           // Skip if no knowledge table was created
           return;
         }
-        
-        final response = await jamai.generativeTable.deleteTable(tableId: testKnowledgeTableId!);
-        
+
+        final response = await jamai.generativeTable.deleteTable(
+          tableId: testKnowledgeTableId!,
+        );
+
         expect(response.ok, isTrue);
-        
+
         // Verify table is deleted
         try {
           await jamai.generativeTable.getTable(tableId: testKnowledgeTableId!);
@@ -592,7 +638,7 @@ void main() {
           // Expected to fail
           expect(e, isA<Exception>());
         }
-        
+
         testKnowledgeTableId = null;
       });
 
@@ -601,11 +647,13 @@ void main() {
           // Skip if no chat table was created
           return;
         }
-        
-        final response = await jamai.generativeTable.deleteTable(tableId: testChatTableId!);
-        
+
+        final response = await jamai.generativeTable.deleteTable(
+          tableId: testChatTableId!,
+        );
+
         expect(response.ok, isTrue);
-        
+
         // Verify table is deleted
         try {
           await jamai.generativeTable.getTable(tableId: testChatTableId!);
@@ -614,7 +662,7 @@ void main() {
           // Expected to fail
           expect(e, isA<Exception>());
         }
-        
+
         testChatTableId = null;
       });
     });
