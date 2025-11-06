@@ -4,7 +4,6 @@ import 'package:jamai_sdk/components/generative_table.dart';
 import 'package:jamai_sdk/components/mcp.dart';
 import 'package:jamai_sdk/components/organization.dart';
 import 'package:jamai_sdk/components/project.dart';
-import 'package:jamai_sdk/components/serving.dart';
 import 'package:jamai_sdk/components/tasks.dart';
 import 'package:jamai_sdk/components/templates.dart';
 
@@ -57,10 +56,6 @@ class JamaiApiClient {
   // Private cached instance for performance optimization
   GenerativeTable? _generativeTable;
 
-  Serving get serving {
-    _serving ??= Serving(apiUrl: baseUrl, apiKey: apiKey);
-    return _serving!;
-  }
 
   /// Provides scoped file operations configured with this client's credentials
   File get file {
@@ -100,7 +95,6 @@ class JamaiApiClient {
   // Private cached instances for performance optimization
   Project? _project;
   Templates? _templates;
-  Serving? _serving;
   File? _file;
   Tasks? _tasks;
   MCP? _mcp;

@@ -1,5 +1,6 @@
 import 'package:dotenv/dotenv.dart';
 import 'package:jamai_sdk/client.dart';
+import 'package:jamai_sdk/components/conversations.dart';
 import 'package:jamai_sdk/types/conversations.dart';
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/db.dart';
@@ -46,7 +47,7 @@ void main() {
       projectId: testProjectName!,
       body: ProjectCreate(
         organizationId: testOrganizationId!,
-        name: testProjectName!,
+        name: SanitizedNonEmptyString(testProjectName!),
       ),
     );
 

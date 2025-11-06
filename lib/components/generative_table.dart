@@ -1,6 +1,8 @@
+import 'package:path/path.dart' as p;
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:jamai_sdk/types/gen_tables.dart' hide TableType;
+import 'package:jamai_sdk/types/gen_tables.dart';
 import 'package:jamai_sdk/types/common.dart';
 
 class GenerativeTable {
@@ -25,8 +27,6 @@ class GenerativeTable {
   Future<TableMetaResponse> createActionTable(TableSchemaCreate request) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/action');
 
-    print('Create Action Table Request:');
-    print(request);
     final response = await http.post(
       url,
       headers: {
@@ -39,7 +39,6 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      print('Create Action Table Response: ${response.body}');
       return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
@@ -51,6 +50,7 @@ class GenerativeTable {
   /// Creates a new knowledge table.
   ///
   /// [request] - The knowledge table schema creation request
+  /// provide an empty list for the columns to create default empty knowledge table
   ///
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
@@ -126,7 +126,7 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<Page<TableMetaResponse>> listTables({
-    TableType? tableType,
+    required TableType tableType,
     int? offset,
     int? limit,
     OrderBy? orderBy,
@@ -137,9 +137,8 @@ class GenerativeTable {
   }) async {
     final Map<String, dynamic> queryParams = {};
 
-    if (tableType != null) queryParams['table_type'] = tableType.toString();
-    if (offset != null) queryParams['offset'] = offset;
-    if (limit != null) queryParams['limit'] = limit;
+    if (offset != null) queryParams['offset'] = offset.toString();
+    if (limit != null) queryParams['limit'] = limit.toString();
     if (orderBy != null) queryParams['order_by'] = orderBy.toString();
     if (orderAscending != null) {
       queryParams['order_ascending'] = orderAscending;
@@ -155,7 +154,7 @@ class GenerativeTable {
     }
 
     final url = Uri.parse(
-      '$apiUrl/api/v2/gen_tables/list',
+      '$apiUrl/api/v2/gen_tables/$tableType/list',
     ).replace(queryParameters: queryParams);
 
     final response = await http.get(
@@ -184,9 +183,12 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the table metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<TableMetaResponse> getTable({required String tableId}) async {
+  Future<TableMetaResponse> getTable({
+    required TableType tableType,
+    required String tableId,
+  }) async {
     final url = Uri.parse(
-      '$apiUrl/api/v2/gen_tables',
+      '$apiUrl/api/v2/gen_tables/$tableType',
     ).replace(queryParameters: {'table_id': tableId});
 
     final response = await http.get(
@@ -215,9 +217,12 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<OkResponse> deleteTable({required String tableId}) async {
+  Future<OkResponse> deleteTable({
+    required TableType tableType,
+    required String tableId,
+  }) async {
     final url = Uri.parse(
-      '$apiUrl/api/v2/gen_tables',
+      '$apiUrl/api/v2/gen_tables/$tableType',
     ).replace(queryParameters: {'table_id': tableId});
 
     final response = await http.delete(
@@ -251,10 +256,10 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<AddTableRowsResponse> addRows(
-    String tableType,
+    TableType tableType,
     MultiRowAddRequest request,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/add');
 
     final headers = {
       'Content-Type': 'application/json',
@@ -305,9 +310,14 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateRow(RowUpdateRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/rows');
+  Future<Map<String, dynamic>> updateRow(
+    TableType tableType,
+    RowUpdateRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
 
+    print('Update Row Request:');
+    print(request.toJson());
     final response = await http.patch(
       url,
       headers: {
@@ -335,8 +345,11 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<OkResponse> updateRows(MultiRowUpdateRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/rows');
+  Future<OkResponse> updateRows(
+    TableType tableType,
+    MultiRowUpdateRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
 
     final response = await http.patch(
       url,
@@ -365,10 +378,13 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<OkResponse> deleteRows(MultiRowDeleteRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/rows');
+  Future<OkResponse> deleteRows(
+    TableType tableType,
+    MultiRowDeleteRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/delete');
 
-    final response = await http.delete(
+    final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -395,8 +411,11 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<AddTableRowsResponse> regenRows(MultiRowRegenRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/regen');
+  Future<AddTableRowsResponse> regenRows(
+    TableType tableType,
+    MultiRowRegenRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/regen');
 
     final response = await http.post(
       url,
@@ -438,15 +457,13 @@ class GenerativeTable {
   /// [request] - The search request containing table_id, query, and search parameters
   ///
   /// Returns a [List<Map<String, dynamic>>] containing the search results
-  ///
+  /// the results may vary. so print it out to see the structure.
   /// Throws an [Exception] if the request fails.
-  Future<List<Map<String, dynamic>>> hybridSearch(
+  Future<List<dynamic>> hybridSearch(
     TableType tableType,
     SearchRequest request,
   ) async {
-    final url = Uri.parse(
-      '$apiUrl/api/v2/gen_tables/${tableType.toString()}/hybrid_search',
-    );
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/hybrid_search');
 
     final response = await http.post(
       url,
@@ -460,7 +477,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as List<Map<String, dynamic>>;
+      return json.decode(response.body) as List<dynamic>;
     } else {
       throw Exception(
         'Failed to search: ${response.statusCode} - ${response.body}',
@@ -476,20 +493,34 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<AddTableRowsResponse> importData(
+    TableType tableType,
     TableDataImportRequest request,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/import/data');
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/import_data');
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-        if (userId != null) 'X-USER-ID': userId!,
-        if (projectId != null) 'X-PROJECT-ID': projectId!,
-      },
-      body: request.toJson(),
-    );
+    final headers = {
+      'Authorization': 'Bearer $apiKey',
+      if (userId != null) 'X-USER-ID': userId!,
+      if (projectId != null) 'X-PROJECT-ID': projectId!,
+    };
+
+    http.Response response;
+    List<int> fileBytes = File(request.filePath).readAsBytesSync();
+
+    String filename = p.basename(request.filePath);
+    // Check if we need to do a file upload (multipart form)
+    // Create multipart request for file upload
+    final multipartRequest = http.MultipartRequest('POST', url)
+      ..headers.addAll(headers)
+      ..files.add(
+        http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
+      )
+      ..fields['table_id'] = request.tableId
+      ..fields['stream'] = request.stream.toString()
+      ..fields['delimiter'] = request.delimiter.value;
+
+    final streamedResponse = await multipartRequest.send();
+    response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body) as Map<String, dynamic>;
@@ -517,26 +548,43 @@ class GenerativeTable {
   /// Imports a table from a file.
   ///
   /// [request] - The table import request
+  /// [fileBytes] - Optional file bytes to upload (if using fromCSVBytes)
+  /// [filename] - Optional filename for the file upload
   ///
-  /// Returns a TableMetaResponse | OkResponse containing the response
+  /// Returns a TableMetaResponse containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<dynamic> importTable(TableImportRequest request) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/import/table');
+  Future<TableMetaResponse> importTable(
+    TableType tableType,
+    TableImportRequest request,
+  ) async {
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/import');
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-        if (userId != null) 'X-USER-ID': userId!,
-        if (projectId != null) 'X-PROJECT-ID': projectId!,
-      },
-      body: request.toJson(),
-    );
+    final headers = {
+      'Authorization': 'Bearer $apiKey',
+      if (userId != null) 'X-USER-ID': userId!,
+      if (projectId != null) 'X-PROJECT-ID': projectId!,
+    };
+
+    http.Response response;
+
+    List<int> fileBytes = File(request.filePath).readAsBytesSync();
+    String filename = p.basename(request.filePath);
+    // Check if we need to do a file upload (multipart form)
+    // Create multipart request for file upload
+    final multipartRequest = http.MultipartRequest('POST', url)
+      ..headers.addAll(headers)
+      ..files.add(
+        http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
+      )
+      ..fields['table_id_dst'] = request.tableIdDst ?? ''
+      ..fields['blocking'] = request.blocking.toString();
+
+    final streamedResponse = await multipartRequest.send();
+    response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return TableMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to import table: ${response.statusCode} - ${response.body}',
@@ -552,9 +600,10 @@ class GenerativeTable {
   ///
   /// Throws an [Exception] if the request fails.
   Future<TableMetaResponse> updateGenConfig(
+    TableType tableType,
     GenConfigUpdateRequest request,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/gen_config');
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/gen_config');
 
     final response = await http.patch(
       url,
@@ -591,7 +640,7 @@ class GenerativeTable {
       '$apiUrl/api/v2/gen_tables/$tableType/columns/rename',
     );
 
-    final response = await http.patch(
+    final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -620,13 +669,14 @@ class GenerativeTable {
   /// Throws an [Exception] if the request fails.
   Future<TableMetaResponse> reorderColumns(
     TableType tableType,
+
     ColumnReorderRequest request,
   ) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/gen_tables/$tableType/columns/reorder',
     );
 
-    final response = await http.patch(
+    final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -657,9 +707,9 @@ class GenerativeTable {
     TableType tableType,
     ColumnDropRequest request,
   ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/columns');
+    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/columns/drop');
 
-    final response = await http.delete(
+    final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',

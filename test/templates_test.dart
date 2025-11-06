@@ -2,7 +2,6 @@ import 'package:dotenv/dotenv.dart';
 import 'package:jamai_sdk/client.dart';
 import 'package:jamai_sdk/types/db.dart' as db_types;
 import 'package:jamai_sdk/types/common.dart' as common_types;
-import 'package:jamai_sdk/types/gen_tables.dart' as gen_tables_types;
 import 'package:test/test.dart';
 
 void main() {

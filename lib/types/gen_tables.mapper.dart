@@ -5185,12 +5185,6 @@ class RowUpdateRequestMapper extends ClassMapperBase<RowUpdateRequest> {
     _$tableId,
     key: r'table_id',
   );
-  static String _$rowId(RowUpdateRequest v) => v.rowId;
-  static const Field<RowUpdateRequest, String> _f$rowId = Field(
-    'rowId',
-    _$rowId,
-    key: r'row_id',
-  );
   static Map<String, dynamic> _$data(RowUpdateRequest v) => v.data;
   static const Field<RowUpdateRequest, Map<String, dynamic>> _f$data = Field(
     'data',
@@ -5200,14 +5194,12 @@ class RowUpdateRequestMapper extends ClassMapperBase<RowUpdateRequest> {
   @override
   final MappableFields<RowUpdateRequest> fields = const {
     #tableId: _f$tableId,
-    #rowId: _f$rowId,
     #data: _f$data,
   };
 
   static RowUpdateRequest _instantiate(DecodingData data) {
     return RowUpdateRequest(
       tableId: data.dec(_f$tableId),
-      rowId: data.dec(_f$rowId),
       data: data.dec(_f$data),
     );
   }
@@ -5276,7 +5268,7 @@ abstract class RowUpdateRequestCopyWith<$R, $In extends RowUpdateRequest, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
   get data;
-  $R call({String? tableId, String? rowId, Map<String, dynamic>? data});
+  $R call({String? tableId, Map<String, dynamic>? data});
   RowUpdateRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -5298,18 +5290,15 @@ class _RowUpdateRequestCopyWithImpl<$R, $Out>
     (v) => call(data: v),
   );
   @override
-  $R call({String? tableId, String? rowId, Map<String, dynamic>? data}) =>
-      $apply(
-        FieldCopyWithData({
-          if (tableId != null) #tableId: tableId,
-          if (rowId != null) #rowId: rowId,
-          if (data != null) #data: data,
-        }),
-      );
+  $R call({String? tableId, Map<String, dynamic>? data}) => $apply(
+    FieldCopyWithData({
+      if (tableId != null) #tableId: tableId,
+      if (data != null) #data: data,
+    }),
+  );
   @override
   RowUpdateRequest $make(CopyWithData data) => RowUpdateRequest(
     tableId: data.get(#tableId, or: $value.tableId),
-    rowId: data.get(#rowId, or: $value.rowId),
     data: data.get(#data, or: $value.data),
   );
 
@@ -6288,7 +6277,7 @@ class TableDataImportRequestMapper
     'stream',
     _$stream,
     opt: true,
-    def: true,
+    def: false,
   );
   static CSVDelimiter _$delimiter(TableDataImportRequest v) => v.delimiter;
   static const Field<TableDataImportRequest, CSVDelimiter> _f$delimiter = Field(

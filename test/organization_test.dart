@@ -1,4 +1,5 @@
 import 'package:jamai_sdk/client.dart';
+import 'package:jamai_sdk/components/organization.dart';
 import 'package:jamai_sdk/types/db.dart';
 import 'package:sealed_currencies/sealed_currencies.dart';
 import 'package:test/test.dart';

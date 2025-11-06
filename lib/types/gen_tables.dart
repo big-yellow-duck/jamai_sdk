@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/lm.dart';
 import 'package:dart_mappable/dart_mappable.dart';
@@ -16,20 +17,6 @@ enum CSVDelimiter {
   @override
   String toString() => value;
 }
-
-/// Table type enumeration
-// @MappableEnum(caseStyle: CaseStyle.snakeCase)
-// enum TableType {
-//   action('action'),
-//   knowledge('knowledge'),
-//   chat('chat');
-
-//   final String apiString;
-//   const TableType(this.apiString);
-
-//   @override
-//   String toString() => apiString;
-// }
 
 @MappableEnum(caseStyle: CaseStyle.snakeCase)
 enum ColumnSchemaDtype {
@@ -91,7 +78,7 @@ enum GenConfigTypes {
   @MappableValue('gen_config.embed')
   embed,
   @MappableValue('gen_config.code')
-  code;
+  code,
 
   // String get value => switch (this) {
   //   GenConfigTypes.llm => 'gen_config.llm',
@@ -837,12 +824,12 @@ class MultiRowAddRequest with MultiRowAddRequestMappable {
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class RowUpdateRequest with RowUpdateRequestMappable {
   final String tableId;
-  final String rowId;
+  // final String rowId;
   final Map<String, dynamic> data;
 
   const RowUpdateRequest({
     required this.tableId,
-    required this.rowId,
+    // required this.rowId,
     required this.data,
   });
 
@@ -979,7 +966,7 @@ class TableDataImportRequest with TableDataImportRequestMappable {
   const TableDataImportRequest({
     required this.filePath,
     required this.tableId,
-    this.stream = true,
+    this.stream = false,
     this.delimiter = CSVDelimiter.comma,
   });
 

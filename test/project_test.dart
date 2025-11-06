@@ -41,7 +41,7 @@ void main() {
       userId: testUserId,
     );
     final projectCreateResult = await jamai.project.create(
-      projectId: testProjectName.toString()!,
+      projectId: testProjectName.toString(),
       body: db_types.ProjectCreate(
         organizationId: testOrganizationId!,
         name: testProjectName!,
@@ -63,7 +63,7 @@ void main() {
     test('Update Project', () async {
       final projectUpdateResult = await jamai.project.update(
         projectId: newProject.id,
-        body: db_types.ProjectUpdate(name: '${testProjectName}_updated'),
+        body: db_types.ProjectUpdate(name: SanitizedNonEmptyString('${testProjectName}_updated')),
       );
       expect(projectUpdateResult, isA<db_types.ProjectRead>());
       expect(projectUpdateResult.name, '${testProjectName}_updated');

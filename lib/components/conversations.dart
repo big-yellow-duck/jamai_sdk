@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/conversations.dart';
+import 'package:jamai_sdk/types/gen_tables.dart';
+import 'package:jamai_sdk/types/lm.dart';
 
 /// Conversation-related API operations
 class Conversations {
@@ -23,7 +25,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the conversation response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> create({
+  Future<Page<ConversationMetaResponse>> create({
     required ConversationCreateRequest request,
   }) async {
     final url = Uri.parse('$apiUrl/api/v2/conversations');
@@ -38,7 +40,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return Page.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to create conversation: ${response.statusCode} - ${response.body}',
@@ -53,7 +55,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the conversation metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> get({required String conversationId}) async {
+  Future<ConversationMetaResponse> get({required String conversationId}) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/conversations',
     ).replace(queryParameters: {'conversation_id': conversationId});
@@ -67,7 +69,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return ConversationMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to get conversation: ${response.statusCode} - ${response.body}',
@@ -82,7 +84,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> delete({required String conversationId}) async {
+  Future<OkResponse> delete({required String conversationId}) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/conversations',
     ).replace(queryParameters: {'conversation_id': conversationId});
@@ -96,7 +98,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to delete conversation: ${response.statusCode} - ${response.body}',
@@ -118,7 +120,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the list of conversations and pagination info.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> list({
+  Future<Page<ConversationMetaResponse>> list({
     int? offset,
     int? limit,
     OrderBy? orderBy,
@@ -158,7 +160,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return Page.fromJson(response.body)
     } else {
       throw Exception(
         'Failed to list conversations: ${response.statusCode} - ${response.body}',
@@ -180,7 +182,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the list of agents and pagination info.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> listAgents({
+  Future<Page<ConversationMetaResponse>> listAgents({
     int? offset,
     int? limit,
     OrderBy? orderBy,
@@ -222,7 +224,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return Page.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to list agents: ${response.statusCode} - ${response.body}',
@@ -237,7 +239,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the agent metadata
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> getAgent({required String agentId}) async {
+  Future<AgentMetaResponse> getAgent({required String agentId}) async {
     final url = Uri.parse(
       '$apiUrl/api/v2/conversations/agents',
     ).replace(queryParameters: {'agent_id': agentId});
@@ -251,7 +253,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return AgentMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to get agent: ${response.statusCode} - ${response.body}',
@@ -266,7 +268,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> generateTitle({
+  Future<ConversationMetaResponse> generateTitle({
     required String conversationId,
   }) async {
     final url = Uri.parse('$apiUrl/api/v2/conversations/title');
@@ -281,7 +283,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return ConversationMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to generate title: ${response.statusCode} - ${response.body}',
@@ -297,7 +299,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> renameTitle({
+  Future<ConversationMetaResponse> renameTitle({
     required String conversationId,
     required String title,
   }) async {
@@ -313,7 +315,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return ConversationMetaResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to rename title: ${response.statusCode} - ${response.body}',
@@ -358,7 +360,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateMessage({
+  Future<AddTableRowsResponse> updateMessage({
     required MessageUpdateRequest request,
   }) async {
     final url = Uri.parse('$apiUrl/api/v2/conversations/messages');
@@ -373,10 +375,24 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Determine the response type based on the 'object' field (discriminator)
+      final objectType = responseData['object'] as String?;
+
+      switch (objectType) {
+        case 'gen_table.completion.rows':
+          return MultiRowCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_completion':
+          return CellCompletionResponse.fromMap(responseData);
+        case 'gen_table.cell_references':
+          return CellReferencesResponse.fromMap(responseData);
+        default:
+          throw Exception('Unknown response type: $objectType');
+      }
     } else {
       throw Exception(
-        'Failed to update message: ${response.statusCode} - ${response.body}',
+        'Failed to add rows: ${response.statusCode} - ${response.body}',
       );
     }
   }
@@ -393,7 +409,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the list of messages and pagination info.
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> listMessages({
+  Future<Page<Map<String, dynamic>>> listMessages({
     required String conversationId,
     int? offset,
     int? limit,
@@ -424,7 +440,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return Page.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to list messages: ${response.statusCode} - ${response.body}',
@@ -470,7 +486,7 @@ class Conversations {
   /// Returns a [Map<String, dynamic>] containing the threads
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> getThreads({
+  Future<ConversationThreadsResponse> getThreads({
     String? conversationId,
     String? agentId,
   }) async {
@@ -492,7 +508,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return ConversationThreadsResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to get threads: ${response.statusCode} - ${response.body}',
