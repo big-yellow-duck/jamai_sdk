@@ -16,6 +16,16 @@ enum GenConfigTypes {
   code,
 }
 
+extension GenConfigTypesX on GenConfigTypes {
+  static GenConfigTypes fromValue(String value) =>
+      GenConfigTypesMapper.fromValue(value);
+}
+
+extension GenConfigTypesFromValue on GenConfigTypes {
+  static GenConfigTypes fromValue(String value) =>
+      GenConfigTypesMapper.fromValue(value);
+}
+
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class MyClass with MyClassMappable {
   final GenConfigTypes type;

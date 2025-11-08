@@ -207,44 +207,53 @@ void main() {
           stream: false,
         );
 
-        final response = await jamai.generativeTable.addRows(
+        final responses = jamai.generativeTable.addRows(
           TableType.action,
           request,
         );
 
-        expect(response, isA<MultiRowCompletionResponse>());
-        final multiRowResponse = response as MultiRowCompletionResponse;
+        // Non-streaming path now yields a single MultiRowCompletionResponse via Stream
+        final collected = await responses.toList();
+        expect(collected.length, equals(1));
+        expect(collected.first, isA<MultiRowCompletionResponse>());
+        final multiRowResponse = collected.first as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(2));
-        // get first row respose to use in later tests
+        // get first row response to use in later tests
         testActionTableRowId = multiRowResponse.rows[0].rowId;
       });
 
-      test('add rows to knowledge table', () async {
+      test('stream add rows to action table', () async {
         final request = MultiRowAddRequest(
-          tableId: testKnowledgeTableId,
+          tableId: testActionTableId,
           data: [
-            {
-              'content':
-                  'This is a test document about artificial intelligence.',
-            },
-            {
-              'content':
-                  'This is another test document about machine learning.',
-            },
+            {'input': 'Streaming test input 1'},
+            {'input': 'Streaming test input 2'},
           ],
-          stream: false, // Disable streaming for easier testing
+          stream: true, // Enable streaming
         );
 
-        final response = await jamai.generativeTable.addRows(
-          TableType.knowledge,
-          request,
-        );
+        final stream = jamai.generativeTable.addRows(TableType.action, request);
 
-        expect(response, isA<MultiRowCompletionResponse>());
-        final multiRowResponse = response as MultiRowCompletionResponse;
-        expect(multiRowResponse.rows.length, equals(2));
-
-        // Store row ID for later tests
+        // Validate that we receive at least one streaming event
+        bool sawEvent = false;
+        await for (final value in stream) {
+          sawEvent = true;
+          expect(
+            value,
+            anyOf(isA<CellCompletionResponse>(), isA<CellReferencesResponse>()),
+          );
+          if (value is CellCompletionResponse) {
+            expect(value.rowId, isNotNull);
+            expect(value.outputColumnName, equals('output'));
+            break;
+          }
+          if (value is CellReferencesResponse) {
+            expect(value.rowId, isNotNull);
+            expect(value.outputColumnName, equals('output'));
+            break;
+          }
+        }
+        expect(sawEvent, isTrue);
       });
 
       test('add rows to chat table', () async {
@@ -257,16 +266,54 @@ void main() {
           stream: false, // Disable streaming for easier testing
         );
 
-        final response = await jamai.generativeTable.addRows(
+        final responses = jamai.generativeTable.addRows(
           TableType.chat,
           request,
         );
 
-        expect(response, isA<MultiRowCompletionResponse>());
-        final multiRowResponse = response as MultiRowCompletionResponse;
+        final collected = await responses.toList();
+        expect(collected.length, equals(1));
+        expect(collected.first, isA<MultiRowCompletionResponse>());
+        final multiRowResponse = collected.first as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(2));
 
         // Store row ID for later tests
+      });
+
+      test('stream add rows to chat table', () async {
+        final request = MultiRowAddRequest(
+          tableId: testChatTableId,
+          data: [
+            {'user_message': 'Hello streaming!', 'assistant_message': ''},
+            {
+              'user_message': 'How does streaming work?',
+              'assistant_message': '',
+            },
+          ],
+          stream: true, // Enable streaming
+        );
+
+        final stream = jamai.generativeTable.addRows(TableType.chat, request);
+
+        bool sawEvent = false;
+        await for (final value in stream) {
+          sawEvent = true;
+          expect(
+            value,
+            anyOf(isA<CellCompletionResponse>(), isA<CellReferencesResponse>()),
+          );
+          if (value is CellCompletionResponse) {
+            expect(value.rowId, isNotNull);
+            expect(value.outputColumnName, equals('ai_message'));
+            break;
+          }
+          if (value is CellReferencesResponse) {
+            expect(value.rowId, isNotNull);
+            expect(value.outputColumnName, equals('ai_message'));
+            break;
+          }
+        }
+        expect(sawEvent, isTrue);
       });
 
       test('update single row', () async {
@@ -283,7 +330,7 @@ void main() {
           request,
         );
 
-        expect(response, isA<Map<String, dynamic>>());
+        expect(response.ok, isTrue);
       });
 
       test('update multiple rows', () async {
@@ -310,14 +357,71 @@ void main() {
           stream: false, // Disable streaming for easier testing
         );
 
-        final response = await jamai.generativeTable.regenRows(
+        final responses = jamai.generativeTable.regenRows(
           TableType.action,
           request,
         );
 
-        expect(response, isA<MultiRowCompletionResponse>());
-        final multiRowResponse = response as MultiRowCompletionResponse;
+        final collected = await responses.toList();
+        expect(collected.length, equals(1));
+        expect(collected.first, isA<MultiRowCompletionResponse>());
+        final multiRowResponse = collected.first as MultiRowCompletionResponse;
         expect(multiRowResponse.rows.length, equals(1));
+      });
+
+      test('stream regenerate rows in action table', () async {
+        // First add a row to regenerate
+        final addRequest = MultiRowAddRequest(
+          tableId: testActionTableId,
+          data: [
+            {'input': 'Row to regenerate with streaming'},
+          ],
+          stream: false, // Use non-streaming for initial add
+        );
+
+        final addResponse = jamai.generativeTable.addRows(
+          TableType.action,
+          addRequest,
+        );
+
+        final addRowReponses = await addResponse.toList();
+        expect(addRowReponses[0], isA<MultiRowCompletionResponse>());
+        final multiRowResponse =
+            addRowReponses[0] as MultiRowCompletionResponse;
+        final rowId = multiRowResponse.rows[0].rowId;
+
+        // Now regenerate with streaming
+        final regenRequest = MultiRowRegenRequest(
+          tableId: testActionTableId,
+          rowIds: [rowId],
+          regenStrategy: RegenStrategy.runAll,
+          stream: true, // Enable streaming
+        );
+
+        final stream = jamai.generativeTable.regenRows(
+          TableType.action,
+          regenRequest,
+        );
+
+        bool sawEvent = false;
+        await for (final value in stream) {
+          sawEvent = true;
+          expect(
+            value,
+            anyOf(isA<CellCompletionResponse>(), isA<CellReferencesResponse>()),
+          );
+          if (value is CellCompletionResponse) {
+            expect(value.rowId, equals(rowId));
+            expect(value.outputColumnName, equals('output'));
+            break;
+          }
+          if (value is CellReferencesResponse) {
+            expect(value.rowId, equals(rowId));
+            expect(value.outputColumnName, equals('output'));
+            break;
+          }
+        }
+        expect(sawEvent, isTrue);
       });
 
       test('delete rows', () async {
@@ -428,17 +532,19 @@ void main() {
       );
       test('import table data', () async {
         final request = TableDataImportRequest(
-          filePath:
-              '/home/jep/jamai_sdk/test/table_data_import_test.csv', // This file would need to exist
+          filePath: '/home/jep/jamai_sdk/test/table_data_import_test.csv',
           tableId: 'tester',
-          stream: false, // Disable streaming for easier testing
+          stream: false,
         );
 
-        final response = await importTestClient.generativeTable.importData(
+        final responses = importTestClient.generativeTable.importData(
           TableType.action,
           request,
         );
-        expect(response, isA<MultiRowCompletionResponse>());
+
+        final collected = await responses.toList();
+        expect(collected.length, equals(1));
+        expect(collected.first, isA<MultiRowCompletionResponse>());
       });
 
       test('import table', () async {
@@ -462,6 +568,8 @@ void main() {
           tableId: response.id,
         );
       });
+
+      ;
     });
 
     group('File Embedding', () {

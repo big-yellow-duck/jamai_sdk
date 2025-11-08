@@ -160,7 +160,7 @@ class Conversations {
     );
 
     if (response.statusCode == 200) {
-      return Page.fromJson(response.body)
+      return Page.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to list conversations: ${response.statusCode} - ${response.body}',

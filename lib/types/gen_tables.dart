@@ -1,7 +1,6 @@
-import 'dart:io';
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:jamai_sdk/types/common.dart';
 import 'package:jamai_sdk/types/lm.dart';
-import 'package:dart_mappable/dart_mappable.dart';
 
 part 'gen_tables.mapper.dart';
 
@@ -102,29 +101,6 @@ sealed class AddTableRowsResponse {
   const AddTableRowsResponse();
 }
 
-/// Stream wrapper for union of CellReferencesResponse and CellCompletionResponse
-/// Represents AsyncGenerator[CellReferencesResponse | CellCompletionResponse, None] from Python
-class AddTableRowsResponseGenerator implements AddTableRowsResponse {
-  final Stream<AddTableRowsStreamItem> stream;
-
-  const AddTableRowsResponseGenerator({required this.stream});
-}
-
-/// Stream wrapper for CellReferencesResponse
-/// Represents AsyncGenerator[CellReferencesResponse, None] from Python
-class CellReferencesResponseGenerator implements AddTableRowsResponse {
-  final Stream<CellReferencesResponse> stream;
-
-  const CellReferencesResponseGenerator({required this.stream});
-}
-
-/// Stream wrapper for CellCompletionResponse
-/// Represents AsyncGenerator[CellCompletionResponse, None] from Python
-class CellCompletionResponseGenerator implements AddTableRowsResponse {
-  final Stream<CellCompletionResponse> stream;
-
-  const CellCompletionResponseGenerator({required this.stream});
-}
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)
 class CellCompletionResponse extends ChatCompletionChunkResponse

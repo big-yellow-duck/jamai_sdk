@@ -25,6 +25,9 @@ enum JSONRPCErrorCode {
 
   final int code;
   const JSONRPCErrorCode(this.code);
+
+  factory JSONRPCErrorCode.fromValue(int value) =>
+      JSONRPCErrorCodeMapper.fromValue(value);
 }
 
 /// Type aliases
@@ -40,6 +43,8 @@ enum MCPRole {
 
   final String value;
   const MCPRole(this.value);
+
+  factory MCPRole.fromValue(String value) => MCPRoleMapper.fromValue(value);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)

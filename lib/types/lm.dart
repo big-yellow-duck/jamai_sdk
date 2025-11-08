@@ -38,6 +38,8 @@ enum ObjectType {
 
   @override
   String toString() => value;
+
+  factory ObjectType.fromValue(String value) => ObjectTypeMapper.fromValue(value);
 }
 
 /// Enum for content types
@@ -53,6 +55,8 @@ enum ContentType {
 
   @override
   String toString() => value;
+
+  factory ContentType.fromValue(String value) => ContentTypeMapper.fromValue(value);
 }
 
 /// Enum for tool types
@@ -67,6 +71,8 @@ enum ToolType {
 
   @override
   String toString() => value;
+
+  factory ToolType.fromValue(String value) => ToolTypeMapper.fromValue(value);
 }
 
 /// Enum for embedding types
@@ -80,6 +86,8 @@ enum EmbeddingType {
 
   @override
   String toString() => value;
+
+  factory EmbeddingType.fromValue(String value) => EmbeddingTypeMapper.fromValue(value);
 }
 
 /// Enum for encoding formats
@@ -94,6 +102,8 @@ enum EncodingFormat {
 
   @override
   String toString() => value;
+
+  factory EncodingFormat.fromValue(String value) => EncodingFormatMapper.fromValue(value);
 }
 
 /// Enum for audio formats
@@ -107,6 +117,8 @@ enum AudioFormat {
 
   @override
   String toString() => value;
+
+  factory AudioFormat.fromValue(String value) => AudioFormatMapper.fromValue(value);
 }
 
 /// Enum for reasoning effort levels
@@ -123,6 +135,8 @@ enum ReasoningEffort {
 
   @override
   String toString() => value;
+
+  factory ReasoningEffort.fromValue(String value) => ReasoningEffortMapper.fromValue(value);
 }
 
 /// Enum for reasoning summary types
@@ -137,6 +151,8 @@ enum ReasoningSummary {
 
   @override
   String toString() => value;
+
+  factory ReasoningSummary.fromValue(String value) => ReasoningSummaryMapper.fromValue(value);
 }
 
 /// Enum for finish reasons
@@ -153,6 +169,8 @@ enum FinishReason {
 
   @override
   String toString() => value;
+
+  factory FinishReason.fromValue(String value) => FinishReasonMapper.fromValue(value);
 }
 
 /// Enum for tool choice types
@@ -168,6 +186,8 @@ enum ToolChoiceType {
 
   @override
   String toString() => value;
+
+  factory ToolChoiceType.fromValue(String value) => ToolChoiceTypeMapper.fromValue(value);
 }
 
 /// Chunk class for storing text and metadata
@@ -1215,6 +1235,8 @@ enum ChatRole {
 
   @override
   String toString() => value;
+
+  factory ChatRole.fromValue(String value) => ChatRoleMapper.fromValue(value);
 }
 
 sealed class ChatEntryContent {

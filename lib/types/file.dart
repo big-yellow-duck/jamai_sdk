@@ -14,6 +14,9 @@ enum FileObjectType {
 
   @override
   String toString() => value;
+
+  factory FileObjectType.fromValue(String value) =>
+      FileObjectTypeMapper.fromValue(value);
 }
 
 @MappableClass(caseStyle: CaseStyle.snakeCase)

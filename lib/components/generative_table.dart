@@ -1,3 +1,4 @@
+import 'package:jamai_sdk/types/lm.dart';
 import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
@@ -255,51 +256,112 @@ class GenerativeTable {
   /// - [CellReferencesResponse] - for streaming cell references events
   ///
   /// Throws an [Exception] if the request fails.
-  Future<AddTableRowsResponse> addRows(
+  Stream<AddTableRowsResponse> addRows(
     TableType tableType,
     MultiRowAddRequest request,
-  ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/add');
+  ) async* {
+    final client = http.Client(); // 1. Create the client
+    try {
+      final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/add');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
+      };
 
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $apiKey',
-      if (userId != null) 'X-USER-ID': userId!,
-      if (projectId != null) 'X-PROJECT-ID': projectId!,
-    };
+      // 2. Prepare the Request object
+      final httpRequest = http.Request('POST', url)
+        ..headers.addAll(headers)
+        ..body = request.toJson();
 
-    // Add streaming-specific headers if requested
-    if (request.stream) {
-      headers['Accept'] = 'text/event-stream';
-      headers['Cache-Control'] = 'no-cache';
-    }
+      if (request.stream) {
+        headers['Accept'] = 'text/event-stream';
+        headers['Cache-Control'] = 'no-cache';
 
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: request.toJson(),
-    );
+        // 3. Send the request and get the StreamedResponse
+        final streamedResponse = await client.send(httpRequest);
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
+        if (streamedResponse.statusCode != 200) {
+          // Read body for error message (not ideal, but required for client.send error handling)
+          final errorBody = await streamedResponse.stream.bytesToString();
+          throw Exception(
+            'Failed to add rows: ${streamedResponse.statusCode} - $errorBody',
+          );
+        }
 
-      // Determine the response type based on the 'object' field (discriminator)
-      final objectType = responseData['object'] as String?;
+        // 4. Process the stream as data arrives
+        // This uses a robust SSE-style parser to handle chunks and line breaks
+        await for (final sseEvent in _parseSseStream(streamedResponse.stream)) {
+          if (sseEvent == '[DONE]') break;
+          if (sseEvent.isEmpty) continue;
 
-      switch (objectType) {
-        case 'gen_table.completion.rows':
-          return MultiRowCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_completion':
-          return CellCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_references':
-          return CellReferencesResponse.fromMap(responseData);
-        default:
-          throw Exception('Unknown response type: $objectType');
+          try {
+            final responseData = json.decode(sseEvent) as Map<String, dynamic>;
+            final ObjectType objectType = ObjectType.fromValue(
+              responseData['object'],
+            );
+
+            switch (objectType) {
+              case ObjectType.completionChunk:
+                yield CellCompletionResponse.fromMap(responseData);
+                break;
+              case ObjectType.genTableReferences:
+                yield CellReferencesResponse.fromMap(responseData);
+                break;
+              default:
+                print('Stream object type is not matched: $objectType');
+            }
+          } catch (e) {
+            // Skip invalid JSON lines
+            print('Error decoding JSON chunk: $e');
+          }
+        }
+      } else {
+        // 5. Handle non-streaming (single response)
+        final response = await http.Response.fromStream(
+          await client.send(httpRequest),
+        );
+
+        if (response.statusCode != 200) {
+          throw Exception(
+            'Failed to add rows: ${response.statusCode} - ${response.body}',
+          );
+        }
+
+        final responseData = json.decode(response.body) as Map<String, dynamic>;
+        final objectType = responseData['object'] as String?;
+
+        switch (objectType) {
+          // ... (Your original non-streaming switch cases) ...
+          case 'gen_table.completion.rows':
+            yield MultiRowCompletionResponse.fromMap(responseData);
+            break;
+          default:
+            throw Exception('Unknown response type: $objectType');
+        }
       }
-    } else {
-      throw Exception(
-        'Failed to add rows: ${response.statusCode} - ${response.body}',
-      );
+    } finally {
+      client.close(); // 6. IMPORTANT: Always close the client!
+    }
+  }
+
+  // 7. Simple SSE Line Parser
+  // This handles decoding bytes and buffering partial lines for 'data: ...'
+  Stream<String> _parseSseStream(http.ByteStream byteStream) async* {
+    var buffer = '';
+    await for (final chunk in byteStream.transform(utf8.decoder)) {
+      buffer += chunk;
+      var lineEnd = buffer.indexOf('\n');
+      while (lineEnd >= 0) {
+        final line = buffer.substring(0, lineEnd).trim();
+        buffer = buffer.substring(lineEnd + 1);
+        lineEnd = buffer.indexOf('\n');
+
+        if (line.startsWith('data: ')) {
+          yield line.substring(6).trim(); // Yield the data payload
+        }
+      }
     }
   }
 
@@ -310,14 +372,12 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<Map<String, dynamic>> updateRow(
+  Future<OkResponse> updateRow(
     TableType tableType,
     RowUpdateRequest request,
   ) async {
     final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows');
 
-    print('Update Row Request:');
-    print(request.toJson());
     final response = await http.patch(
       url,
       headers: {
@@ -330,7 +390,7 @@ class GenerativeTable {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      return OkResponse.fromJson(response.body);
     } else {
       throw Exception(
         'Failed to update row: ${response.statusCode} - ${response.body}',
@@ -411,43 +471,94 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<AddTableRowsResponse> regenRows(
+  Stream<AddTableRowsResponse> regenRows(
     TableType tableType,
     MultiRowRegenRequest request,
-  ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/regen');
+  ) async* {
+    final client = http.Client(); // 1. Create the client
+    try {
+      final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/rows/regen');
 
-    final response = await http.post(
-      url,
-      headers: {
+      final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
         if (userId != null) 'X-USER-ID': userId!,
         if (projectId != null) 'X-PROJECT-ID': projectId!,
-      },
-      body: request.toJson(),
-    );
+      };
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      // 2. Prepare the Request object
+      final httpRequest = http.Request('POST', url)
+        ..headers.addAll(headers)
+        ..body = request.toJson();
 
-      // Determine the response type based on the 'object' field (discriminator)
-      final objectType = responseData['object'] as String?;
+      if (request.stream) {
+        headers['Accept'] = 'text/event-stream';
+        headers['Cache-Control'] = 'no-cache';
 
-      switch (objectType) {
-        case 'gen_table.completion.rows':
-          return MultiRowCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_completion':
-          return CellCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_references':
-          return CellReferencesResponse.fromMap(responseData);
-        default:
-          throw Exception('Unknown response type: $objectType');
+        // 3. Send the request and get the StreamedResponse
+        final streamedResponse = await client.send(httpRequest);
+
+        if (streamedResponse.statusCode != 200) {
+          // Read body for error message (not ideal, but required for client.send error handling)
+          final errorBody = await streamedResponse.stream.bytesToString();
+          throw Exception(
+            'Failed to add rows: ${streamedResponse.statusCode} - $errorBody',
+          );
+        }
+
+        // 4. Process the stream as data arrives
+        // This uses a robust SSE-style parser to handle chunks and line breaks
+        await for (final sseEvent in _parseSseStream(streamedResponse.stream)) {
+          if (sseEvent == '[DONE]') break;
+          if (sseEvent.isEmpty) continue;
+
+          try {
+            final responseData = json.decode(sseEvent) as Map<String, dynamic>;
+            final ObjectType objectType = ObjectType.fromValue(
+              responseData['object'],
+            );
+
+            switch (objectType) {
+              case ObjectType.completionChunk:
+                yield CellCompletionResponse.fromMap(responseData);
+                break;
+              case ObjectType.genTableReferences:
+                yield CellReferencesResponse.fromMap(responseData);
+                break;
+              default:
+                print('Stream object type is not matched: $objectType');
+            }
+          } catch (e) {
+            // Skip invalid JSON lines
+            print('Error decoding JSON chunk: $e');
+          }
+        }
+      } else {
+        // 5. Handle non-streaming (single response)
+        final response = await http.Response.fromStream(
+          await client.send(httpRequest),
+        );
+
+        if (response.statusCode != 200) {
+          throw Exception(
+            'Failed to add rows: ${response.statusCode} - ${response.body}',
+          );
+        }
+
+        final responseData = json.decode(response.body) as Map<String, dynamic>;
+        final objectType = responseData['object'] as String?;
+
+        switch (objectType) {
+          // ... (Your original non-streaming switch cases) ...
+          case 'gen_table.completion.rows':
+            yield MultiRowCompletionResponse.fromMap(responseData);
+            break;
+          default:
+            throw Exception('Unknown response type: $objectType');
+        }
       }
-    } else {
-      throw Exception(
-        'Failed to add rows: ${response.statusCode} - ${response.body}',
-      );
+    } finally {
+      client.close(); // 6. IMPORTANT: Always close the client!
     }
   }
 
@@ -492,56 +603,105 @@ class GenerativeTable {
   /// Returns a [Map<String, dynamic>] containing the response
   ///
   /// Throws an [Exception] if the request fails.
-  Future<AddTableRowsResponse> importData(
+  Stream<AddTableRowsResponse> importData(
     TableType tableType,
     TableDataImportRequest request,
-  ) async {
-    final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/import_data');
+  ) async* {
+    final client = http.Client();
+    try {
+      final url = Uri.parse('$apiUrl/api/v2/gen_tables/$tableType/import_data');
 
-    final headers = {
-      'Authorization': 'Bearer $apiKey',
-      if (userId != null) 'X-USER-ID': userId!,
-      if (projectId != null) 'X-PROJECT-ID': projectId!,
-    };
+      // Base headers (no Content-Type here, MultipartRequest sets it)
+      final headers = {
+        'Authorization': 'Bearer $apiKey',
+        if (userId != null) 'X-USER-ID': userId!,
+        if (projectId != null) 'X-PROJECT-ID': projectId!,
+      };
 
-    http.Response response;
-    List<int> fileBytes = File(request.filePath).readAsBytesSync();
+      // Read file bytes from local path
+      final fileBytes = File(request.filePath).readAsBytesSync();
+      final filename = p.basename(request.filePath);
 
-    String filename = p.basename(request.filePath);
-    // Check if we need to do a file upload (multipart form)
-    // Create multipart request for file upload
-    final multipartRequest = http.MultipartRequest('POST', url)
-      ..headers.addAll(headers)
-      ..files.add(
-        http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
-      )
-      ..fields['table_id'] = request.tableId
-      ..fields['stream'] = request.stream.toString()
-      ..fields['delimiter'] = request.delimiter.value;
+      // Create multipart request
+      final multipartRequest = http.MultipartRequest('POST', url)
+        ..headers.addAll(headers)
+        ..files.add(
+          http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
+        )
+        ..fields['table_id'] = request.tableId
+        ..fields['delimiter'] = request.delimiter.value;
 
-    final streamedResponse = await multipartRequest.send();
-    response = await http.Response.fromStream(streamedResponse);
+      if (request.stream) {
+        // Configure for streaming SSE
+        multipartRequest.headers['Accept'] = 'text/event-stream';
+        multipartRequest.headers['Cache-Control'] = 'no-cache';
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
+        final streamedResponse = await client.send(multipartRequest);
 
-      // Determine the response type based on the 'object' field (discriminator)
-      final objectType = responseData['object'] as String?;
+        if (streamedResponse.statusCode != 200) {
+          final errorBody = await streamedResponse.stream.bytesToString();
+          throw Exception(
+            'Failed to import data: ${streamedResponse.statusCode} - $errorBody',
+          );
+        }
 
-      switch (objectType) {
-        case 'gen_table.completion.rows':
-          return MultiRowCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_completion':
-          return CellCompletionResponse.fromMap(responseData);
-        case 'gen_table.cell_references':
-          return CellReferencesResponse.fromMap(responseData);
-        default:
-          throw Exception('Unknown response type: $objectType');
+        // Parse SSE-style stream
+        await for (final sseEvent in _parseSseStream(streamedResponse.stream)) {
+          // Normalize: handle possible "data: ...", blank lines, and [DONE]
+          final normalized = sseEvent.startsWith('data: ')
+              ? sseEvent.substring(6).trim()
+              : sseEvent.trim();
+
+          if (normalized.isEmpty) continue;
+          if (normalized == '[DONE]') break;
+
+          try {
+            final responseData =
+                json.decode(normalized) as Map<String, dynamic>;
+            final ObjectType objectType = ObjectType.fromValue(
+              responseData['object'],
+            );
+
+            switch (objectType) {
+              case ObjectType.completionChunk:
+                yield CellCompletionResponse.fromMap(responseData);
+                break;
+              case ObjectType.genTableReferences:
+                yield CellReferencesResponse.fromMap(responseData);
+                break;
+              default:
+                // Unknown chunk type, ignore but log for debugging
+                print('Stream object type is not matched: $objectType');
+            }
+          } catch (e) {
+            // Skip invalid JSON lines
+            print('Error decoding JSON chunk: $e');
+          }
+        }
+      } else {
+        // Non-streaming: send multipart and parse single JSON response
+        final streamedResponse = await client.send(multipartRequest);
+        final response = await http.Response.fromStream(streamedResponse);
+
+        if (response.statusCode != 200) {
+          throw Exception(
+            'Failed to import data: ${response.statusCode} - ${response.body}',
+          );
+        }
+        print(response.body);
+        final responseData = json.decode(response.body) as Map<String, dynamic>;
+        final objectType = responseData['object'] as String?;
+
+        switch (objectType) {
+          case 'gen_table.completion.rows':
+            yield MultiRowCompletionResponse.fromMap(responseData);
+            break;
+          default:
+            throw Exception('Unknown response type: $objectType');
+        }
       }
-    } else {
-      throw Exception(
-        'Failed to add rows: ${response.statusCode} - ${response.body}',
-      );
+    } finally {
+      client.close();
     }
   }
 
